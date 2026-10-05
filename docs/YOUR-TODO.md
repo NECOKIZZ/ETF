@@ -5,7 +5,7 @@ Deadline: **Sun 11 Oct 2026, 12:00 UTC**. Submit form: https://forms.gle/yToDUza
 ## Now (Mon–Wed)
 - [ ] **Look at the app** in Cloud Shell (commands below). Pages: `/` `/league` `/create` `/me` `/leaderboard` `/rules` `/agents` `/round/1` `/ui`. Tell Claude what to change.
 - [ ] **Make the GitHub repo public** (needed for the agent skill install `npx skills add NECOKIZZ/ETF/skills/league-of-stocks`, and for judging).
-- [ ] (1 min) Live check of "Buy the ETF" in Cloud Shell, paste the output to Claude. This answers where Binance puts the approval step:
+- [x] (1 min) Live check of "Buy the ETF" in Cloud Shell (done 5 Oct: approval found in `tx.signatureData`):
   ```
   cd ~/ETF && npx pnpm buy-plan 20 --raw
   ```

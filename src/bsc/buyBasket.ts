@@ -28,9 +28,32 @@ export interface BuyLegPlan {
 }
 
 /**
- * Binance's docs don't say where `approveTransaction=true` puts the approval
- * (docs/dx-notes.md), so look for any {to, data} object under an "approve" key.
+ * With `approveTransaction=true`, Binance puts the approval inside
+ * `tx.signatureData`: an array of JSON *strings*, e.g.
+ * '{"approveContract":"0xB444…", …}' (seen live on 5 Oct; undocumented, see
+ * docs/dx-notes.md). Returns the spender, and approve calldata if present.
  */
+export function approvalFromSignatureData(swap: Record<string, unknown>): { spender: string | null; data: string | null } {
+  const sd = (swap.tx as { signatureData?: unknown } | undefined)?.signatureData;
+  for (const item of Array.isArray(sd) ? sd : []) {
+    let o: unknown = item;
+    if (typeof item === "string") {
+      try {
+        o = JSON.parse(item);
+      } catch {
+        continue;
+      }
+    }
+    if (!o || typeof o !== "object") continue;
+    const rec = o as Record<string, unknown>;
+    const spender = typeof rec.approveContract === "string" ? rec.approveContract : null;
+    const data = Object.values(rec).find((v): v is string => typeof v === "string" && /^0x095ea7b3/i.test(v)) ?? null;
+    if (spender || data) return { spender: spender ?? (data ? spenderOfApprove(data) : null), data };
+  }
+  return { spender: null, data: null };
+}
+
+/** Fallback: any {to, data} object under an "approve…" key. */
 export function findApproveTx(swap: Record<string, unknown>): { to: string; data: string } | null {
   for (const [k, v] of Object.entries(swap)) {
     if (!/approv/i.test(k) || !v || typeof v !== "object") continue;
@@ -93,8 +116,9 @@ export async function planBasketBuy(
       const best = routes[0];
       if (!best) throw new Error("no route");
       const swap = await api.buildSwap(req, best.quoteId);
-      const approveTx = findApproveTx(swap);
-      const spender = (approveTx && spenderOfApprove(approveTx.data)) ?? best.approveTarget ?? swap.tx?.to ?? null;
+      const fromSig = approvalFromSignatureData(swap);
+      const approveTx = findApproveTx(swap) ?? (fromSig.data ? { to: req.fromTokenAddress, data: fromSig.data } : null);
+      const spender = fromSig.spender ?? (approveTx && spenderOfApprove(approveTx.data)) ?? best.approveTarget ?? swap.tx?.to ?? null;
       out.push({ ...base, expectedOut: best.toTokenAmount, vendor: best.vendorName, mode: swap.executionMode, tx: swap.tx ?? null, rfq: swap.rfq ?? null, spender, approveTx });
     } catch (e) {
       out.push({ ...base, error: e instanceof Error ? e.message : String(e) });

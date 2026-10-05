@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { decodeFunctionData, type Address } from "viem";
 import { planLock, planBack, normaliseWeights, buyPlanSteps, bawCommand } from "../src/league/actions";
-import { findApproveTx, spenderOfApprove } from "../src/bsc/buyBasket";
+import { findApproveTx, spenderOfApprove, approvalFromSignatureData } from "../src/bsc/buyBasket";
 import { leagueEscrowAbi, erc20Abi } from "../src/league/escrow";
 import { teamKeyFromWeights } from "../src/bsc/basket";
 
@@ -52,6 +52,12 @@ describe("buy plan → steps", () => {
     const swap = { tx: { to: A(0xb0b) }, approveTransaction: { to: USDT, data: approveData(A(0xa11)) } };
     expect(findApproveTx(swap)).toEqual({ to: USDT, data: approveData(A(0xa11)) });
     expect(spenderOfApprove(approveData(A(0xa11)))).toBe(A(0xa11));
+  });
+  it("reads the spender from tx.signatureData (the live response shape)", () => {
+    const router = "0xB44446b0c8E56988c34f7Ff73Ae904982b5FdDA5";
+    const swap = { executionMode: "SWAP", tx: { to: router, data: "0xad43f73d", signatureData: [JSON.stringify({ approveContract: router })] } };
+    expect(approvalFromSignatureData(swap)).toEqual({ spender: router, data: null });
+    expect(approvalFromSignatureData({ tx: { signatureData: ["not json"] } })).toEqual({ spender: null, data: null });
   });
   it("approves each spender once for the sum of its legs, then swaps; RFQ legs are reported", () => {
     const leg = (token: Address, amountIn: string, mode = "SWAP") => ({ token, amountIn, mode, tx: { to: A(0xb0b), data: "0x12", value: "0" }, spender: A(0xa11), error: null });
