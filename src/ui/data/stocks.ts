@@ -80,8 +80,13 @@ const RAW: Raw[] = [
   s("DRAMB", "DRAM", "Memory ETF", 61.63, "0x93862d63fd9fd488b1328e9b47717d75e994a84b", "#2B2D42", "light", "etf"),
 ];
 
-/** Tickers with a logo saved in public/logos/<TICKER>.png. */
-export const LOGOS = new Set<string>([]);
+/** Tickers with a logo saved in public/logos/<TICKER>.png (Binance's bStock logos). */
+export const LOGOS = new Set<string>([
+  "AAOI", "AMD", "ARM", "AVGO", "AXTI", "BABA", "CBRS", "COIN", "CRCL", "CRWV",
+  "DRAM", "EWY", "GLW", "GOOGL", "HOOD", "IBM", "INTC", "LITE", "META", "MRVL",
+  "MSFT", "MSTR", "MU", "NBIS", "NOK", "NVDA", "ORCL", "PLTR", "QCOM", "QNT",
+  "QQQ", "RKLB", "SKHY", "SNDK", "SPCX", "SPY", "TSLA", "TSM", "WDC",
+]);
 
 const COLORS = assignColors(RAW.map((r) => ({ key: r.ticker, brand: r.brand })));
 

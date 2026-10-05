@@ -24,3 +24,13 @@ describe("card colours", () => {
     expect(lab[0]).toBeCloseTo(0.6, 2);
   });
 });
+
+describe("logos", () => {
+  it("every league stock has a saved logo", async () => {
+    const { existsSync } = await import("node:fs");
+    for (const s of BSTOCKS) {
+      expect(s.logo, s.ticker).toBe(`/logos/${s.ticker}.png`);
+      expect(existsSync(`public${s.logo}`), s.ticker).toBe(true);
+    }
+  });
+});
