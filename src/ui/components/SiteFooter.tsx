@@ -1,10 +1,10 @@
 import { LogoMark } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
-const cols = [
-  { title: "Play", links: ["League", "Create an ETF", "Leaderboard", "Rules"] },
-  { title: "Build", links: ["Agents", "API", "Contracts", "Verify a round"] },
-  { title: "About", links: ["How it works", "BNB Hack", "GitHub", "Risk notice"] },
+const cols: { title: string; links: [string, string][] }[] = [
+  { title: "Play", links: [["League", "/league"], ["Create an ETF", "/create"], ["Leaderboard", "/leaderboard"], ["My entries", "/me"]] },
+  { title: "Build", links: [["Agents", "/agents"], ["API", "/agents#api"], ["Contracts", "/rules#contracts"], ["Verify a round", "/rules#verify"]] },
+  { title: "About", links: [["How it works", "/#how"], ["Rules", "/rules"], ["GitHub", "https://github.com/NECOKIZZ/ETF"], ["Risk notice", "/rules#risk"]] },
 ];
 
 /** Line-art candle range: a quiet nod to Gloam's engraved landscape. */
@@ -45,8 +45,12 @@ export function SiteFooter() {
               <div className="t-label text-white/60">{c.title}</div>
               <div className="mt-2 h-px w-6 bg-white/30" />
               <ul className="mt-5 space-y-3 text-[15px] text-white/85">
-                {c.links.map((l) => (
-                  <li key={l}>{l}</li>
+                {c.links.map(([l, href]) => (
+                  <li key={l}>
+                    <a href={href} className="transition hover:text-white">
+                      {l}
+                    </a>
+                  </li>
                 ))}
               </ul>
             </div>

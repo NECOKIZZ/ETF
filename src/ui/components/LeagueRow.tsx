@@ -1,5 +1,6 @@
 // One ETF in the league table: rank, hand, name, return, team, odds, Back.
 
+import Link from "next/link";
 import { EtfChips, type Holding } from "./EtfHand";
 import { Change } from "./Pills";
 
@@ -10,13 +11,15 @@ export interface LeagueEntry {
   holdings: Holding[];
   returnPct: number;
   team: number;
-  /** Estimated payout per $5 ticket if this ETF wins. */
-  ifWins: number;
+  /** Profit per $5 ticket if the round ended now (null: this ETF is losing now). */
+  ifWins: number | null;
+  href?: string;
 }
 
 export function LeagueRow({ e, winning }: { e: LeagueEntry; winning: boolean }) {
+  const Row = e.href ? Link : "div";
   return (
-    <div className={`grid grid-cols-[28px_auto_1fr_auto] items-center gap-4 rounded-[20px] px-4 py-3 md:grid-cols-[32px_auto_1fr_110px_90px_130px_auto] md:gap-6 ${winning ? "bg-up-bg/50" : ""}`}>
+    <Row href={e.href ?? ""} className={`grid transition hover:bg-surface grid-cols-[28px_auto_1fr_auto] items-center gap-4 rounded-[20px] px-4 py-3 md:grid-cols-[32px_auto_1fr_110px_90px_130px_auto] md:gap-6 ${winning ? "bg-up-bg/50" : ""}`}>
       <span className="t-num text-[15px] text-muted">{e.rank}</span>
       <EtfChips holdings={e.holdings} />
       <div className="min-w-0">
@@ -28,17 +31,22 @@ export function LeagueRow({ e, winning }: { e: LeagueEntry; winning: boolean }) 
         <span className="t-num text-ink">{e.team}</span> on team
       </span>
       <span className="hidden text-[13px] text-muted md:block">
-        if it wins <span className="t-num text-ink">+${e.ifWins.toFixed(2)}</span>
+        {e.ifWins !== null ? (
+          <>
+            ticket now <span className="t-num text-ink">+${e.ifWins.toFixed(2)}</span>
+          </>
+        ) : (
+          "below the cut"
+        )}
       </span>
-      <button type="button" className="hidden h-9 rounded-full border border-line px-4 text-[13px] font-medium hover:bg-surface md:inline-flex md:items-center">
-        Back
-      </button>
-    </div>
+      <span className="hidden h-9 rounded-full border border-line px-4 text-[13px] font-medium md:inline-flex md:items-center">Back</span>
+    </Row>
   );
 }
 
-export function LeagueTable({ entries }: { entries: LeagueEntry[] }) {
-  const cut = Math.floor(entries.length / 2);
+/** `cutAfter`: rows above the winners' line (default: half). */
+export function LeagueTable({ entries, cutAfter }: { entries: LeagueEntry[]; cutAfter?: number }) {
+  const cut = cutAfter ?? Math.floor(entries.length / 2);
   return (
     <div className="flex flex-col gap-1">
       {entries.map((e, i) => (

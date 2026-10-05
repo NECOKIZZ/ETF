@@ -8,6 +8,7 @@ import { BSTOCKS, type StockInfo } from "../ui/data/stocks";
 import { chainFromEnv, clientsFromEnv, escrowFromEnv, rpcFromEnv } from "./chain";
 import { erc20Abi, leagueEscrowAbi, readEntries, readRound, readTeamMeta, type RoundInfo } from "./escrow";
 import { livePrices, loadRoundView } from "./live";
+import { FileStore } from "./store";
 import { DEFAULT_RULES, DRIFT_BPS } from "./settlement";
 import { basketWeightsBps } from "../engine/league";
 import { planBack, planClaim, planClaimBasket, planLock, buyPlanSteps, normaliseWeights, type TxStep } from "./actions";
@@ -32,17 +33,35 @@ export interface PublicStock {
   colorLight: string;
   price: number;
   trading: boolean | null;
+  /** Percent change since the current round's start price, when known. */
+  changePct: number | null;
+}
+
+/** Start prices of the latest round (token → USD), from the keeper's saved samples. */
+async function roundStartPrices(): Promise<Map<string, number>> {
+  try {
+    const { pub } = clientsFromEnv();
+    const id = await pub.readContract({ address: escrowFromEnv(), abi: leagueEscrowAbi, functionName: "roundCount" });
+    if (id === 0n) return new Map();
+    const samples = new FileStore().loadSamples(id, "start");
+    if (!samples.length) return new Map();
+    return new Map([...samples[0].sample.values()].map((p) => [p.token, Number(p.value) / 1e18]));
+  } catch {
+    return new Map();
+  }
 }
 
 /** League stocks with this chain's addresses (mock copies on the local demo chain). */
 export async function chainStocks(): Promise<{ source: string; stocks: PublicStock[] }> {
-  const live = await livePrices();
+  const [live, startPrices] = await Promise.all([livePrices(), roundStartPrices()]);
   const demo = isLocal() ? demoFile() : null;
   const list: { s: StockInfo; address: Address }[] = isLocal()
     ? BSTOCKS.filter((s) => demo?.tokens[s.ticker]).map((s) => ({ s, address: getAddress(demo!.tokens[s.ticker]) }))
     : BSTOCKS.map((s) => ({ s, address: getAddress(s.address) }));
   const stocks = list.map(({ s, address }) => {
     const p = live?.get(address.toLowerCase());
+    const price = p ? Number(p.value) / 1e18 : s.price;
+    const start = startPrices.get(address.toLowerCase());
     return {
       symbol: s.symbol,
       ticker: s.ticker,
@@ -52,8 +71,9 @@ export async function chainStocks(): Promise<{ source: string; stocks: PublicSto
       logo: s.logo ?? null,
       color: s.color,
       colorLight: s.colorLight,
-      price: p ? Number(p.value) / 1e18 : s.price,
+      price,
       trading: p ? p.trading : null,
+      changePct: start ? Math.round(((price - start) / start) * 10_000) / 100 : null,
     };
   });
   return { source: live ? "binance-live" : isLocal() ? "local-demo (snapshot prices)" : "snapshot-2026-10-05", stocks };
@@ -120,6 +140,8 @@ export async function loadMe(wallet: Address, lastRounds = 6) {
         basket = tokens.map((t, i) => ({ token: t, amount: amounts[i].toString() }));
       }
       const done = info.status === "Settled" || info.status === "Voided";
+      // What claim() pays: the payout once settled, the ticket back if voided.
+      const owed = info.status === "Voided" ? info.stake : info.status === "Settled" ? e.payout : 0n;
       return {
         roundId: id.toString(),
         status: info.status,
@@ -128,9 +150,9 @@ export async function loadMe(wallet: Address, lastRounds = 6) {
         teamName: meta.get(e.teamKey.toLowerCase())?.name ?? "",
         role: e.isCreator ? "creator" : "backer",
         stake: info.stake.toString(),
-        payout: e.payout.toString(),
+        payout: owed.toString(),
         claimed: e.claimed,
-        claimable: done && !e.claimed,
+        claimable: done && !e.claimed && (owed > 0n || e.isCreator),
         basket,
       };
     }),
@@ -291,4 +313,65 @@ export async function makePlan(req: PlanRequest): Promise<Plan> {
     case "claim-basket":
       return { action: "claim-basket", steps: planClaimBasket(escrow, BigInt(req.roundId)), notes: ["Only needed if a stock was paused when you claimed."] };
   }
+}
+
+// ---------------------------------------------------------------------------
+// Leaderboard: from the published settlement inputs of every settled round.
+// ---------------------------------------------------------------------------
+
+export interface CreatorRow { wallet: string; name: string; rounds: number; wins: number; bestReturnPct: number; teamTickets: number; won: string }
+export interface BackerRow { wallet: string; tickets: number; wins: number; net: string }
+
+export async function loadLeaderboard() {
+  const { pub } = clientsFromEnv();
+  const escrow = escrowFromEnv();
+  const count = Number(await pub.readContract({ address: escrow, abi: leagueEscrowAbi, functionName: "roundCount" }));
+  const store = new FileStore();
+  const creators = new Map<string, CreatorRow & { wonWei: bigint }>();
+  const backers = new Map<string, BackerRow & { netWei: bigint }>();
+  let settled = 0;
+  for (let id = 1; id <= count; id++) {
+    const inp = store.loadInputs(BigInt(id)) as null | {
+      stake: string;
+      entries: { wallet: string; teamKey: string; isCreator: boolean; payout: string; status: { kind: string; captain?: boolean } }[];
+      teams: { teamKey: string; captain: string; ret: string; members: number; isWinner: boolean }[];
+      result: { void: string | null };
+    };
+    if (!inp || inp.result.void) continue;
+    settled++;
+    const stake = BigInt(inp.stake);
+    const meta = await readTeamMeta(pub, escrow, BigInt(id), inp.teams.map((t) => t.teamKey as Hex));
+    for (const t of inp.teams) {
+      const k = t.captain.toLowerCase();
+      const row = creators.get(k) ?? { wallet: t.captain, name: "", rounds: 0, wins: 0, bestReturnPct: -Infinity, teamTickets: 0, won: "0", wonWei: 0n };
+      row.rounds++;
+      if (t.isWinner) row.wins++;
+      row.bestReturnPct = Math.max(row.bestReturnPct, Number(BigInt(t.ret)) / 1e10);
+      row.teamTickets += t.members;
+      row.name = meta.get(t.teamKey.toLowerCase())?.name || row.name;
+      const pay = BigInt(inp.entries.find((e) => e.wallet.toLowerCase() === k && e.status.captain)?.payout ?? "0");
+      row.wonWei += pay - stake;
+      creators.set(k, row);
+    }
+    for (const e of inp.entries) {
+      if (e.isCreator || e.status.kind !== "playing") continue;
+      const k = e.wallet.toLowerCase();
+      const row = backers.get(k) ?? { wallet: e.wallet, tickets: 0, wins: 0, net: "0", netWei: 0n };
+      row.tickets++;
+      const pay = BigInt(e.payout);
+      if (pay > stake) row.wins++;
+      row.netWei += pay - stake;
+      backers.set(k, row);
+    }
+  }
+  const usd = (w: bigint) => (Number(w / 10n ** 14n) / 1e4).toFixed(2);
+  return {
+    settledRounds: settled,
+    creators: [...creators.values()]
+      .map(({ wonWei, ...r }) => ({ ...r, won: usd(wonWei) }))
+      .sort((a, b) => b.wins - a.wins || Number(b.won) - Number(a.won)),
+    backers: [...backers.values()]
+      .map(({ netWei, ...r }) => ({ ...r, net: usd(netWei) }))
+      .sort((a, b) => Number(b.net) - Number(a.net)),
+  };
 }

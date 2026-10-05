@@ -145,3 +145,19 @@ describe("declared weights (enterCreatorNamed)", () => {
     expect(run(e, [100, 100, 100]).statuses[0]).toEqual({ kind: "refunded", reason: "team-key-mismatch" });
   });
 });
+
+describe("verifyInputs", () => {
+  it("re-derives a settlement from its published inputs, and catches tampering", async () => {
+    const { verifyInputs } = await import("../src/league/verify");
+    const [a, b, c, d] = [0, 1, 2, 3].map((k) => creator(k, k, TOKENS.slice(k * 2, k * 2 + 3), [5, 4, 3]));
+    const s = settleRound(round([a, b, c, d, backer(4, 10, a.teamKey)], { ...flat(100), [TOKENS[0]]: 110, [TOKENS[6]]: 95 }));
+    const published = JSON.parse(JSON.stringify(s.inputs));
+    expect(verifyInputs(published, s.inputsHash).ok).toBe(true);
+
+    const tampered = JSON.parse(JSON.stringify(s.inputs));
+    tampered.entries[2].payout = "123"; // claims a payout the maths doesn't give
+    const r = verifyInputs(tampered, s.inputsHash);
+    expect(r.ok).toBe(false);
+    expect(r.mismatches).toEqual([2]);
+  });
+});

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
-import { Button } from "./Button";
+import { ChainChip, ConnectButton } from "../../web/components/ConnectButton";
 
 const links = [
   { href: "/league", label: "League" },
@@ -12,6 +12,18 @@ const links = [
 
 export function AnnouncementBar({ children }: { children: React.ReactNode }) {
   return <div className="bg-brand-ink py-2.5 text-center text-[13px] text-brand-paper/80">{children}</div>;
+}
+
+function MobileNav() {
+  return (
+    <nav className="flex gap-5 overflow-x-auto px-4 pb-3 text-[14px] md:hidden">
+      {links.map((l) => (
+        <Link key={l.href} href={l.href} className="shrink-0 text-ink/80">
+          {l.label}
+        </Link>
+      ))}
+    </nav>
+  );
 }
 
 export function SiteHeader() {
@@ -29,12 +41,11 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <span className="hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-[13px] text-muted lg:inline-flex">
-            <span className="size-2 rounded-full bg-brand-mint" /> BNB Chain
-          </span>
-          <Button size="sm">Connect</Button>
+          <ChainChip />
+          <ConnectButton />
         </div>
       </div>
+      <MobileNav />
     </header>
   );
 }

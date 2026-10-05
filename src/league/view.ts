@@ -46,6 +46,8 @@ export interface RoundView {
   teams: TeamView[];
   refunded: number;
   priceSource: string;
+  /** Hash of the published settlement inputs (zero until settled). */
+  inputsHash: Hex;
 }
 
 export function buildRoundView(opts: {
@@ -120,5 +122,6 @@ export function buildRoundView(opts: {
     teams,
     refunded: s.statuses.filter((x) => x.kind === "refunded").length,
     priceSource: opts.priceSource,
+    inputsHash: info.inputsHash,
   };
 }
