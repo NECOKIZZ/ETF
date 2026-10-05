@@ -20,7 +20,8 @@
     "start": "next start",
     "preview": "next build && next start -p 8080",
     "dev:8080": "next dev -p 8080",
-    "keeper": "tsx --env-file-if-exists=.env.local scripts/keeper.mts"
+    "keeper": "tsx --env-file-if-exists=.env.local scripts/keeper.mts",
+    "buy-plan": "tsx --env-file=.env.local scripts/buy-plan.mts"
   },
   "dependencies": {
     "viem": "^2.55.8",

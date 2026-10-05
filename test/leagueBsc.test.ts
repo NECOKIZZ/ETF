@@ -115,3 +115,27 @@ describe("leveraged-fund ban", () => {
     expect(isLeveraged(t("SHV", "iShares Short Treasury Bond ETF"))).toBe(false);
   });
 });
+
+describe("buy the basket", () => {
+  it("quotes each leg with the creator as fee referrer and keeps going past a failed leg", async () => {
+    const { planBasketBuy } = await import("../src/bsc/buyBasket");
+    const seen: { to: string; amount: bigint; fee?: number; ref?: string }[] = [];
+    const api = {
+      quote: async (r: { toTokenAddress: string; amount: bigint; feePercent?: number; referrer?: string }) => {
+        seen.push({ to: r.toTokenAddress, amount: r.amount, fee: r.feePercent, ref: r.referrer });
+        if (r.toTokenAddress === AAPL) throw new Error("no liquidity");
+        return [{ quoteId: "q1", vendorName: "LiquidMesh", toTokenAmount: "42", executionMode: "SWAP" as const }];
+      },
+      buildSwap: async () => ({ executionMode: "SWAP" as const, tx: { from: "0xw", to: "0xrouter", data: "0x", value: "0" } }),
+    };
+    const plan = await planBasketBuy(
+      { tokens: [NVDA, TSLA, AAPL], weightsBps: [5000, 3000, 2000], usdtIn: 100n * 10n ** 18n, wallet: "0xw", creator: "0xcreator", creatorFeePct: 1 },
+      api as never,
+    );
+    expect(seen.map((s) => s.amount)).toEqual([50n * 10n ** 18n, 30n * 10n ** 18n, 20n * 10n ** 18n]);
+    expect(seen.every((s) => s.fee === 1 && s.ref === "0xcreator")).toBe(true);
+    expect(plan.legs[0].tx?.to).toBe("0xrouter");
+    expect(plan.legs[2].error).toBe("no liquidity");
+    expect(plan.ok).toBe(false);
+  });
+});
