@@ -54,6 +54,21 @@ Each entry: **what we tried → what happened → why it matters**. The technica
   - The list doesn't flag which funds are leveraged; you have to know the tickers. Any app that ranks or compares returns has to filter those out by hand.
 - _Technical detail:_ `platformId=bstock`, 46 tokens, `statusInfo.marketStatus` empty, `reasonCode` TRADING for all. `assetType` 3 (ETF) covers both plain index funds (SPY) and leveraged ones (TQQQ, SOXL), with no leverage field.
 
+### Mon 5 Oct: buying a stock with a creator fee works
+- **What we tried:** asked Binance for the price of buying $10 of NVIDIA (bStock) with USDT, once normally and once with a 1% fee paid to an ETF creator, then had it build the actual purchase transaction (not sent, no money moved).
+- **What happened:** all three steps worked first time, each in about 0.3 seconds. With the fee, the NVIDIA received dropped by exactly 1% (0.042485 → 0.042060). The fee feature is what our whole creator business model relies on, so this was the biggest risk and it's cleared.
+- **Why it matters / what could be better:**
+  - Only **one route** came back (LiquidMesh). For a $10 buy that's fine; for big buys a single source means more slippage risk.
+  - The docs warn that stock tokens may use a different "RFQ" style of trade that needs an extra signature, but this bStock trade was a normal swap. The docs don't say which stocks use which style or when, so we have to support both.
+  - The response had a field called `routerResult` that the docs don't describe.
+  - Gas limit came back as 450,000, high for a simple swap. Worth checking real cost on mainnet.
+- _Technical detail:_ `/aggregator/quote` 370 ms (no fee) and 268 ms (`feePercent=1.00`, `feeSource=FROM_TOKEN`); `/aggregator/swap` 326 ms with `fromTokenReferrerWalletAddress`, `executionMode=SWAP`, router `0xB44446b0c8E56988c34f7Ff73Ae904982b5FdDA5`. Implied price ≈ $235.38 vs listed `tokenPrice` $235.30 (~0.03% spread on $10). `minReceiveAmount` set ~2% below the quote by auto-slippage.
+
+### Mon 5 Oct: bStocks can be locked in our contract
+- **What we tried:** on a copy of BSC mainnet, moved real NVIDIA, Microsoft and Tesla bStocks plus USDT into our league contract and back out.
+- **What happened:** it worked. bStocks behave like normal tokens: no allowlist blocked a brand-new contract from holding them. This wasn't documented anywhere; we had to test it.
+- _Technical detail:_ Foundry fork test `contracts/test/LeagueEscrowFork.t.sol`. bStock contracts are small proxies (no standard EIP-1967 slot), so you can't easily read the token logic. The public BSC RPC refused log searches over ~2,000 blocks (`-32005 limit exceeded`).
+
 ## Sections the report asks for (fill in from the log on Saturday)
 
 ### Onboarding: time from reading the docs to the first successful call; what got in the way

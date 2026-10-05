@@ -69,7 +69,7 @@ What we take:
 
 ## 6. Open questions
 - **Eligibility:** the hackathon is closed to residents of the US, Canada, the Netherlands, the UK and Japan. Confirm every team member is outside these.
-- **Referral fee on stock tokens:** stock routes are RFQ. Check that the fee parameters are accepted there.
-- **bStocks transfer rules:** confirm bStocks can move into a contract (the escrow). If not, creators of bStock ETFs use a balance check instead of a lock.
+- ✅ **Referral fee on stock tokens:** works on bStocks (NVDAB, SWAP route via LiquidMesh): 1% fee came off exactly. Still to see: an RFQ-mode route.
+- ✅ **bStocks transfer rules:** real NVDAB/MSFTB/TSLAB lock into and return from the escrow on a mainnet fork (`LeagueEscrowFork.t.sol`).
 - **Stake token:** BSC USDT `0x55d398326f99059fF775485246999027B3197955`. Check it on BscScan before deploying.
 - **Season pot payout:** still to decide (top creators / backers per season).
