@@ -14,7 +14,7 @@ Repo: github.com/NECOKIZZ/ETF (main). Plan: docs/BNB.md · UI: docs/UI.md · Car
 Site chrome uses only the four brand colours (Ink `#0B0B0C`, Paper `#FFFFFF`, Mint `#3DDC97`, Coral `#FF5A36`; everything else is a mix). Stock cards follow the user's card design: each stock's own colour (unique, `src/ui/data/palette.ts`) plus the card's fixed colours (`CARD`). `test/palette.test.ts` enforces both.
 
 ## Constraints
-- Binance Web3 API and `baw` block this (US) container: live calls run in the user's Cloud Shell (`/tmp/ETF`; home disk full).
+- Binance Web3 API and `baw` block this (US) container: live calls run in the user's Cloud Shell (`~/ETF`; home disk cleared on 5 Oct).
 - Not deployed to mainnet yet (planned Thursday). Not live-verified: `approveTransaction=true` response shape (we detect an approval heuristically: `findApproveTx`), RFQ legs (reported as skipped), `baw` contract calls.
 
 ## Next

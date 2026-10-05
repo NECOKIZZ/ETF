@@ -7,18 +7,17 @@ Deadline: **Sun 11 Oct 2026, 12:00 UTC**. Submit form: https://forms.gle/yToDUza
 - [ ] **Make the GitHub repo public** (needed for the agent skill install `npx skills add NECOKIZZ/ETF/skills/league-of-stocks`, and for judging).
 - [ ] (1 min) Live check of "Buy the ETF" in Cloud Shell, paste the output to Claude. This answers where Binance puts the approval step:
   ```
-  cd /tmp/ETF && npx pnpm buy-plan
+  cd ~/ETF && npx pnpm buy-plan 20 --raw
   ```
 - [ ] **Try the Binance Agentic Wallet** (prize track): on your phone, Binance App → Web3 Wallet → Agentic Wallet; turn on **Developer Mode** there. On a computer outside the US: `npm i -g @binance/agentic-wallet`, then `baw auth signin --json`. Note anything confusing for the DX report.
-- [ ] Free space in your Cloud Shell home (it's 100% full): `du -sh ~/* ~/.[!.]* 2>/dev/null | sort -h | tail -15`, then delete old `node_modules` you don't need.
+- [x] Free space in your Cloud Shell home.
 
-## Cloud Shell setup (after every restart)
+## Cloud Shell setup (home folder, now that it has space)
 ```
-export npm_config_cache=/tmp/npm-cache
-cd /tmp && git clone https://github.com/NECOKIZZ/ETF.git   # skip if /tmp/ETF exists; else: cd /tmp/ETF && git pull
-cp ~/ETF/.env.local /tmp/ETF/
-cd /tmp/ETF && npx pnpm install --store-dir /tmp/pnpm-store
-npx pnpm preview      # then Web Preview → port 8080
+cd ~ && git clone https://github.com/NECOKIZZ/ETF.git     # first time only; later: cd ~/ETF && git pull
+cd ~/ETF && npx pnpm install
+cp .env.example .env.local && nano .env.local               # first time only: paste your Binance keys
+npx pnpm dev:8080                                           # then Web Preview → Preview on port 8080
 ```
 Without a deployed contract the pages show "not reachable" for the league. To see everything with
 demo data, run the local demo (docs/LOCAL.md: needs Foundry; ask Claude for the Cloud Shell
