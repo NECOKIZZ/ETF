@@ -46,6 +46,14 @@ Each entry: **what we tried → what happened → why it matters**. The technica
 - **Why it matters:** builders need an example response for every endpoint. A stock app needs to know exactly when prices are "live" (regular session) vs pre-market, and how to compute a true return.
 - _Technical detail:_ fields seen include `tokenSymbol`, `tokenName`, `underlyingTicker`, `assetType` (1 stock, 3 ETF; e.g. EWZon is a real ETF), `tokenPrice`, `referencePrice`, `tokenToShareRatio`, `statusInfo{openState, marketStatus, reasonCode, reasonMsg, nextOpenTime, nextCloseTime}`. Check: PBRon `referencePrice` 24.4657 × ratio 1.0380 = 25.3954 = `tokenPrice` exactly. 825 ms on the second call.
 
+### Mon 5 Oct: the bStocks list
+- **What we tried:** listed only Binance's own bStocks.
+- **What happened:** 46 bStocks came back in 0.36 seconds, all marked TRADING. They include big names (NVIDIA, Microsoft, Tesla, Meta, Google, AMD, Broadcom) and fund-style tokens (SPY, QQQ), plus **leveraged funds** such as TQQQ and SOXL (3× daily moves).
+- **Why it matters:**
+  - For bStocks the "session" field is empty, while Ondo tokens say "premarket". We guess that's because bStocks trade 24/7, but the docs don't say what an empty session means.
+  - The list doesn't flag which funds are leveraged; you have to know the tickers. Any app that ranks or compares returns has to filter those out by hand.
+- _Technical detail:_ `platformId=bstock`, 46 tokens, `statusInfo.marketStatus` empty, `reasonCode` TRADING for all. `assetType` 3 (ETF) covers both plain index funds (SPY) and leveraged ones (TQQQ, SOXL), with no leverage field.
+
 ## Sections the report asks for (fill in from the log on Saturday)
 
 ### Onboarding: time from reading the docs to the first successful call; what got in the way
