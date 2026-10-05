@@ -7,3 +7,4 @@ contracts/cache/
 contracts/broadcast/*/*/dry-run/
 .next/
 next-env.d.ts
+data/
