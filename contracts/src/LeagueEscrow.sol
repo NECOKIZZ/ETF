@@ -23,7 +23,7 @@ interface IERC20Min {
 ///         disclosed trust assumption. The contract enforces:
 ///           - conservation: Σ payouts + platform + seasonIn == Σ stakes + seasonOut
 ///           - the season pot can never go negative
-///           - no payout above stake × (1 + capMultiple)
+///           - no payout above stake × (1 + capMultiple × max team size)
 ///           - locked baskets always go back to their owner, whatever the result
 ///           - liveness: if the keeper never settles, anyone can void the round
 ///             VOID_GRACE after it ends, and everyone gets their stake back.
@@ -274,7 +274,10 @@ contract LeagueEscrow {
         Entry[] storage es = _entries[roundId];
         if (payouts.length != es.length) revert LengthMismatch();
 
-        uint256 maxPayout = uint256(r.stake) * (1 + uint256(r.capMultiple));
+        // A team's gain is capped at capMultiple × team stake, and the captain
+        // can receive (through creator fees) up to the whole team's gain. So
+        // the per-entry ceiling is stake + capMultiple × the largest team stake.
+        uint256 maxPayout = uint256(r.stake) * (1 + uint256(r.capMultiple) * (1 + uint256(r.maxBackers)));
         uint256 paid;
         for (uint256 i; i < payouts.length; ++i) {
             if (payouts[i] > maxPayout) revert PayoutTooLarge(i);

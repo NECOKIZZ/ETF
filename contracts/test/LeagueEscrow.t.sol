@@ -298,13 +298,29 @@ contract LeagueEscrowTest is Test {
 
     function test_settleRejectsOversizedPayout() public {
         vm.prank(keeper);
-        roundId = escrow.openRound(CLOSE, END, STAKE, 1, 20); // cap: payout ≤ 2× stake
+        roundId = escrow.openRound(CLOSE, END, STAKE, 1, 2); // ceiling: 5 + 5 × 1 × (1 + 2) = 20
         _fullRound();
         vm.warp(END);
-        uint128[] memory p = _payouts(11e18, 0, 4.5e18, 4.5e18);
+        uint128[] memory p = _payouts(20.5e18, 0, 0, 0); // over the ceiling: rejected
         vm.prank(keeper);
         vm.expectRevert(abi.encodeWithSelector(LeagueEscrow.PayoutTooLarge.selector, 0));
         escrow.settle(roundId, p, 0, 0, 0, bytes32(0));
+    }
+
+    /// A captain's payout can exceed stake × (1 + cap) through creator fees on
+    /// a full team; the contract must still accept it (it is under the team cap).
+    function test_captainFeesAboveSingleEntryCapAreAccepted() public {
+        vm.prank(keeper);
+        roundId = escrow.openRound(CLOSE, END, STAKE, 1, 2); // single-entry cap would be 10
+        _fullRound();
+        vm.warp(END);
+        // Captain gets 14.5 (> 10, < 20), losers 0, two members share the rest.
+        uint128[] memory p = _payouts(14.5e18, 0, 2.75e18, 2.75e18);
+        vm.prank(keeper);
+        escrow.settle(roundId, p, 0, 0, 0, bytes32(0));
+        vm.prank(alice);
+        escrow.claim(roundId);
+        assertEq(usdt.balanceOf(alice), 14.5e18);
     }
 
     function test_settleOnlyKeeperAndAfterEnd() public {
