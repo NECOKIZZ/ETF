@@ -24,6 +24,7 @@ import { leagueEscrowAbi, readEntries, readRound, roundTokens, submitSettlement 
 import { buildSnapshot, sampleFromTokens, type PriceMode } from "../src/league/snapshot";
 import { settleRound } from "../src/league/settlement";
 import { FileStore, type Phase } from "../src/league/store";
+import { livePrices } from "../src/league/live";
 
 const args = process.argv.slice(2);
 const cmd = args[0];
@@ -57,6 +58,16 @@ async function open() {
 }
 
 async function sample(roundId: bigint, phase: Phase, mode: PriceMode) {
+  // Local demo chain: demo prices for the mock tokens, stamped with chain time
+  // (anvil's clock can be moved forward to end a round early).
+  if (process.env.LEAGUE_CHAIN === "local") {
+    const { pub } = clientsFromEnv();
+    const at = Number((await pub.getBlock()).timestamp) * 1000;
+    const s = await livePrices();
+    if (!s) throw new Error("no local demo prices (run scripts/local-demo.mts first)");
+    for (const p of s.values()) p.at = at;
+    return log(`saved ${phase} sample (${s.size} local demo tokens) → ${store.saveSample(roundId, phase, s, at)}`);
+  }
   const at = Date.now();
   const tokens = await rwaTokens();
   const s = sampleFromTokens(tokens, mode, at);

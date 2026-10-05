@@ -1,23 +1,24 @@
 # Handoff for the next session
 
-Repo: github.com/NECOKIZZ/ETF (main). Plan: docs/BNB.md · UI: docs/UI.md · Keeper: docs/KEEPER.md · User tasks: docs/YOUR-TODO.md · DX log: docs/dx-notes.md
+Repo: github.com/NECOKIZZ/ETF (main). Plan: docs/BNB.md · UI: docs/UI.md · Card design: docs/design/stock-card · Keeper: docs/KEEPER.md · Local demo: docs/LOCAL.md · User tasks: docs/YOUR-TODO.md · DX log: docs/dx-notes.md
 
-## Done (Mon 5 Oct)
-- Engine `src/engine/league.ts`, escrow `contracts/src/LeagueEscrow.sol` (+ fork test with real bStocks), payout-ceiling bug fixed.
-- Binance client `src/bsc/*` (signing, RWA data, quotes/swaps with creator referral fee, leveraged-fund ban, buy-the-basket planner).
-- Settlement + keeper `src/league/*`, `scripts/keeper.mts`, local demo `scripts/local-demo.mts`, anvil e2e test. 43 Vitest + 21 Foundry tests pass.
-- Web: Next.js 16 + Tailwind v4, tokens, `/ui` kit (stock card, deck, ETF hand, weight bar, ticker strip, round pill, league table, bands, footer). Real bStock logos in `public/logos`. API: `/api/stocks`, `/api/rounds/current`, `/api/rounds/:id`, `POST /api/buy-plan`.
+## Built (Mon 5 Oct)
+- **Contract** `contracts/src/LeagueEscrow.sol`: rounds, `enterCreator`, **`enterCreatorNamed`** (ETF name ≤ 32 bytes, buy fee ≤ 2%, declared weights summing to 10 000 bps), `enterBacker`, keeper `settle` with conservation + ceiling checks, `voidRound` after 3 days, `claim`, `claimBasket`. Views `teamMeta`, `weightsOf`. 23 Foundry tests.
+- **Settlement** `src/league/settlement.ts`: team key from **declared weights** (`teamKeyFromWeights`); at start prices a basket may drift 5 points from them and be ≥ $9.50 (entry rule $10, ≤ 50%: `DEFAULT_RULES`; settlement `SETTLE_RULES`). Verification `src/league/verify.ts` + `scripts/verify.mts` + `/api/rounds/:id/verify`.
+- **Plans** `src/league/actions.ts` + `src/league/server.ts`: `POST /api/plan` (back, lock, buy-basket, buy-etf, claim, claim-basket) → calldata steps + `baw contract-call` commands. Also `/api/config`, `/api/stocks` (per chain, change since round start), `/api/me`, `/api/leaderboard`, `/api/rounds/:id/inputs`, local-only `/api/faucet` and `/api/rpc`.
+- **Agents**: skill `skills/league-of-stocks/` (SKILL.md + read/create/play references) driving the Binance Agentic Wallet (`baw contract-call preview/execute`, Developer Mode) and `scripts/agent.mts` (same plans, local key). Tested on anvil: agent created "Agent Alpha".
+- **Web**: wagmi (injected) + react-query. Pages `/`, `/league`, `/etf/[key]`, `/create`, `/me`, `/leaderboard`, `/round/[id]`, `/rules`, `/agents`, `/ui`. Stock card rebuilt from the user's design (`src/ui/components/StockCard.tsx`, sizes big/medium/tiny64/tiny48/tiny34).
+- **Tested**: 54 Vitest, 23 Foundry, production build; browser e2e (Playwright with an injected test wallet on anvil): create → back → claim all pass; keeper settled round 2 on a snapshot and it verified.
+
+## Colours
+Site chrome uses only the four brand colours (Ink `#0B0B0C`, Paper `#FFFFFF`, Mint `#3DDC97`, Coral `#FF5A36`; everything else is a mix). Stock cards follow the user's card design: each stock's own colour (unique, `src/ui/data/palette.ts`) plus the card's fixed colours (`CARD`). `test/palette.test.ts` enforces both.
 
 ## Constraints
-- Binance Web3 API blocks this (US) container: live calls run in the user's Cloud Shell (`/tmp/ETF`). Their home disk is full; use /tmp.
-- User is redesigning the **stock card**: wait for their design before polishing card-heavy pages.
+- Binance Web3 API and `baw` block this (US) container: live calls run in the user's Cloud Shell (`/tmp/ETF`; home disk full).
+- Not deployed to mainnet yet (planned Thursday). Not live-verified: `approveTransaction=true` response shape (we detect an approval heuristically: `findApproveTx`), RFQ legs (reported as skipped), `baw` contract calls.
 
 ## Next
-1. Agents: Binance Agentic Wallet / Wallet Skills integration ($2k prize): agent creates/backs ETFs via our API.
-2. Pages: landing, /league (uses /api/rounds/current), /etf/[id], /create, /me; wallet connect (wagmi, BSC).
-3. ETF names (signed by creator), creator buy-fee setting, verify page for settlement inputs.
-4. Mainnet deploy Thursday (DeployLeague.s.sol, allowlist the 39 tokens), keeper `auto` for demo rounds.
-5. Verify live: `approveTransaction=true` response shape and RFQ legs with fees (scripts/buy-plan.mts).
-
-## Rule: four brand colours only
-Ink `#0B0B0C`, Paper `#FFFFFF`, Mint `#3DDC97`, Coral `#FF5A36`. Everything else is a mix of these (docs/UI.md, Colour). `test/palette.test.ts` blocks any other hex in the UI code.
+1. Mainnet deploy (DeployLeague.s.sol, allowlist the 39 bStocks), host app + keeper together (shared `data/`), keeper `auto` for demo rounds.
+2. Live-check buy plans in Cloud Shell; fix approval handling from the real response.
+3. Polish from the user's review; demo video script; README final.
+4. Optional: BSC testnet demo (mock tokens) so the user can click through with MetaMask before mainnet; WalletConnect.

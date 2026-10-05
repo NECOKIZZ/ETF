@@ -10,7 +10,8 @@ export const wagmiConfig = createConfig({
   connectors: [injected({ shimDisconnect: true })],
   transports: {
     [bsc.id]: http(process.env.NEXT_PUBLIC_BSC_RPC_URL ?? "https://bsc-dataseed.bnbchain.org"),
-    [foundry.id]: http(process.env.NEXT_PUBLIC_LOCAL_RPC_URL ?? "http://127.0.0.1:8545"),
+    // Local demo chain: through the app's relay, so it works wherever the app runs.
+    [foundry.id]: http(process.env.NEXT_PUBLIC_LOCAL_RPC_URL ?? (typeof window !== "undefined" ? `${window.location.origin}/api/rpc` : "http://127.0.0.1:8545")),
   },
   ssr: true,
 });

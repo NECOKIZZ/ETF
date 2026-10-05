@@ -49,7 +49,7 @@ export function EtfChips({ holdings, max = 5 }: { holdings: Holding[]; max?: num
   return (
     <div className="flex items-center" aria-label={holdings.map((x) => `${x.stock.ticker} ${x.weightPct}%`).join(", ")}>
       {shown.map((x, i) => (
-        <div key={x.stock.ticker} style={{ marginLeft: i ? -10 : 0, zIndex: shown.length - i, borderRadius: 10, boxShadow: "0 0 0 2px var(--bg)" }}>
+        <div key={x.stock.ticker} className={i >= 3 ? "hidden md:block" : ""} style={{ marginLeft: i ? -10 : 0, zIndex: shown.length - i, borderRadius: 10, boxShadow: "0 0 0 2px var(--bg)" }}>
           <StockCard stock={x.stock} size="tiny34" />
         </div>
       ))}

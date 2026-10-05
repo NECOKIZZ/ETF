@@ -44,7 +44,7 @@
 
 Scale: 72 / 56 / 40 / 28 / 21 / 17 / 15 / 13 / 11 (uppercase labels at 11px with +0.12em tracking).
 
-### Colour: four brand colours only
+### Colour: four brand colours for the site
 | Brand colour | Hex | Use |
 |---|---|---|
 | **Ink** | `#0B0B0C` | text, dark panels, dark cards (page background in dark mode) |
@@ -54,7 +54,7 @@ Scale: 72 / 56 / 40 / 28 / 21 / 17 / 15 / 13 / 11 (uppercase labels at 11px with
 
 Every other shade (surface, muted, line, the darker green for "up" text on white, the pale pill backgrounds, the mint gradient) is a **mix of these four**, defined once in `app/globals.css` (`--brand-*`). To change a colour, edit `--brand-*` there and `BRAND` in `src/ui/data/palette.ts`. A test (`test/palette.test.ts`) fails if any other hex colour appears in the UI code.
 
-- Stock cards rotate ink / mint / paper; the company **logo** tells stocks apart, not colour. Coral is never a card colour, because it means "down".
+- **Stock cards** follow the card design handoff (`docs/design/stock-card`): black cards with each stock's own colour glowing through (unique per stock, picked near its brand in `src/ui/data/palette.ts`) and the card's fixed colours (`CARD`). That's the one place colours beyond the four appear.
 - Weight bars step through ink and mint by position in the basket; the legend names each stock.
 - Company logos keep their own colours (they're the companies' marks, not ours).
 - Green and coral always come with ▲/▼ or text, never colour alone.
@@ -76,7 +76,7 @@ Every other shade (surface, muted, line, the darker green for "up" text on white
 
 1. **Ticker strip** (Sleeve). Under the nav on every page: bStock logos, symbol, price (Plex Mono), ▲/▼ 24h, sliding slowly; at the right, "Binance reference · 14:32 UTC". Data: RWA token list + prices.
 2. **Round pill** (Sleeve's status pill). `● Round 12 · locks in 2d 04:13:22`, mint when open for entries, orange in the last hour, grey while running ("Running · settles Mon 13:30 UTC").
-3. **Stock card** (Kickoff player card, redrawn).
+3. **Stock card**: now built from the user's design handoff, `docs/design/stock-card/README.md` (sizes big 218×312, medium 150×215, tiny 64/48/34). The original notes below are superseded.
    - Portrait 7:10, 28px radius, the company's brand colour as the background (from a small colour map; fallback taken from the logo).
    - **Huge ticker** stacked twice, one filled and one outlined (`NVDA` / `NVDA`); token logo top-right; League of Stocks mark bottom-right.
    - A frosted strip at the bottom: price · ▲ 1.24% · "● Market open".

@@ -9,15 +9,16 @@ On-chain stock ETFs on BNB Chain, playing a weekly league. Built for **BNB Hack:
 > "ETF" here means an on-chain basket of tokenized stocks, not a regulated fund. Capital is at risk.
 
 ## Status
-Work in progress (hackathon week, 5–11 Oct 2026). See [`docs/BNB.md`](docs/BNB.md) for the rules and the plan.
+Hackathon week, 5–11 Oct 2026. Rules and plan: [`docs/BNB.md`](docs/BNB.md).
 
 | Piece | Where | State |
 |---|---|---|
-| Settlement engine | `src/engine/league.ts` | ✅ built, tested |
-| Escrow contract (BSC) | `contracts/src/LeagueEscrow.sol` | ✅ built, tested; not deployed yet |
-| Binance Web3 API client | `src/bsc/binanceWeb3.ts` | ✅ built, unit tested; live calls next |
-| Team keys + buy split | `src/bsc/basket.ts` | ✅ built, tested |
-| Keeper jobs, database, API, UI | — | next |
+| Settlement engine | `src/engine/league.ts` | ✅ tested |
+| League contract (BSC) | `contracts/src/LeagueEscrow.sol` | ✅ tested; mainnet deploy planned Thu 8 Oct |
+| Binance Web3 API (RWA prices, swaps with creator fee) | `src/bsc/` | ✅ live-checked from an allowed region |
+| Keeper + verifiable settlement | `scripts/keeper.mts`, `scripts/verify.mts` | ✅ tested on a local chain |
+| Web app | `app/` | ✅ landing, league, ETF, create, my entries, leaderboard, results, rules, agents |
+| Agents (Binance Agentic Wallet) | `skills/league-of-stocks/`, `/api/plan`, `scripts/agent.mts` | ✅ plans tested on a local chain |
 
 ## How settlement works
 1. Every ETF's score is the buy-and-hold return of its locked basket, priced by the Binance RWA price API.
@@ -34,8 +35,11 @@ Work in progress (hackathon week, 5–11 Oct 2026). See [`docs/BNB.md`](docs/BNB
 
 If the keeper doesn't settle within 3 days of the round's end, anyone can void the round and everyone gets their stake back.
 
+## Agents
+An AI agent with the [Binance Agentic Wallet](https://developers.binance.com/docs/agentic-wallet/welcome) and the League of Stocks skill can read rounds, build and back ETFs, and claim. Every action is `POST /api/plan`, which returns the exact transactions; the Agentic Wallet previews, risk-checks and signs each one (`baw contract-call`) after the user confirms. See [`skills/league-of-stocks/SKILL.md`](skills/league-of-stocks/SKILL.md) and the `/agents` page.
+
 ## Run it
-Requires Node 22+, pnpm, and [Foundry](https://getfoundry.sh) for the contracts.
+Requires Node 22+, pnpm, and [Foundry](https://getfoundry.sh) for the contracts. To try the whole app with no real money, see [`docs/LOCAL.md`](docs/LOCAL.md).
 
 ```bash
 pnpm install
@@ -56,7 +60,8 @@ The Binance Web3 API refuses requests from restricted regions (including the US)
 - [`docs/BNB.md`](docs/BNB.md): rules, architecture, day-by-day plan
 - [`docs/dx-notes.md`](docs/dx-notes.md): developer-experience log for the hackathon report
 - [`docs/YOUR-TODO.md`](docs/YOUR-TODO.md): what the team still has to do · [`docs/HANDOFF.md`](docs/HANDOFF.md): state of the build
-- [`docs/KEEPER.md`](docs/KEEPER.md): running rounds
+- [`docs/KEEPER.md`](docs/KEEPER.md): running rounds · [`docs/LOCAL.md`](docs/LOCAL.md): local demo chain
+- [`docs/UI.md`](docs/UI.md): design · [`docs/design/stock-card`](docs/design/stock-card): stock card handoff
 - [`docs/prototype-results.md`](docs/prototype-results.md): stress tests of the payout rules (Python prototype)
 - [`docs/robinhood-colosseum-spec.md`](docs/robinhood-colosseum-spec.md): the Robinhood Chain version (parked)
 

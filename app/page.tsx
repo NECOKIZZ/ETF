@@ -41,10 +41,10 @@ export default function Home() {
       {/* Hero */}
       <div className="px-3 pt-3 md:px-6 md:pt-6">
         <div className="mint-gradient relative overflow-hidden rounded-[32px] md:rounded-[48px]">
-          <div className="mx-auto grid max-w-[1280px] items-center gap-6 px-6 pb-10 pt-14 md:grid-cols-[1fr_1.15fr] md:px-12 md:pb-14 md:pt-20">
+          <div className="mx-auto grid max-w-[1280px] items-center gap-6 px-6 pb-10 pt-14 md:grid-cols-[1fr_1.15fr] md:gap-10 md:px-12 md:pb-14 md:pt-20">
             <div>
               <HeroRound />
-              <h1 className="t-display mt-6 text-[48px] md:text-[64px] xl:text-[76px]">
+              <h1 className="t-display mt-6 text-[48px] md:text-[60px] xl:text-[70px]">
                 Build an ETF.
                 <br />
                 Beat the league.

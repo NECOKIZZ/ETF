@@ -2,13 +2,15 @@
 
 Deadline: **Sun 11 Oct 2026, 12:00 UTC**. Submit form: https://forms.gle/yToDUzaDMwWnq6R6A · DX report form: https://forms.gle/EUQ39xf54GHjC2ys5
 
-## Now
-- [ ] **Design the stock card** (sizes: ~218×312 big, ~150 medium, 34–64 px tiny). Data per stock: logo, ticker, name, price, % change, weight, kind. Send a screenshot, Figma export or sketch.
-- [ ] (Optional, 1 min) Live check of "Buy the ETF" in Cloud Shell, paste the output to Claude:
+## Now (Mon–Wed)
+- [ ] **Look at the app** in Cloud Shell (commands below). Pages: `/` `/league` `/create` `/me` `/leaderboard` `/rules` `/agents` `/round/1` `/ui`. Tell Claude what to change.
+- [ ] **Make the GitHub repo public** (needed for the agent skill install `npx skills add NECOKIZZ/ETF/skills/league-of-stocks`, and for judging).
+- [ ] (1 min) Live check of "Buy the ETF" in Cloud Shell, paste the output to Claude. This answers where Binance puts the approval step:
   ```
-  cd /tmp/ETF && git pull && npx pnpm install --store-dir /tmp/pnpm-store && npx pnpm buy-plan
+  cd /tmp/ETF && npx pnpm buy-plan
   ```
-- [ ] Free space in your Cloud Shell home (it's 100% full): `du -sh ~/* ~/.[!.]* 2>/dev/null | sort -h | tail -15`, then delete old projects' `node_modules` you don't need.
+- [ ] **Try the Binance Agentic Wallet** (prize track): on your phone, Binance App → Web3 Wallet → Agentic Wallet; turn on **Developer Mode** there. On a computer outside the US: `npm i -g @binance/agentic-wallet`, then `baw auth signin --json`. Note anything confusing for the DX report.
+- [ ] Free space in your Cloud Shell home (it's 100% full): `du -sh ~/* ~/.[!.]* 2>/dev/null | sort -h | tail -15`, then delete old `node_modules` you don't need.
 
 ## Cloud Shell setup (after every restart)
 ```
@@ -16,20 +18,24 @@ export npm_config_cache=/tmp/npm-cache
 cd /tmp && git clone https://github.com/NECOKIZZ/ETF.git   # skip if /tmp/ETF exists; else: cd /tmp/ETF && git pull
 cp ~/ETF/.env.local /tmp/ETF/
 cd /tmp/ETF && npx pnpm install --store-dir /tmp/pnpm-store
-npx pnpm preview      # then Web Preview → port 8080 → add /ui to the address
+npx pnpm preview      # then Web Preview → port 8080
 ```
+Without a deployed contract the pages show "not reachable" for the league. To see everything with
+demo data, run the local demo (docs/LOCAL.md: needs Foundry; ask Claude for the Cloud Shell
+install commands). Your own browser wallet can't easily reach Cloud Shell's test chain, so test
+real clicks on mainnet Thursday with small amounts, or ask Claude for a BSC testnet demo.
 
 ## Before Thursday (mainnet deploy)
-- [ ] Make a **new wallet** just for the app (deployer + keeper). Fund on BNB Smart Chain: ~0.01 BNB (gas) + ~$30 USDT (BEP-20) for demo rounds.
+- [ ] Make a **new wallet** just for the app (deployer + keeper). Fund on BNB Smart Chain: ~0.02 BNB (gas) + ~$40 USDT (BEP-20) for demo rounds.
 - [ ] Put its private key in `.env.local` as `DEPLOYER_PRIVATE_KEY` and `KEEPER_PRIVATE_KEY` (never in chat or git). Tell Claude the **public** address.
-- [ ] Pick hosting for the web app: Vercel (set region to Singapore, not the US, because Binance blocks US servers).
+- [ ] Hosting: the app and the keeper must share the `data/` folder (price samples, settlement inputs). Simplest: one small server in an allowed region (e.g. a Singapore VM) running `pnpm start` and the keeper. Vercel works for the pages but can't keep `data/`.
 - [ ] (Optional) WalletConnect project ID from cloud.reown.com, for phone wallets.
 
 ## Thu–Fri (demo)
-- [ ] Run demo rounds during US market hours (13:30–20:00 UTC) with a few wallets; record the video (≤ 4 min).
+- [ ] Run demo rounds during US market hours (13:30–20:00 UTC) with 4+ ETFs (a round needs at least 4); record the video (≤ 4 min): landing → create → back → league → agent → results + verify.
 
 ## Sat (DX report: 25% of the score)
 - [ ] Rewrite `docs/dx-notes.md` **in your own words** into the DX form. AI-written reports are rejected, so use the notes as facts only.
 
 ## Sun before 12:00 UTC
-- [ ] Repo public, README final, demo link works, submit both forms.
+- [ ] README final, demo link works, submit both forms.
