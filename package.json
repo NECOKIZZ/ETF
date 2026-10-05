@@ -17,7 +17,9 @@
     "quote": "tsx --env-file=.env.local scripts/quote.mts",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "preview": "next build && next start -p 8080",
+    "dev:8080": "next dev -p 8080"
   },
   "dependencies": {
     "viem": "^2.55.8",
