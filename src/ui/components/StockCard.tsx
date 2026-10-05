@@ -27,6 +27,7 @@ export interface StockCardProps {
 
 export function StockCard({ stock, width = CARD_W, changePct, weightPct, logoUrl, compact, className = "", style }: StockCardProps) {
   const dark = stock.ink === "dark";
+  const logo = logoUrl ?? stock.logo;
   const fg = dark ? "#0B0B0C" : "#FFFFFF";
   const len = stock.ticker.length;
   // Fit the ticker to the card: ~0.68em per glyph (semibold, tight) across
@@ -55,6 +56,27 @@ export function StockCard({ stock, width = CARD_W, changePct, weightPct, logoUrl
         }}
       />
 
+      {/* The company logo as a large, clear watermark, blended into the card colour. */}
+      {logo && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logo}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute max-w-none"
+          style={{
+            width: "118%",
+            right: "-38%",
+            bottom: compact ? "-30%" : "-8%",
+            transform: "rotate(-12deg)",
+            borderRadius: "50%",
+            filter: "grayscale(1) contrast(1.25)",
+            mixBlendMode: dark ? "multiply" : "screen",
+            opacity: dark ? 0.22 : 0.3,
+          }}
+        />
+      )}
+
       {/* Top row: kind chip + logo */}
       <div className="absolute flex items-center justify-between" style={{ top: "0.9em", left: "0.9em", right: "0.9em" }}>
         {!compact ? (
@@ -69,11 +91,19 @@ export function StockCard({ stock, width = CARD_W, changePct, weightPct, logoUrl
         )}
         <span
           className="grid place-items-center overflow-hidden font-semibold"
-          style={{ width: "2.1em", height: "2.1em", borderRadius: 999, background: dark ? "#0B0B0C" : "#FFFFFF", color: stock.color, fontSize: "0.95em" }}
+          style={{
+            width: logo ? "2.5em" : "2.1em",
+            height: logo ? "2.5em" : "2.1em",
+            borderRadius: 999,
+            background: dark ? "#0B0B0C" : "#FFFFFF",
+            color: stock.color,
+            fontSize: "0.95em",
+            boxShadow: "0 2px 8px rgb(0 0 0 / .18)",
+          }}
         >
-          {logoUrl ? (
+          {logo ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt="" className="size-full object-cover" />
+            <img src={logo} alt={`${stock.name} logo`} className="size-full object-cover" />
           ) : (
             stock.ticker[0]
           )}

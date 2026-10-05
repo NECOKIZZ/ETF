@@ -5,6 +5,8 @@
 // Leveraged funds (TQQQ, SOXL, KORU, MUU, INTW, SNXX, MVLL) are left out:
 // they are banned from the league.
 
+import { assignColors, inkFor } from "./palette";
+
 export interface StockInfo {
   symbol: string;   // token symbol, e.g. NVDAB
   ticker: string;   // underlying ticker, e.g. NVDA
@@ -12,11 +14,17 @@ export interface StockInfo {
   kind: "stock" | "etf";
   price: number;    // USD per token
   address: `0x${string}`;
-  /** Card background. A brand-adjacent colour, not an official asset. */
+  /** Brand-adjacent hint, used only to pick the card colour. */
+  brand: string;
+  /** Card background: the closest free colour to `brand` (unique per stock). */
   color: string;
   /** Text colour on the card. */
   ink: "light" | "dark";
+  /** Company logo, from Binance's token list (saved under public/logos). */
+  logo?: string;
 }
+
+type Raw = Omit<StockInfo, "color" | "ink" | "logo">;
 
 const s = (
   symbol: string,
@@ -24,12 +32,13 @@ const s = (
   name: string,
   price: number,
   address: string,
-  color: string,
-  ink: "light" | "dark" = "light",
+  brand: string,
+  _ink?: "light" | "dark",
   kind: "stock" | "etf" = "stock",
-): StockInfo => ({ symbol, ticker, name, price, address: address as `0x${string}`, color, ink, kind });
+): Raw => ({ symbol, ticker, name, price, address: address as `0x${string}`, brand, kind });
 
-export const BSTOCKS: StockInfo[] = [
+// Most recognisable first: they get first pick of the colours.
+const RAW: Raw[] = [
   s("NVDAB", "NVDA", "NVIDIA", 235.28, "0x02fca66c1d1afb4e2a7884261eb00f63598a7436", "#76B900", "dark"),
   s("TSLAB", "TSLA", "Tesla", 369.14, "0x5b1910eaad6450e50f816082aa078c41f10c292f", "#E31937"),
   s("METAB", "META", "Meta Platforms", 726.65, "0x7425889fe94f9d693e8daefe88bcced6acfef4c0", "#0866FF"),
@@ -70,6 +79,18 @@ export const BSTOCKS: StockInfo[] = [
   s("EWYB", "EWY", "iShares MSCI South Korea", 191.36, "0xbe82f76637dba2c114c41df856c2c51e522e2cb8", "#000000", "light", "etf"),
   s("DRAMB", "DRAM", "Memory ETF", 61.63, "0x93862d63fd9fd488b1328e9b47717d75e994a84b", "#2B2D42", "light", "etf"),
 ];
+
+/** Tickers with a logo saved in public/logos/<TICKER>.png. */
+export const LOGOS = new Set<string>([]);
+
+const COLORS = assignColors(RAW.map((r) => ({ key: r.ticker, brand: r.brand })));
+
+export const BSTOCKS: StockInfo[] = RAW.map((r) => ({
+  ...r,
+  color: COLORS[r.ticker],
+  ink: inkFor(COLORS[r.ticker]),
+  logo: LOGOS.has(r.ticker) ? `/logos/${r.ticker}.png` : undefined,
+}));
 
 export const byTicker = (t: string): StockInfo | undefined => BSTOCKS.find((x) => x.ticker === t);
 
