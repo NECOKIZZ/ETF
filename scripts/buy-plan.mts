@@ -5,7 +5,7 @@
 import { planBasketBuy } from "../src/bsc/buyBasket";
 import { byTicker } from "../src/ui/data/stocks";
 
-const [usd = "20", wallet = "0x000000000000000000000000000000000000dEaD", creator = "0x1111111111111111111111111111111111111111"] = process.argv.slice(2);
+const [usd = "20", wallet = "0x000000000000000000000000000000000000dEaD", creator = "0x1111111111111111111111111111111111111111"] = process.argv.slice(2).filter((a) => !a.startsWith("--"));
 const basket: [string, number][] = [["NVDA", 4000], ["AMD", 3000], ["AVGO", 3000]];
 const t0 = Date.now();
 const plan = await planBasketBuy({
