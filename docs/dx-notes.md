@@ -35,7 +35,16 @@ Each entry: **what we tried → what happened → why it matters**. The technica
 - **Why it matters:**
   - Time from first reading the docs to a successful call was mostly spent on the location block, not on the API itself. Signing requests worked first time.
   - The docs list xStocks as a hackathon option, but the stock-list endpoint only knows two platforms (`ondo`, `bstock`). Builders who want xStocks need another way to find them.
-- _Technical detail:_ `GET /api/v1/dex/market/rwa/tokens?binanceChainId=56`, 603 ms. Our first printout showed addresses and prices but **blank names and market status**. Still checking whether that's our code guessing the field names wrong or fields missing from the API (the docs describe fields in prose, without exact names or an example response).
+- _Technical detail:_ `GET /api/v1/dex/market/rwa/tokens?binanceChainId=56`, 603 ms. Our first printout showed addresses and prices but **blank names and market status**. Cause: our code guessed the field names wrong, because the docs describe fields in prose without exact names or an example response (see the next entry).
+
+### Mon 5 Oct: reading a real response, and three surprises
+- **What we tried:** printed the raw response to see the real field names.
+- **What happened:** the data is rich (name, ticker, logo, price, market cap, volume, market session), but it didn't match what we expected from the docs:
+  1. **Names differ from the docs' wording.** The docs talk about "market status"; the real data has `marketStatus` *inside* a `statusInfo` box, and it holds the trading session (`"premarket"`). The codes the docs list (TRADING, MARKET_CLOSED…) are in a different field, `reasonCode`. We only found this by trial and error.
+  2. **A token isn't always exactly one share.** Each Ondo token has a `tokenToShareRatio`, for example 1.038 shares of Petrobras per token. The token's price = share price × that ratio, and the ratio grows when dividends are paid. Anyone tracking returns from the share price alone gets the wrong number. This matters a lot for us, because our game ranks ETFs by return. The docs mention the ratio, but not that it changes over time or how it relates to the price.
+  3. **Confusing market-hours times.** At 11:20 UTC (pre-market), "next close" was 13:29 and "next open" was 13:31, so close came before open. It looks like pre-market ends at 13:29 and regular trading starts at 13:31, with a 2-minute gap, but nothing explains how sessions work. `openState` was `true` during pre-market.
+- **Why it matters:** builders need an example response for every endpoint. A stock app needs to know exactly when prices are "live" (regular session) vs pre-market, and how to compute a true return.
+- _Technical detail:_ fields seen include `tokenSymbol`, `tokenName`, `underlyingTicker`, `assetType` (1 stock, 3 ETF; e.g. EWZon is a real ETF), `tokenPrice`, `referencePrice`, `tokenToShareRatio`, `statusInfo{openState, marketStatus, reasonCode, reasonMsg, nextOpenTime, nextCloseTime}`. Check: PBRon `referencePrice` 24.4657 × ratio 1.0380 = 25.3954 = `tokenPrice` exactly. 825 ms on the second call.
 
 ## Sections the report asks for (fill in from the log on Saturday)
 

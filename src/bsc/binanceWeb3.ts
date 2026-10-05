@@ -102,20 +102,55 @@ export async function w3Request<T>(
 
 export type RwaPlatform = "ondo" | "bstock";
 
-/** Loosely typed: field names follow the docs; unknown extras are kept. */
+export interface RwaStatusInfo {
+  openState: boolean;
+  marketStatus: string;  // e.g. "premarket", "regular" — the session, lowercase
+  reasonCode: string;    // TRADING | MARKET_CLOSED | MARKET_PAUSED | MARKET_MAINTENANCE | ASSET_PAUSED | ASSET_LIMITED | UNSUPPORTED
+  reasonMsg: string | null;
+  nextOpenTime: number;  // unix ms
+  nextCloseTime: number; // unix ms
+}
+
+/** One tokenized stock, as returned by /rwa/tokens (field names from a live response, 5 Oct 2026). */
 export interface RwaToken {
-  tokenContractAddress?: string;
-  contractAddress?: string;
-  symbol?: string;
-  name?: string;
-  decimals?: number | string;
-  logoUrl?: string;
-  platformId?: string;
-  marketStatus?: string; // TRADING | MARKET_CLOSED | MARKET_PAUSED | ...
-  openState?: string | number;
-  price?: string;          // on-chain USD price
-  referencePrice?: string; // underlying share price
+  binanceChainId: string;
+  tokenContractAddress: string;
+  platformId: RwaPlatform;
+  assetType: number;         // 1 = stock, 2 = pre-IPO, 3 = ETF
+  tokenName: string;
+  tokenSymbol: string;       // e.g. "PBRon"
+  tokenLogoUrl: string;
+  decimals: string;
+  underlyingTicker: string;  // e.g. "PBR"
+  underlyingName: string;
+  /** Shares per token. Grows over time for Ondo tokens (dividends are reinvested). */
+  tokenToShareRatio: string;
+  tags: string[] | null;
+  statusInfo: RwaStatusInfo;
+  tokenPrice: string;        // USD per token (≈ referencePrice × tokenToShareRatio)
+  referencePrice: string;    // USD per underlying share
+  volume24H: string;
+  marketCap: string;
+  peRatioTTM: string | null;
   [k: string]: unknown;
+}
+
+/**
+ * USD value of ONE token, 18-decimal fixed point: referencePrice × tokenToShareRatio.
+ * League scores use this rather than the raw share price, because the ratio
+ * grows when dividends are reinvested — a holder's real return includes it.
+ */
+export function tokenValueE18(referencePrice: string, tokenToShareRatio: string): bigint {
+  return (decimalToE18(referencePrice) * decimalToE18(tokenToShareRatio)) / 10n ** 18n;
+}
+
+/** Parse a decimal string ("43.2912…") into 18-decimal fixed point, truncating extra digits. */
+export function decimalToE18(x: string): bigint {
+  const m = /^(-?)(\d*)(?:\.(\d*))?$/.exec(x.trim());
+  if (!m || (m[2] === "" && !m[3])) throw new Error(`not a decimal: ${x}`);
+  const frac = (m[3] ?? "").slice(0, 18).padEnd(18, "0");
+  const v = BigInt(m[2] || "0") * 10n ** 18n + BigInt(frac);
+  return m[1] ? -v : v;
 }
 
 export interface RwaPrice {

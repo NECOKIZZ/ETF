@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createHmac } from "node:crypto";
-import { signRequest, toQuery, w3Request, BinanceW3Error } from "../src/bsc/binanceWeb3";
+import { signRequest, toQuery, w3Request, BinanceW3Error, decimalToE18, tokenValueE18 } from "../src/bsc/binanceWeb3";
 import { teamKeyOf, splitBuy, clampCreatorFee } from "../src/bsc/basket";
 
 const NVDA = "0x1111111111111111111111111111111111111111";
@@ -78,5 +78,20 @@ describe("buy the basket", () => {
     expect(clampCreatorFee(9)).toBe(2);
     expect(clampCreatorFee(-1)).toBe(0);
     expect(clampCreatorFee(0.555)).toBe(0.56);
+  });
+});
+
+describe("RWA token value", () => {
+  it("parses decimals to 18-dp fixed point", () => {
+    expect(decimalToE18("1")).toBe(10n ** 18n);
+    expect(decimalToE18("43.5")).toBe(435n * 10n ** 17n);
+    expect(decimalToE18("0.026527932639")).toBe(26527932639000000n);
+    expect(decimalToE18("1.0000000000000000019")).toBe(10n ** 18n + 1n); // truncates past 18 dp
+    expect(() => decimalToE18("abc")).toThrow();
+  });
+  it("token value = reference share price × shares per token (live PBRon sample)", () => {
+    const v = tokenValueE18("24.465700263163722", "1.038001708237747999");
+    // Binance's own tokenPrice for that sample was 25.3954386663966642…
+    expect(Number(v) / 1e18).toBeCloseTo(25.3954386663966642, 9);
   });
 });
