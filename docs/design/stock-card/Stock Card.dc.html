@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0f1a16;}
+a{color:#fff;}a:hover{color:#ffd5d9;}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;gap:72px;padding:64px 40px 80px;box-sizing:border-box;background:#0f1a16;font-family:Archivo, sans-serif;overflow:hidden;">
+
+  <div style="display:flex;flex-direction:column;gap:28px;">
+    <div style="font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:.08em;color:#8fa59b;">BIG · 218 × 312 · LANDING DECK</div>
+    <div style="{{ rowStyle }}">
+      <sc-for list="{{ cards }}" as="s" hint-placeholder-count="5">
+        <div onMouseEnter="{{ s.onEnter }}" onMouseLeave="{{ s.onLeave }}" style="{{ s.wrapStyle }}">
+          <div style="position:relative;width:218px;height:312px;border-radius:22px;overflow:hidden;background:#000;box-shadow:0 24px 48px -18px rgba(0,0,0,.6);">
+            <div style="{{ s.bgStyle }}"></div>
+            <img src="{{ s.logo }}" alt="" style="position:absolute;width:170px;height:170px;right:-38px;top:118px;object-fit:contain;transform:rotate(-14deg);opacity:.16;filter:grayscale(1) brightness(1.6);pointer-events:none;">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:15px;box-sizing:border-box;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;gap:5px;">
+                  <div style="font-size:8px;font-weight:700;letter-spacing:.12em;color:#fff;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.16);">{{ s.kind }}</div>
+                  <sc-if value="{{ s.showWeight }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-family:'JetBrains Mono', monospace;font-size:8px;font-weight:600;color:#111;padding:5px 8px;border-radius:999px;background:#fff;">{{ s.weightLabel }}</div>
+                  </sc-if>
+                </div>
+                <div style="width:30px;height:30px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 2px rgba(255,255,255,.25);">
+                  <img src="{{ s.logo }}" alt="{{ s.ticker }}" style="width:20px;height:20px;object-fit:contain;">
+                </div>
+              </div>
+              <div style="margin-top:24px;display:flex;flex-direction:column;">
+                <div style="{{ s.tickerStyle }}">{{ s.ticker }}</div>
+                <div style="{{ s.outlineStyle }}">{{ s.ticker }}</div>
+                <div style="margin-top:10px;font-size:11px;font-weight:500;color:rgba(255,255,255,.92);">{{ s.name }}</div>
+              </div>
+              <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding:9px 10px 9px 13px;border-radius:16px;background:#fff;box-shadow:0 6px 18px -6px rgba(0,0,0,.25);">
+                <div style="display:flex;flex-direction:column;gap:2px;font-family:'JetBrains Mono', monospace;">
+                  <div style="font-size:14px;font-weight:600;color:#111;letter-spacing:-.02em;">{{ s.price }}</div>
+                  <div style="{{ s.changeStyle }}">{{ s.change }}</div>
+                </div>
+                <div style="width:28px;height:28px;border-radius:50%;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;cursor:pointer;" style-hover="background:#333;">+</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px;">
+    <div style="font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:.08em;color:#8fa59b;">MEDIUM · 150 × 215 · PICKERS</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;">
+      <sc-for list="{{ cards }}" as="s" hint-placeholder-count="5">
+        <div style="position:relative;width:150px;height:215px;border-radius:16px;overflow:hidden;background:#000;cursor:pointer;">
+          <div style="{{ s.bgStyle }}"></div>
+          <img src="{{ s.logo }}" alt="" style="position:absolute;width:118px;height:118px;right:-28px;top:80px;object-fit:contain;transform:rotate(-14deg);opacity:.16;filter:grayscale(1) brightness(1.6);pointer-events:none;">
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:10px;box-sizing:border-box;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-size:7px;font-weight:700;letter-spacing:.12em;color:#fff;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.16);">{{ s.kind }}</div>
+              <div style="width:22px;height:22px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                <img src="{{ s.logo }}" alt="{{ s.ticker }}" style="width:14px;height:14px;object-fit:contain;">
+              </div>
+            </div>
+            <div style="margin-top:16px;display:flex;flex-direction:column;">
+              <div style="{{ s.tickerStyleM }}">{{ s.ticker }}</div>
+              <div style="{{ s.outlineStyleM }}">{{ s.ticker }}</div>
+            </div>
+            <div style="margin-top:auto;display:flex;flex-direction:column;gap:1px;padding:7px 10px;border-radius:11px;background:#fff;font-family:'JetBrains Mono', monospace;">
+              <div style="font-size:11px;font-weight:600;color:#111;">{{ s.price }}</div>
+              <div style="{{ s.changeStyleM }}">{{ s.change }}</div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px;">
+    <div style="font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:.08em;color:#8fa59b;">TINY · 64 / 48 / 34 · ETF HANDS &amp; TABLE ROWS</div>
+    <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-end;">
+      <div style="display:flex;gap:10px;align-items:flex-end;">
+        <sc-for list="{{ cards }}" as="s" hint-placeholder-count="5">
+          <div style="position:relative;width:64px;height:84px;border-radius:12px;overflow:hidden;background:#000;">
+            <div style="{{ s.bgStyleTiny }}"></div>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:8px 4px 6px;box-sizing:border-box;">
+              <div style="width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                <img src="{{ s.logo }}" alt="{{ s.ticker }}" style="width:17px;height:17px;object-fit:contain;">
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+                <div style="font-size:12px;font-weight:900;letter-spacing:-.04em;color:#111;">{{ s.ticker }}</div>
+                <div style="font-family:'JetBrains Mono', monospace;font-size:8px;font-weight:600;color:#111;background:#fff;border-radius:999px;padding:2px 6px;">{{ s.weightLabel }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <sc-for list="{{ cards }}" as="s" hint-placeholder-count="5">
+          <div style="position:relative;width:48px;height:62px;border-radius:10px;overflow:hidden;background:#000;">
+            <div style="{{ s.bgStyleTiny }}"></div>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:7px 2px 6px;box-sizing:border-box;">
+              <div style="width:22px;height:22px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                <img src="{{ s.logo }}" alt="{{ s.ticker }}" style="width:14px;height:14px;object-fit:contain;">
+              </div>
+              <div style="font-size:10px;font-weight:900;letter-spacing:-.04em;color:#111;">{{ s.ticker }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:6px;align-items:flex-end;">
+        <sc-for list="{{ cards }}" as="s" hint-placeholder-count="5">
+          <div style="{{ s.dotStyle }}">
+            <div style="width:22px;height:22px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+              <img src="{{ s.logo }}" alt="{{ s.ticker }}" style="width:14px;height:14px;object-fit:contain;">
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="max-width:560px;display:flex;flex-direction:column;border-radius:16px;overflow:hidden;background:#16241f;">
+      <sc-for list="{{ cards }}" as="s" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.06);">
+          <div style="{{ s.dotStyle }}">
+            <div style="width:22px;height:22px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+              <img src="{{ s.logo }}" alt="{{ s.ticker }}" style="width:14px;height:14px;object-fit:contain;">
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+            <div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:-.02em;">{{ s.ticker }}</div>
+            <div style="font-size:11px;color:#8fa59b;">{{ s.name }}</div>
+          </div>
+          <div style="font-family:'JetBrains Mono', monospace;font-size:12px;color:#c9d6d0;">{{ s.weightLabel }}</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-family:'JetBrains Mono', monospace;">
+            <div style="font-size:13px;font-weight:600;color:#fff;">{{ s.price }}</div>
+            <div style="{{ s.changeStyleRow }}">{{ s.change }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;layout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;fan&quot;,&quot;grid&quot;],&quot;default&quot;:&quot;fan&quot;,&quot;tsType&quot;:&quot;'fan'|'grid'&quot;},&quot;showWeight&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;liveTicking&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = {
+    hover: -1,
+    stocks: [
+      { ticker: 'TSLA', name: 'Tesla', price: 369.14, pct: 3.48, weight: 15, fund: false, c: '#d40a0a', l: '#fde6e8', logo: 'https://www.google.com/s2/favicons?domain=tesla.com&sz=128' },
+      { ticker: 'META', name: 'Meta Platforms', price: 726.65, pct: 0.05, weight: 20, fund: false, c: '#0a6bd4', l: '#e4effd', logo: 'https://www.google.com/s2/favicons?domain=meta.com&sz=128' },
+      { ticker: 'NVDA', name: 'NVIDIA', price: 235.28, pct: -2.63, weight: 40, fund: false, c: '#4fae12', l: '#ebf7e2', logo: 'https://www.google.com/s2/favicons?domain=nvidia.com&sz=128' },
+      { ticker: 'MSFT', name: 'Microsoft', price: 512.40, pct: 1.12, weight: 15, fund: false, c: '#6a3bf0', l: '#ece6fd', logo: 'https://www.google.com/s2/favicons?domain=microsoft.com&sz=128' },
+      { ticker: 'GOOGL', name: 'Alphabet', price: 198.73, pct: -0.41, weight: 10, fund: false, c: '#e86a00', l: '#fdeee2', logo: 'https://www.google.com/s2/favicons?domain=google.com&sz=128' },
+    ],
+  };
+  componentDidMount() { this.sync(); }
+  componentDidUpdate() { this.sync(); }
+  componentWillUnmount() { clearInterval(this.t); }
+  sync() {
+    const live = this.props.liveTicking ?? true;
+    if (live && !this.t) {
+      this.t = setInterval(() => this.setState(st => ({
+        stocks: st.stocks.map(s => {
+          const d = (Math.random() - 0.5) * s.price * 0.002;
+          return { ...s, price: Math.max(1, s.price + d), pct: s.pct + (d / s.price) * 100 };
+        }),
+      })), 1400);
+    } else if (!live && this.t) { clearInterval(this.t); this.t = null; }
+  }
+  renderVals() {
+    const fan = (this.props.layout ?? 'fan') === 'fan';
+    const showWeight = this.props.showWeight ?? false;
+    const { stocks, hover } = this.state;
+    const mid = (stocks.length - 1) / 2;
+    const tk = (len, big) => big ? (len >= 5 ? 50 : len === 4 ? 60 : 72) : (len >= 5 ? 34 : len === 4 ? 41 : 50);
+    const solid = sz => ({ fontSize: sz, fontWeight: 900, lineHeight: 0.86, letterSpacing: '-0.05em', color: '#fff' });
+    const outline = sz => ({ ...solid(sz), color: 'transparent', WebkitTextStroke: '1.2px rgba(255,255,255,.9)' });
+    const cards = stocks.map((s, i) => {
+      const off = i - mid, up = s.pct >= 0, h = hover === i;
+      const rot = fan ? off * 7 : 0, ty = fan ? Math.abs(off) * 18 : 0;
+      const chg = (sz, dark) => ({ fontSize: sz, fontWeight: 600, color: up ? (dark ? '#4ade80' : '#0f8a3c') : (dark ? '#ff6b7d' : '#c8102e') });
+      return {
+        ...s,
+        kind: s.fund ? 'FUND' : 'BSTOCK',
+        showWeight,
+        weightLabel: s.weight + '%',
+        price: '$' + s.price.toFixed(2),
+        change: (up ? '▲ ' : '▼ ') + Math.abs(s.pct).toFixed(2) + '%',
+        onEnter: () => this.setState({ hover: i }),
+        onLeave: () => this.setState({ hover: -1 }),
+        wrapStyle: {
+          margin: fan ? '0 -30px' : 0,
+          transform: `translateY(${ty - (h ? 22 : 0)}px) rotate(${h ? rot * 0.4 : rot}deg) scale(${h ? 1.04 : 1})`,
+          zIndex: h ? 50 : (fan ? 20 - Math.abs(Math.round(off * 2)) : 1),
+          transition: 'transform .35s cubic-bezier(.2,.8,.2,1)', position: 'relative', cursor: 'pointer',
+        },
+        bgStyle: {
+          position: 'absolute', inset: '-30px', filter: 'blur(18px)',
+          background: [
+            `radial-gradient(38% 22% at 28% 52%, ${s.c} 0%, transparent 100%)`,
+            `radial-gradient(30% 34% at 66% 40%, ${s.c} 0%, transparent 100%)`,
+            `radial-gradient(34% 16% at 64% 74%, ${s.l} 0%, transparent 100%)`,
+            `radial-gradient(28% 14% at 30% 80%, ${s.l} 0%, transparent 100%)`,
+            `linear-gradient(180deg, #000 0%, #000 20%, ${s.c} 48%, ${s.c} 60%, ${s.l} 82%, ${s.l} 100%)`,
+          ].join(','),
+        },
+        bgStyleTiny: { position: 'absolute', inset: '-10px', filter: 'blur(6px)', background: `linear-gradient(180deg, #000 0%, ${s.c} 40%, ${s.l} 80%)` },
+        dotStyle: { width: 34, height: 34, borderRadius: 10, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(180deg, #000 0%, ${s.c} 75%)` },
+        tickerStyle: solid(tk(s.ticker.length, true)),
+        outlineStyle: outline(tk(s.ticker.length, true)),
+        tickerStyleM: solid(tk(s.ticker.length, false)),
+        outlineStyleM: outline(tk(s.ticker.length, false)),
+        changeStyle: chg(10),
+        changeStyleM: chg(9),
+        changeStyleRow: chg(11, true),
+      };
+    });
+    return {
+      cards,
+      rowStyle: fan
+        ? { display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '10px 0 40px' }
+        : { display: 'flex', flexWrap: 'wrap', gap: 20 },
+    };
+  }
+}
+</script>
+</body>
+</html>

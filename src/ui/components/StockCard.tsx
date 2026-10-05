@@ -1,175 +1,187 @@
-// Stock card: Kickoff's player card redrawn for stocks (docs/UI.md §3.3).
-// Portrait card in one of the brand colours (ink, mint or paper), huge ticker stacked twice (filled + outlined),
-// logo top-right, League of Stocks mark bottom-right, frosted price strip.
+// Stock card, built from the design handoff (docs/design/stock-card/README.md).
+// Black card, the stock's own colour glowing up from below, a huge ticker
+// (solid + outline), the logo as a watermark, and a white price bar.
 //
-// Everything is sized in `em` off the card's own font-size, so one design
-// scales from the landing deck (218px) down to a chip in an ETF hand (56px).
+// Sizes: big 218×312 (landing deck) · medium 150×215 (pickers) ·
+// tiny64 64×84 (ETF hands) · tiny48 48×62 · tiny34 34×34 (table rows).
 
 import type { StockInfo } from "../data/stocks";
-import { LogoMark } from "./Logo";
-import { BRAND } from "../data/palette";
+import { CARD } from "../data/palette";
+import { CardAddButton } from "./CardAddButton";
 
-export const CARD_W = 218;
-export const CARD_H = 312;
+export type CardSize = "big" | "medium" | "tiny64" | "tiny48" | "tiny34";
+
+export const CARD_SIZES: Record<CardSize, { w: number; h: number; r: number }> = {
+  big: { w: 218, h: 312, r: 22 },
+  medium: { w: 150, h: 215, r: 16 },
+  tiny64: { w: 64, h: 84, r: 12 },
+  tiny48: { w: 48, h: 62, r: 10 },
+  tiny34: { w: 34, h: 34, r: 10 },
+};
 
 export interface StockCardProps {
   stock: StockInfo;
-  /** Rendered width in px; height follows the 7:10 ratio. */
-  width?: number;
+  size?: CardSize;
+  /** Live price; defaults to the stock's listed price. */
+  price?: number;
   changePct?: number;
-  /** Shows a weight badge instead of the price strip (ETF hands). */
   weightPct?: number;
-  logoUrl?: string;
-  /** Hide the bottom strip entirely (tiny cards). */
-  compact?: boolean;
+  /** Show the weight pill on a big card. */
+  showWeight?: boolean;
+  /** The + button on a big card. */
+  onAdd?: () => void;
+  addLabel?: string;
   className?: string;
   style?: React.CSSProperties;
 }
 
-export function StockCard({ stock, width = CARD_W, changePct, weightPct, logoUrl, compact, className = "", style }: StockCardProps) {
-  const dark = stock.ink === "dark";
-  const logo = logoUrl ?? stock.logo;
-  const fg = dark ? BRAND.ink : BRAND.paper;
-  const len = stock.ticker.length;
-  // Fit the ticker to the card: ~0.68em per glyph (semibold, tight) across
-  // ~11.4em of usable width (the card is 13.6em wide).
-  const tickerEm = Math.min(4.2, 11.4 / (len * 0.68));
+const display = "var(--font-archivo), ui-sans-serif, system-ui, sans-serif";
+const mono = "var(--font-jbmono), ui-monospace, monospace";
 
+const tickerPx = (len: number, big: boolean) => (big ? (len >= 5 ? 50 : len === 4 ? 60 : 72) : len >= 5 ? 34 : len === 4 ? 41 : 50);
+
+export function fmtPrice(p: number) {
+  return "$" + p.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+export function fmtChange(pct: number) {
+  return `${pct >= 0 ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%`;
+}
+
+function glow(c: string, l: string): React.CSSProperties {
+  return {
+    position: "absolute",
+    inset: -30,
+    filter: "blur(18px)",
+    background: [
+      `radial-gradient(38% 22% at 28% 52%, ${c} 0%, transparent 100%)`,
+      `radial-gradient(30% 34% at 66% 40%, ${c} 0%, transparent 100%)`,
+      `radial-gradient(34% 16% at 64% 74%, ${l} 0%, transparent 100%)`,
+      `radial-gradient(28% 14% at 30% 80%, ${l} 0%, transparent 100%)`,
+      `linear-gradient(180deg, ${CARD.black} 0%, ${CARD.black} 20%, ${c} 48%, ${c} 60%, ${l} 82%, ${l} 100%)`,
+    ].join(","),
+  };
+}
+
+function LogoBadge({ stock, px, logoPx, ring }: { stock: StockInfo; px: number; logoPx: number; ring?: boolean }) {
   return (
     <div
-      className={`relative overflow-hidden select-none ${className}`}
-      style={{
-        width,
-        height: (width * CARD_H) / CARD_W,
-        fontSize: (width / CARD_W) * 16,
-        borderRadius: "1.75em",
-        background: stock.color,
-        color: fg,
-        // A paper card needs an edge to stand off a paper page.
-        boxShadow: stock.color === BRAND.paper ? "inset 0 0 0 1px rgb(0 0 0 / .08)" : undefined,
-        ...style,
-      }}
-      aria-label={`${stock.name} (${stock.ticker}) card`}
+      className="flex shrink-0 items-center justify-center overflow-hidden rounded-full"
+      style={{ width: px, height: px, background: CARD.white, boxShadow: ring ? "0 0 0 2px rgba(255,255,255,.25)" : undefined }}
     >
-      {/* Light sheen + depth, like a printed card. */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background: `radial-gradient(120% 70% at 0% 0%, rgb(255 255 255 / ${dark ? 0.35 : 0.22}), transparent 55%), radial-gradient(90% 60% at 100% 100%, rgb(0 0 0 / ${dark ? 0.12 : 0.28}), transparent 60%)`,
-        }}
-      />
-
-      {/* The company logo as a large, clear watermark, blended into the card colour. */}
-      {logo && (
+      {stock.logo ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logo}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute max-w-none"
-          style={{
-            width: "118%",
-            right: "-38%",
-            bottom: compact ? "-30%" : "-8%",
-            transform: "rotate(-12deg)",
-            borderRadius: "50%",
-            filter: "grayscale(1) contrast(1.25)",
-            mixBlendMode: dark ? "multiply" : "screen",
-            opacity: dark ? 0.22 : 0.3,
-          }}
-        />
-      )}
-
-      {/* Top row: kind chip + logo */}
-      <div className="absolute flex items-center justify-between" style={{ top: "0.9em", left: "0.9em", right: "0.9em" }}>
-        {!compact ? (
-          <span
-            className="font-medium uppercase"
-            style={{ fontSize: "0.62em", letterSpacing: "0.12em", padding: "0.35em 0.8em", borderRadius: 999, background: dark ? "rgb(0 0 0 / .08)" : "rgb(255 255 255 / .16)" }}
-          >
-            {stock.kind === "etf" ? "Fund" : "bStock"}
-          </span>
-        ) : (
-          <span />
-        )}
-        <span
-          className="grid place-items-center overflow-hidden font-semibold"
-          style={{
-            width: logo ? "2.5em" : "2.1em",
-            height: logo ? "2.5em" : "2.1em",
-            borderRadius: 999,
-            background: dark ? BRAND.ink : BRAND.paper,
-            color: dark ? BRAND.paper : BRAND.ink,
-            fontSize: "0.95em",
-            boxShadow: "0 2px 8px rgb(0 0 0 / .18)",
-          }}
-        >
-          {logo ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logo} alt={`${stock.name} logo`} className="size-full object-cover" />
-          ) : (
-            stock.ticker[0]
-          )}
-        </span>
-      </div>
-
-      {/* Huge stacked ticker */}
-      <div
-        className="absolute font-sans font-semibold uppercase"
-        style={{ left: "0.55em", right: "0.4em", top: compact ? "26%" : "21%", fontSize: `${tickerEm}em`, lineHeight: 0.86, letterSpacing: "-0.05em" }}
-      >
-        <div>{stock.ticker}</div>
-        <div className="ticker-outline" style={{ ["--outline" as string]: fg, opacity: 0.9 }}>
-          {stock.ticker}
-        </div>
-        {!compact && (
-          <div
-            className="font-sans font-medium normal-case"
-            style={{ fontSize: `${0.82 / tickerEm}em`, letterSpacing: "-0.01em", marginTop: "0.9em", opacity: 0.85, lineHeight: 1.2 }}
-          >
-            {stock.name}
-          </div>
-        )}
-      </div>
-
-      {/* Bottom: frosted strip with price, or a weight badge */}
-      {weightPct !== undefined ? (
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between" style={{ padding: "0 0.8em 0.8em" }}>
-          <span
-            className="t-num font-medium"
-            style={{ fontSize: "1.5em", padding: "0.15em 0.5em", borderRadius: "0.6em", background: dark ? "rgb(255 255 255 / .55)" : "rgb(0 0 0 / .28)" }}
-          >
-            {weightPct}%
-          </span>
-        </div>
+        <img src={stock.logo} alt={stock.ticker} width={logoPx} height={logoPx} className="rounded-full object-cover" style={{ width: logoPx, height: logoPx, transform: "scale(1.22)" }} />
       ) : (
-        !compact && (
-          <div
-            className="absolute flex items-center justify-between"
-            style={{
-              left: "0.6em",
-              right: "0.6em",
-              bottom: "0.6em",
-              padding: "0.55em 0.7em",
-              borderRadius: "1.1em",
-              background: dark ? "rgb(255 255 255 / .55)" : "rgb(0 0 0 / .26)",
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            <span className="leading-tight">
-              <span className="t-num block font-medium" style={{ fontSize: "1em" }}>
-                ${stock.price.toFixed(2)}
-              </span>
-              {changePct !== undefined && (
-                <span className="t-num block" style={{ fontSize: "0.72em", opacity: 0.9 }}>
-                  {changePct >= 0 ? "▲" : "▼"} {Math.abs(changePct).toFixed(2)}%
-                </span>
-              )}
-            </span>
-            <LogoMark size={(width / CARD_W) * 22} />
-          </div>
-        )
+        <span style={{ fontFamily: display, fontWeight: 900, fontSize: logoPx * 0.6, color: CARD.text }}>{stock.ticker[0]}</span>
       )}
+    </div>
+  );
+}
+
+function Watermark({ stock, px, right, top }: { stock: StockInfo; px: number; right: number; top: number }) {
+  if (!stock.logo) return null;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={stock.logo}
+      alt=""
+      aria-hidden="true"
+      className="pointer-events-none absolute rounded-full object-contain"
+      style={{ width: px, height: px, right, top, transform: "rotate(-14deg)", opacity: 0.16, filter: "grayscale(1) brightness(1.6)", clipPath: "circle(41%)" }}
+    />
+  );
+}
+
+function Ticker({ text, px }: { text: string; px: number }) {
+  const solid: React.CSSProperties = { fontFamily: display, fontSize: px, fontWeight: 900, lineHeight: 0.86, letterSpacing: "-0.05em", color: CARD.white, whiteSpace: "nowrap" };
+  return (
+    <>
+      <div style={solid}>{text}</div>
+      <div aria-hidden="true" style={{ ...solid, color: "transparent", WebkitTextStroke: "1.2px rgba(255,255,255,.9)" }}>
+        {text}
+      </div>
+    </>
+  );
+}
+
+export function StockCard({ stock, size = "big", price, changePct, weightPct, showWeight, onAdd, addLabel, className = "", style }: StockCardProps) {
+  const { w, h, r } = CARD_SIZES[size];
+  const c = stock.color;
+  const l = stock.colorLight;
+  const p = price ?? stock.price;
+  const up = (changePct ?? 0) >= 0;
+  const label = `${stock.name} (${stock.ticker})`;
+  const base: React.CSSProperties = { position: "relative", width: w, height: h, borderRadius: r, overflow: "hidden", background: CARD.black, flexShrink: 0, fontFamily: display, ...style };
+
+  if (size === "tiny34") {
+    return (
+      <div className={`flex items-center justify-center ${className}`} style={{ ...base, background: `linear-gradient(180deg, ${CARD.black} 0%, ${c} 75%)` }} title={label} aria-label={label}>
+        <LogoBadge stock={stock} px={22} logoPx={14} />
+      </div>
+    );
+  }
+
+  if (size === "tiny64" || size === "tiny48") {
+    const t64 = size === "tiny64";
+    return (
+      <div className={className} style={base} aria-label={weightPct !== undefined ? `${label} ${weightPct}%` : label}>
+        <div style={{ position: "absolute", inset: -10, filter: "blur(6px)", background: `linear-gradient(180deg, ${CARD.black} 0%, ${c} 40%, ${l} 80%)` }} />
+        <div className="absolute inset-0 flex flex-col items-center justify-between" style={{ padding: t64 ? "8px 4px 6px" : "7px 2px 6px" }}>
+          <LogoBadge stock={stock} px={t64 ? 26 : 22} logoPx={t64 ? 17 : 14} />
+          <div className="flex flex-col items-center" style={{ gap: 3 }}>
+            <div style={{ fontSize: t64 ? 12 : 10, fontWeight: 900, letterSpacing: "-0.04em", color: CARD.text }}>{stock.ticker}</div>
+            {t64 && weightPct !== undefined && (
+              <div style={{ fontFamily: mono, fontSize: 8, fontWeight: 600, color: CARD.text, background: CARD.white, borderRadius: 999, padding: "2px 6px" }}>{weightPct}%</div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const big = size === "big";
+  const changeEl = changePct !== undefined && (
+    <div style={{ fontSize: big ? 10 : 9, fontWeight: 600, color: up ? CARD.up : CARD.down }}>
+      <span className="sr-only">{up ? "up" : "down"} </span>
+      {fmtChange(changePct)}
+    </div>
+  );
+
+  return (
+    <div className={className} style={{ ...base, boxShadow: big ? "0 24px 48px -18px rgba(0,0,0,.6)" : undefined }} aria-label={`${label} card`}>
+      <div style={glow(c, l)} />
+      {big ? <Watermark stock={stock} px={170} right={-38} top={118} /> : <Watermark stock={stock} px={118} right={-28} top={80} />}
+      <div className="absolute inset-0 flex flex-col" style={{ padding: big ? 15 : 10 }}>
+        <div className="flex items-center justify-between">
+          <div className="flex" style={{ gap: 5 }}>
+            <div style={{ fontSize: big ? 8 : 7, fontWeight: 700, letterSpacing: "0.12em", color: CARD.white, padding: big ? "5px 9px" : "4px 7px", borderRadius: 999, background: "rgba(255,255,255,.16)" }}>
+              {stock.kind === "etf" ? "FUND" : "BSTOCK"}
+            </div>
+            {big && showWeight && weightPct !== undefined && (
+              <div style={{ fontFamily: mono, fontSize: 8, fontWeight: 600, color: CARD.text, padding: "5px 8px", borderRadius: 999, background: CARD.white }}>{weightPct}%</div>
+            )}
+          </div>
+          <LogoBadge stock={stock} px={big ? 30 : 22} logoPx={big ? 20 : 14} ring={big} />
+        </div>
+        <div className="flex flex-col" style={{ marginTop: big ? 24 : 16 }}>
+          <Ticker text={stock.ticker} px={tickerPx(stock.ticker.length, big)} />
+          {big && <div style={{ marginTop: 10, fontSize: 11, fontWeight: 500, color: "rgba(255,255,255,.92)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{stock.name}</div>}
+        </div>
+        {big ? (
+          <div className="mt-auto flex items-center justify-between" style={{ padding: "9px 10px 9px 13px", borderRadius: 16, background: CARD.white, boxShadow: "0 6px 18px -6px rgba(0,0,0,.25)" }}>
+            <div className="flex flex-col" style={{ gap: 2, fontFamily: mono }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: CARD.text, letterSpacing: "-0.02em" }}>{fmtPrice(p)}</div>
+              {changeEl}
+            </div>
+            <CardAddButton onAdd={onAdd} label={addLabel ?? `Add ${stock.ticker}`} />
+          </div>
+        ) : (
+          <div className="mt-auto flex flex-col" style={{ gap: 1, padding: "7px 10px", borderRadius: 11, background: CARD.white, fontFamily: mono }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: CARD.text }}>{fmtPrice(p)}</div>
+            {changeEl}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

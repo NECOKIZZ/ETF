@@ -18,7 +18,7 @@ export async function GET() {
       address: s.address,
       logo: s.logo ?? null,
       color: s.color,
-      ink: s.ink,
+      colorLight: s.colorLight,
       price: p ? Number(p.value) / 1e18 : s.price,
       trading: p ? p.trading : null,
     };

@@ -80,10 +80,10 @@ export default function UiKit() {
               </div>
             </div>
             <div className="hidden md:block">
-              <StockDeck stocks={deck} changes={changes} spread={118} cardWidth={200} />
+              <StockDeck stocks={deck} changes={changes} />
             </div>
             <div className="md:hidden">
-              <StockDeck stocks={deck.slice(1, 4)} changes={changes} spread={150} cardWidth={150} />
+              <StockDeck stocks={deck.slice(1, 4)} changes={changes} size="medium" />
             </div>
           </div>
         </div>
@@ -141,10 +141,12 @@ export default function UiKit() {
         <Section label="02 · Stock card" title="Every stock is a card">
           <div className="flex flex-wrap items-end gap-6">
             <StockCard stock={st("NVDA")} changePct={changes.NVDA} />
-            <StockCard stock={st("TSLA")} changePct={changes.TSLA} width={180} />
-            <StockCard stock={st("SPY")} changePct={changes.SPY} width={150} />
-            <StockCard stock={st("HOOD")} width={110} compact />
-            <StockCard stock={st("META")} width={64} compact weightPct={34} />
+            <StockCard stock={st("TSLA")} changePct={changes.TSLA} weightPct={40} showWeight />
+            <StockCard stock={st("SPY")} size="medium" changePct={changes.SPY} />
+            <StockCard stock={st("HOOD")} size="medium" changePct={changes.HOOD} />
+            <StockCard stock={st("META")} size="tiny64" weightPct={34} />
+            <StockCard stock={st("MSFT")} size="tiny48" />
+            <StockCard stock={st("GOOGL")} size="tiny34" />
           </div>
         </Section>
       </Band>
@@ -168,7 +170,7 @@ export default function UiKit() {
                 <Change pct={3.41} className="text-[22px] font-medium" />
               </div>
               <div className="mt-6 flex justify-center">
-                <EtfHand holdings={AI_CHIPS} cardWidth={92} />
+                <EtfHand holdings={AI_CHIPS} />
               </div>
               <div className="mt-8">
                 <WeightBar holdings={AI_CHIPS} />
@@ -177,7 +179,7 @@ export default function UiKit() {
             <div className="flex flex-col gap-4">
               {LEAGUE.slice(1, 4).map((e) => (
                 <div key={e.name} className="flex items-center gap-5 rounded-[24px] bg-bg p-5 shadow-card">
-                  <EtfHand holdings={e.holdings} cardWidth={48} />
+                  <EtfHand holdings={e.holdings} size="tiny48" showWeights={false} />
                   <div className="min-w-0 flex-1">
                     <div className="font-medium">{e.name}</div>
                     <div className="mt-2">

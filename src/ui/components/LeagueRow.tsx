@@ -1,6 +1,6 @@
 // One ETF in the league table: rank, hand, name, return, team, odds, Back.
 
-import { EtfHand, type Holding } from "./EtfHand";
+import { EtfChips, type Holding } from "./EtfHand";
 import { Change } from "./Pills";
 
 export interface LeagueEntry {
@@ -18,7 +18,7 @@ export function LeagueRow({ e, winning }: { e: LeagueEntry; winning: boolean }) 
   return (
     <div className={`grid grid-cols-[28px_auto_1fr_auto] items-center gap-4 rounded-[20px] px-4 py-3 md:grid-cols-[32px_auto_1fr_110px_90px_130px_auto] md:gap-6 ${winning ? "bg-up-bg/50" : ""}`}>
       <span className="t-num text-[15px] text-muted">{e.rank}</span>
-      <EtfHand holdings={e.holdings} cardWidth={34} showWeights={false} />
+      <EtfChips holdings={e.holdings} />
       <div className="min-w-0">
         <div className="truncate font-medium">{e.name}</div>
         <div className="truncate text-[13px] text-muted">by {e.creator}</div>
