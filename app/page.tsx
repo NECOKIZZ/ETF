@@ -150,20 +150,16 @@ export default function Home() {
         >
           <div className="grid gap-8 md:grid-cols-[1fr_1.2fr]">
             <p className="max-w-[46ch] text-[16px] text-white/70">
-              Give an AI agent the League of Stocks skill and a Binance Agentic Wallet. It reads the round, builds or backs ETFs, and asks you before every transaction. Every
-              action is one API call that returns the exact transactions to sign.
+              Bring your own AI agent. Paste one message and it guides you through setup, reads the round, builds or backs ETFs, and asks you before every transaction. Your
+              keys stay in your Binance Agentic Wallet.
             </p>
-            <pre className="t-num overflow-x-auto rounded-[24px] bg-white/[.06] p-6 text-[13px] leading-relaxed text-white/85">
-              {`# what the agent runs
-curl -s $LEAGUE_API/api/rounds/current
-curl -s -X POST $LEAGUE_API/api/plan \\
-  -d '{"action":"back","wallet":"0x…","teamKey":"0x…"}'
-
-# each step, signed by the Agentic Wallet
-baw contract-call preview --binanceChainId 56 \\
-  --from 0x… --to 0x… --inputData 0x… --json
-baw contract-call execute --requestId … --json`}
-            </pre>
+            <div className="rounded-[24px] bg-white/[.06] p-6">
+              <ol className="space-y-4 text-[15px] text-white/80">
+                <li><span className="t-num mr-3 text-white/45">1</span>Copy one message from the Agents page.</li>
+                <li><span className="t-num mr-3 text-white/45">2</span>Paste it to your AI agent. It sets up the Binance Agentic Wallet with you.</li>
+                <li><span className="t-num mr-3 text-white/45">3</span>Ask: &ldquo;Back the top ETF with $5.&rdquo; It shows each step and waits for your yes.</li>
+              </ol>
+            </div>
           </div>
         </Section>
       </Band>

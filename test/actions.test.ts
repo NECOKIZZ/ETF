@@ -68,3 +68,15 @@ describe("buy plan → steps", () => {
     expect(skipped).toEqual([{ token: SPY, reason: expect.stringMatching(/RFQ/) }]);
   });
 });
+
+describe("agent guide", () => {
+  it("fills in the site address everywhere and says what the agent must never do", async () => {
+    const { agentGuide, agentPrompt } = await import("../src/agent/guide");
+    const g = agentGuide("https://league.example");
+    expect(g).toContain("https://league.example/api/plan");
+    expect(g).toContain("baw contract-call preview");
+    expect(g).toMatch(/Never ask for or accept private keys/);
+    expect(g).not.toMatch(/\$\{|undefined/);
+    expect(agentPrompt("https://league.example")).toBe("Read https://league.example/agent.md and follow it to help me play League of Stocks. Guide me one step at a time, in plain words.");
+  });
+});
