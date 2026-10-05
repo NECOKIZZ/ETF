@@ -155,6 +155,7 @@ People hold on-chain ETFs on **EARN** (Balancer V3 weighted pools of Robinhood s
 - One live demo round completes on mainnet: enter → lock → settle → claim, with at least 4 ETFs and at least 1 backer team.
 
 ## 11. Open questions / risks
+- **⚠️ Balancer is winding down (BIP-928, passed Sept 2026):** pausable pools go **withdrawals-only on 30 Oct 2026** (extension to 30 Nov if requested by 16 Oct). EARN's docs now describe Uniswap v3/v4. Re-check what EARN's ETFs run on before building on them.
 - **Chainlink feed addresses** for each Robinhood stock token: take from Chainlink's Robinhood feeds page (don't hardcode from memory). Do all EARN stock tokens have feeds?
 - **Stock token eligibility:** Robinhood stock tokens may be restricted for some users (e.g. US persons). Check before inviting testers.
 - **EARN dependency:** unknown audit status; small pools. Get EARN's OK and ideally co-marketing.

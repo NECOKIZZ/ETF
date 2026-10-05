@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createHmac } from "node:crypto";
 import { signRequest, toQuery, w3Request, BinanceW3Error, decimalToE18, tokenValueE18 } from "../src/bsc/binanceWeb3";
 import { teamKeyOf, splitBuy, clampCreatorFee } from "../src/bsc/basket";
+import { isLeveraged } from "../src/bsc/tokens";
 
 const NVDA = "0x1111111111111111111111111111111111111111";
 const TSLA = "0x2222222222222222222222222222222222222222";
@@ -93,5 +94,24 @@ describe("RWA token value", () => {
     const v = tokenValueE18("24.465700263163722", "1.038001708237747999");
     // Binance's own tokenPrice for that sample was 25.3954386663966642…
     expect(Number(v) / 1e18).toBeCloseTo(25.3954386663966642, 9);
+  });
+});
+
+describe("leveraged-fund ban", () => {
+  const t = (underlyingTicker: string, underlyingName: string, tokenName = "") => ({ underlyingTicker, underlyingName, tokenName });
+  it("bans leveraged and inverse funds by name or ticker", () => {
+    expect(isLeveraged(t("TQQQ", "ProShares UltraPro QQQ"))).toBe(true);
+    expect(isLeveraged(t("SOXL", "Direxion Daily Semiconductor Bull 3X Shares"))).toBe(true);
+    expect(isLeveraged(t("XYZ", "Some Fund 2X Long NVDA Daily ETF"))).toBe(true);
+    expect(isLeveraged(t("SQQQ", "ProShares UltraPro Short QQQ"))).toBe(true);
+    expect(isLeveraged(t("KORU", "anything"))).toBe(true);
+  });
+  it("keeps plain stocks and index funds", () => {
+    expect(isLeveraged(t("SPY", "SPDR S&P 500 ETF Trust"))).toBe(false);
+    expect(isLeveraged(t("QQQ", "Invesco QQQ Trust"))).toBe(false);
+    expect(isLeveraged(t("EWY", "iShares MSCI South Korea ETF"))).toBe(false);
+    expect(isLeveraged(t("NVDA", "NVIDIA Corporation", "NVIDIA (bStock)"))).toBe(false);
+    expect(isLeveraged(t("PBR", "PETROLEO BRASILEIRO S.A.-PETROBRAS"))).toBe(false);
+    expect(isLeveraged(t("SHV", "iShares Short Treasury Bond ETF"))).toBe(false);
   });
 });

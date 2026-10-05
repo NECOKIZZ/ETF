@@ -17,7 +17,8 @@ On-chain stock ETFs on BSC, built from **bStocks / Ondo / xStocks** tokens, play
 |---|---|
 | Ticket | Fixed **$5 BSC USDT** (18 decimals) per entry |
 | Creator basket | ≥ 3 allowlisted stock tokens, ≥ **$10** total, no token above 50%, ≤ 10 tokens. Locked in escrow for the round, then returned whatever the result |
-| Score | Buy-and-hold % return of the locked quantities, priced by the Binance RWA price API (reference price by default; on-chain price in demo mode, since bStocks trade 24/7) |
+| Banned tokens | **Leveraged and inverse funds** (TQQQ, SOXL…: detected by name + ticker list, `src/bsc/tokens.ts`), pre-IPO tokens, anything not TRADING |
+| Score | Buy-and-hold % return of the locked quantities. Token value = reference share price × `tokenToShareRatio` (the ratio grows with reinvested dividends), from the Binance RWA API. On-chain `tokenPrice` in demo mode, since bStocks trade 24/7 |
 | Teams | One ETF = one team. Captain = its creator. Ticket backers join with $5 only |
 | Clone-merging | Same stocks + same weights (to 1%) = one team (`teamKeyOf`). A later clone joins the first team as a member |
 | Team cap | 20 members per team (captain excluded) |
@@ -53,7 +54,20 @@ On-chain stock ETFs on BSC, built from **bStocks / Ondo / xStocks** tokens, play
 | Sat 10 | DX report (written by you, from your notes), final checks |
 | Sun 11 | Submit before **12:00 UTC** |
 
-## 5. Open questions
+## 5. Ideas from EARN (earnonhood.com, the Robinhood Chain ETF app)
+What they do:
+- **ETFs** are weighted pools of **2–8 assets**, weights fixed at creation, equal weights by default. The yield is a **0.30% swap fee** on trades through the pool: 90% to holders, 10% to EARN. **Creators get nothing extra** and have no admin powers.
+- **Auto vaults:** single-stock liquidity on Uniswap v4 managed by Steer (SPY, NVDA, TSLA, QQQ, SpaceX…), showing **15–31% APY**, partly from Merkl incentives.
+- Clear disclaimer: *"'ETF' is product branding, not a regulated exchange-traded fund… Capital is at risk."*
+- Popular picks: SPY, QQQ, NVDA, TSLA, AAPL, SpaceX, plus meme coins.
+
+What we take:
+1. **Creation UX:** pick assets, "equal weights" button, weights must total 100%, review screen, one payment split across the basket by live quotes. Same flow for our creators.
+2. **Their disclaimer wording** on every page.
+3. **Our edge to pitch:** EARN pays creators nothing. We pay creators a buy fee on every backer's purchase, plus 10% of ticket-backers' winnings, and add a weekly competition with a leaderboard.
+4. **Later (stretch):** yield on locked baskets while a round runs. The Binance DeFi Data / DeFi Transaction APIs list lending protocols and build deposit calldata, which would be deep API usage. Only if the core is done.
+
+## 6. Open questions
 - **Eligibility:** the hackathon is closed to residents of the US, Canada, the Netherlands, the UK and Japan. Confirm every team member is outside these.
 - **Referral fee on stock tokens:** stock routes are RFQ. Check that the fee parameters are accepted there.
 - **bStocks transfer rules:** confirm bStocks can move into a contract (the escrow). If not, creators of bStock ETFs use a balance check instead of a lock.
