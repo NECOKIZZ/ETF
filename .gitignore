@@ -5,3 +5,5 @@ node_modules/
 contracts/out/
 contracts/cache/
 contracts/broadcast/*/*/dry-run/
+.next/
+next-env.d.ts

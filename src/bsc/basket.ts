@@ -1,4 +1,4 @@
-// ETF League basket helpers shared by the keeper, API routes and UI:
+// League of Stocks basket helpers shared by the keeper, API routes and UI:
 // team keys (clone-merging) and the buy-the-basket split.
 
 import { encodeAbiParameters, keccak256, getAddress, type Hex } from "viem";

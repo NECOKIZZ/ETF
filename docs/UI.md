@@ -1,6 +1,6 @@
-# ETF League: UI plan
+# League of Stocks: UI plan
 
-**Status:** plan for review. Nothing is built yet.
+**Status:** steps 1–2 built: app skeleton + signature components on `/ui` (run `pnpm dev`, open /ui).
 **Goal:** a web app that looks like a polished consumer product in a 4-minute demo. Judging counts product quality and UX for 20%, and the "Web2-adjacent" feel matters.
 **Not Kickoff:** this is its own brand. The only thing taken from Kickoff is the *shape language*: rounded, overlapping cards and the fanned card deck, redrawn for stocks.
 
@@ -78,7 +78,7 @@ Red is never used for "you lost": orange keeps it calm. Green and orange are alw
 2. **Round pill** (Sleeve's status pill). `● Round 12 · locks in 2d 04:13:22`, mint when open for entries, orange in the last hour, grey while running ("Running · settles Mon 13:30 UTC").
 3. **Stock card** (Kickoff player card, redrawn).
    - Portrait 7:10, 28px radius, the company's brand colour as the background (from a small colour map; fallback taken from the logo).
-   - **Huge ticker** stacked twice, one filled and one outlined (`NVDA` / `NVDA`); token logo top-right; ETF League mark bottom-right.
+   - **Huge ticker** stacked twice, one filled and one outlined (`NVDA` / `NVDA`); token logo top-right; League of Stocks mark bottom-right.
    - A frosted strip at the bottom: price · ▲ 1.24% · "● Market open".
    - Used in the landing deck, in pickers and in ETF composition.
 4. **ETF hand.** An ETF *is* a hand of stock cards: its 3–8 cards fanned small (the Kickoff fan at 40% size), with weight % on each card. Shown on ETF rows, ETF pages and share cards. This is our most recognisable visual.
@@ -171,7 +171,7 @@ Short, exact, calm, like Gloam and Sleeve. Real numbers and times, no hype words
 | 7 | Agents page, share cards, polish, phone pass |
 
 ## 9. Decisions needed from you
-1. **Name.** "ETF League" is the working name. Keep it or choose another before the logo.
+1. ✅ **Name:** League of Stocks.
 2. **Logo:** a simple mark, e.g. three stacked rounded cards. I can draw a first version.
 3. **Footer illustration:** etching-style bull (Gloam-like). I'd draw a simplified line version in SVG; a proper illustration would need an artist or image tool.
 4. **WalletConnect project ID** (free at cloud.reown.com) for phone wallets. Optional; Binance Wallet and MetaMask work without it.

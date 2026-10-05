@@ -7,7 +7,7 @@ interface IERC20Min {
     function balanceOf(address who) external view returns (uint256);
 }
 
-/// @title LeagueEscrow — ETF League rounds on BSC (tokenized stocks).
+/// @title LeagueEscrow — League of Stocks rounds on BSC (tokenized stocks).
 /// @notice Holds the fixed ticket stakes and the creators' locked stock
 ///         baskets for each round, then pays out the keeper's settlement.
 ///

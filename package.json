@@ -1,8 +1,8 @@
 {
-  "name": "etf-league",
+  "name": "league-of-stocks",
   "version": "0.1.0",
   "private": true,
-  "description": "ETF League: on-chain stock ETFs on BNB Chain compete in weekly leagues. Built for BNB Hack: Tokenized Stocks Edition.",
+  "description": "League of Stocks: on-chain stock ETFs on BNB Chain compete in weekly leagues. Built for BNB Hack: Tokenized Stocks Edition.",
   "type": "module",
   "license": "MIT",
   "packageManager": "pnpm@10.28.0",
@@ -14,15 +14,25 @@
     "test:contracts": "cd contracts && forge test",
     "typecheck": "tsc --noEmit",
     "rwa:tokens": "tsx --env-file=.env.local scripts/rwa-tokens.mts",
-    "quote": "tsx --env-file=.env.local scripts/quote.mts"
+    "quote": "tsx --env-file=.env.local scripts/quote.mts",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
   "dependencies": {
-    "viem": "^2.55.8"
+    "viem": "^2.55.8",
+    "next": "^16.2.10",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
     "tsx": "^4.23.1",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "@tailwindcss/postcss": "^4.3.3",
+    "tailwindcss": "^4.3.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3"
   }
 }

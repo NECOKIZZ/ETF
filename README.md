@@ -1,4 +1,4 @@
-# ETF League
+# League of Stocks
 
 On-chain stock ETFs on BNB Chain, playing a weekly league. Built for **BNB Hack: Tokenized Stocks Edition**.
 
@@ -60,3 +60,9 @@ The Binance Web3 API refuses requests from restricted regions (including the US)
 
 ## License
 MIT
+
+## Web app
+```bash
+pnpm dev             # http://localhost:3000/ui shows every UI component
+```
+The design plan is in [`docs/UI.md`](docs/UI.md).

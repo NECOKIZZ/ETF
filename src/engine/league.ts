@@ -1,4 +1,4 @@
-// ETF League settlement engine.
+// League of Stocks settlement engine.
 //
 // Weekly (or demo-length) rounds where on-chain stock baskets ("ETFs") are
 // ranked by the % growth of their stocks. The top half of teams win the bottom

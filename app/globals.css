@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+/* League of Stocks design tokens (docs/UI.md §2). */
+:root {
+  --bg: #ffffff;
+  --surface: #f4f5f7;
+  --surface-2: #eceef2;
+  --ink: #0b0b0c;
+  --muted: #5b6270;
+  --line: #e7e9ed;
+  --up: #007456;
+  --up-bg: #d8faeb;
+  --down: #c2410c;
+  --down-bg: #ffedd5;
+  --bnb: #f0b90b;
+  --mint-1: #eef2f1;
+  --mint-2: #cfebdd;
+  --mint-3: #b8dccb;
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
+  --lift-shadow: 0 24px 60px rgb(0 0 0 / 0.18);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0b0c;
+    --surface: #16171a;
+    --surface-2: #1d1f23;
+    --ink: #f4f5f7;
+    --muted: #9aa1ad;
+    --line: #24262b;
+    --up: #3ddc97;
+    --up-bg: #0e2a20;
+    --down: #fb923c;
+    --down-bg: #2a1a0e;
+    --mint-1: #121715;
+    --mint-2: #13241c;
+    --mint-3: #173327;
+    --card-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+    --lift-shadow: 0 24px 60px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b0b0c;
+  --surface: #16171a;
+  --surface-2: #1d1f23;
+  --ink: #f4f5f7;
+  --muted: #9aa1ad;
+  --line: #24262b;
+  --up: #3ddc97;
+  --up-bg: #0e2a20;
+  --down: #fb923c;
+  --down-bg: #2a1a0e;
+  --mint-1: #121715;
+  --mint-2: #13241c;
+  --mint-3: #173327;
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+  --lift-shadow: 0 24px 60px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-up: var(--up);
+  --color-up-bg: var(--up-bg);
+  --color-down: var(--down);
+  --color-down-bg: var(--down-bg);
+  --color-bnb: var(--bnb);
+
+  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-chip: 14px;
+  --radius-card: 24px;
+  --radius-stock: 28px;
+  --radius-panel: 32px;
+  --radius-band: 48px;
+
+  --shadow-card: var(--card-shadow);
+  --shadow-lift: var(--lift-shadow);
+
+  --ease-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headings: light and tight (Gloam), UI headings: medium and tight (Sleeve). */
+.t-display {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+}
+.t-heading {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: -0.032em;
+  line-height: 1.08;
+}
+.t-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.t-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.mint-gradient {
+  background:
+    radial-gradient(60% 80% at 15% 20%, color-mix(in oklab, var(--surface-2) 90%, transparent), transparent 70%),
+    radial-gradient(70% 90% at 85% 80%, var(--mint-3), transparent 70%),
+    linear-gradient(135deg, var(--mint-1), var(--mint-2) 55%, var(--mint-3));
+}
+
+/* Stock card ticker: one line filled, one outlined (Kickoff player-card type). */
+.ticker-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--outline, #fff);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

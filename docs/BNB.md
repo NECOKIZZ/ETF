@@ -1,4 +1,4 @@
-# ETF League on BSC: build spec
+# League of Stocks on BSC: build spec
 
 **Target:** BNB Hack: Tokenized Stocks Edition. Submissions lock **Sun 11 Oct 2026, 12:00 UTC**.
 **Status (Mon 5 Oct):** the engine, escrow and Binance API client are built and tested. The keeper jobs, database, UI and mainnet deploy are next.
