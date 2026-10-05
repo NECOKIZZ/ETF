@@ -57,7 +57,7 @@ export function StockDeck({
                 : "translateX(0) translateY(120px) rotate(0deg) scale(0.85)",
               opacity: inView ? 1 : 0,
               borderRadius: 28 * k,
-              boxShadow: lifted ? `0 30px 70px rgb(0 0 0 / .32), 0 0 40px ${s.color}66` : "0 16px 40px rgb(0 0 0 / .18)",
+              boxShadow: lifted ? `0 30px 70px rgb(0 0 0 / .32), 0 0 40px color-mix(in oklab, var(--brand-mint) 40%, transparent)` : "0 16px 40px rgb(0 0 0 / .18)",
             }}
           >
             <StockCard stock={s} width={cardWidth} changePct={changes[s.ticker]} />

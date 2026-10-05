@@ -44,20 +44,20 @@
 
 Scale: 72 / 56 / 40 / 28 / 21 / 17 / 15 / 13 / 11 (uppercase labels at 11px with +0.12em tracking).
 
-### Colour
-| Token | Light | Dark | Use |
-|---|---|---|---|
-| `bg` | `#FFFFFF` | `#0B0B0C` | page |
-| `surface` | `#F4F5F7` | `#16171A` | panels, cards |
-| `ink` | `#0B0B0C` | `#F4F5F7` | text, primary buttons |
-| `muted` | `#5B6270` | `#9AA1AD` | secondary text |
-| `line` | `#E7E9ED` | `#24262B` | borders |
-| `up` | `#007456` on `#D8FAEB` | `#3DDC97` on `#0E2A20` | gains, "open", winning |
-| `down` | `#C2410C` on `#FFEDD5` | `#FB923C` on `#2A1A0E` | losses, "closing" (orange, as in Sleeve) |
-| `bnb` | `#F0B90B` | `#F0B90B` | small chain accents only: "on BNB Chain" chip, round number |
-| `mint-gradient` | `#EEF2F1 → #CFEBDD → #B8DCCB` | dim variant | hero, featured panels |
+### Colour: four brand colours only
+| Brand colour | Hex | Use |
+|---|---|---|
+| **Ink** | `#0B0B0C` | text, dark panels, dark cards (page background in dark mode) |
+| **Paper** | `#FFFFFF` | page, light cards (text in dark mode) |
+| **Mint** | `#3DDC97` | gains, winners, highlights, hero gradient |
+| **Coral** | `#FF5A36` | losses, "closing", the cut-off line |
 
-Red is never used for "you lost": orange keeps it calm. Green and orange are always paired with ▲/▼ or text, never colour alone.
+Every other shade (surface, muted, line, the darker green for "up" text on white, the pale pill backgrounds, the mint gradient) is a **mix of these four**, defined once in `app/globals.css` (`--brand-*`). To change a colour, edit `--brand-*` there and `BRAND` in `src/ui/data/palette.ts`. A test (`test/palette.test.ts`) fails if any other hex colour appears in the UI code.
+
+- Stock cards rotate ink / mint / paper; the company **logo** tells stocks apart, not colour. Coral is never a card colour, because it means "down".
+- Weight bars step through ink and mint by position in the basket; the legend names each stock.
+- Company logos keep their own colours (they're the companies' marks, not ours).
+- Green and coral always come with ▲/▼ or text, never colour alone.
 
 ### Shape and depth
 - Radius: pills `999px` · inputs and chips `14px` · cards `24px` · panels `32px` · **stock cards `28px`** · landing bands `48px` top corners.

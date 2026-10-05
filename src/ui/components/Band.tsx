@@ -7,7 +7,7 @@ const tones: Record<Tone, string> = {
   white: "bg-bg text-ink",
   surface: "bg-surface text-ink",
   mint: "mint-gradient text-ink",
-  black: "bg-[#0B0B0C] text-[#F4F5F7]",
+  black: "bg-brand-ink text-brand-paper",
 };
 
 export function Band({ tone = "white", overlap = true, children, className = "", z = 1 }: { tone?: Tone; overlap?: boolean; children: React.ReactNode; className?: string; z?: number }) {

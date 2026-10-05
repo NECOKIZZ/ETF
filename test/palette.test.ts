@@ -1,33 +1,31 @@
 import { describe, it, expect } from "vitest";
-import { cardPalette, hexToOklab, deltaE, oklchToHex, MIN_SEPARATION } from "../src/ui/data/palette";
+import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { join } from "node:path";
+import { BRAND_HEX } from "../src/ui/data/palette";
 import { BSTOCKS } from "../src/ui/data/stocks";
 
-describe("card colours", () => {
-  it("palette colours are valid and well separated", () => {
-    const pal = cardPalette();
-    expect(new Set(pal).size).toBe(pal.length);
-    for (const h of pal) expect(h).toMatch(/^#[0-9A-F]{6}$/);
-    let min = Infinity;
-    for (let i = 0; i < pal.length; i++)
-      for (let j = i + 1; j < pal.length; j++) min = Math.min(min, deltaE(hexToOklab(pal[i]), hexToOklab(pal[j])));
-    expect(min).toBeGreaterThanOrEqual(MIN_SEPARATION);
-    expect(pal.length).toBeGreaterThanOrEqual(BSTOCKS.length + 4);
+const files = (dir: string): string[] =>
+  readdirSync(dir).flatMap((f) => {
+    const p = join(dir, f);
+    return statSync(p).isDirectory() ? files(p) : /\.(tsx?|css)$/.test(p) ? [p] : [];
   });
 
-  it("every stock gets its own colour", () => {
-    const colors = BSTOCKS.map((s) => s.color);
-    expect(new Set(colors).size).toBe(colors.length);
+describe("four brand colours only", () => {
+  it("every stock card uses a brand colour", () => {
+    for (const s of BSTOCKS) expect(BRAND_HEX, s.ticker).toContain(s.color);
   });
 
-  it("round-trips OKLCH for in-gamut colours", () => {
-    const lab = hexToOklab(oklchToHex(0.6, 0.1, 150));
-    expect(lab[0]).toBeCloseTo(0.6, 2);
+  it("no other hex colour appears in the UI code", () => {
+    const allowed = new Set(BRAND_HEX.map((h) => h.toLowerCase()));
+    for (const f of [...files("app"), ...files("src/ui")]) {
+      const hexes = readFileSync(f, "utf8").match(/#[0-9a-fA-F]{6}\b/g) ?? [];
+      for (const h of hexes) expect(allowed.has(h.toLowerCase()), `${f}: ${h}`).toBe(true);
+    }
   });
 });
 
 describe("logos", () => {
-  it("every league stock has a saved logo", async () => {
-    const { existsSync } = await import("node:fs");
+  it("every league stock has a saved logo", () => {
     for (const s of BSTOCKS) {
       expect(s.logo, s.ticker).toBe(`/logos/${s.ticker}.png`);
       expect(existsSync(`public${s.logo}`), s.ticker).toBe(true);

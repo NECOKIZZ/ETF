@@ -18,3 +18,6 @@ Repo: github.com/NECOKIZZ/ETF (main). Plan: docs/BNB.md · UI: docs/UI.md · Kee
 3. ETF names (signed by creator), creator buy-fee setting, verify page for settlement inputs.
 4. Mainnet deploy Thursday (DeployLeague.s.sol, allowlist the 39 tokens), keeper `auto` for demo rounds.
 5. Verify live: `approveTransaction=true` response shape and RFQ legs with fees (scripts/buy-plan.mts).
+
+## Rule: four brand colours only
+Ink `#0B0B0C`, Paper `#FFFFFF`, Mint `#3DDC97`, Coral `#FF5A36`. Everything else is a mix of these (docs/UI.md, Colour). `test/palette.test.ts` blocks any other hex in the UI code.

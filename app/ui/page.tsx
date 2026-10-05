@@ -101,15 +101,12 @@ export default function UiKit() {
             </div>
             <div className="grid grid-cols-3 gap-3 text-[12px]">
               {[
-                ["bg", "bg-bg border border-line"],
-                ["surface", "bg-surface"],
-                ["ink", "bg-ink"],
-                ["muted", "bg-muted"],
-                ["up", "bg-up"],
-                ["up-bg", "bg-up-bg"],
-                ["down", "bg-down"],
-                ["down-bg", "bg-down-bg"],
-                ["bnb", "bg-bnb"],
+                ["ink #0B0B0C", "bg-brand-ink"],
+                ["paper #FFFFFF", "bg-brand-paper border border-line"],
+                ["mint #3DDC97", "bg-brand-mint"],
+                ["coral #FF5A36", "bg-brand-coral"],
+                ["surface (mix)", "bg-surface"],
+                ["muted (mix)", "bg-muted"],
               ].map(([n, c]) => (
                 <div key={n}>
                   <div className={`h-16 rounded-[14px] ${c}`} />

@@ -12,7 +12,7 @@ export function TickerStrip({ stocks, changes, source }: { stocks: StockInfo[]; 
             // eslint-disable-next-line @next/next/no-img-element
             <img src={s.logo} alt="" className="size-[20px] rounded-full" />
           ) : (
-            <span className="grid size-[18px] place-items-center rounded-[6px] text-[10px] font-semibold" style={{ background: s.color, color: s.ink === "dark" ? "#0B0B0C" : "#fff" }}>
+            <span className="grid size-[18px] place-items-center rounded-[6px] text-[10px] font-semibold" style={{ background: s.color, color: s.ink === "dark" ? "var(--brand-ink)" : "var(--brand-paper)", boxShadow: "inset 0 0 0 1px rgb(0 0 0 / .08)" }}>
               {s.ticker[0]}
             </span>
           )}

@@ -11,7 +11,7 @@ const links = [
 ];
 
 export function AnnouncementBar({ children }: { children: React.ReactNode }) {
-  return <div className="bg-[#0B0B0C] py-2.5 text-center text-[13px] text-white/80">{children}</div>;
+  return <div className="bg-brand-ink py-2.5 text-center text-[13px] text-brand-paper/80">{children}</div>;
 }
 
 export function SiteHeader() {
@@ -30,7 +30,7 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-2">
           <span className="hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-[13px] text-muted lg:inline-flex">
-            <span className="size-2 rounded-full bg-bnb" /> BNB Chain
+            <span className="size-2 rounded-full bg-brand-mint" /> BNB Chain
           </span>
           <Button size="sm">Connect</Button>
         </div>

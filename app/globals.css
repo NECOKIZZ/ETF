@@ -2,20 +2,25 @@
 
 /* League of Stocks design tokens (docs/UI.md §2). */
 :root {
-  --bg: #ffffff;
-  --surface: #f4f5f7;
-  --surface-2: #eceef2;
-  --ink: #0b0b0c;
-  --muted: #5b6270;
-  --line: #e7e9ed;
-  --up: #007456;
-  --up-bg: #d8faeb;
-  --down: #c2410c;
-  --down-bg: #ffedd5;
-  --bnb: #f0b90b;
-  --mint-1: #eef2f1;
-  --mint-2: #cfebdd;
-  --mint-3: #b8dccb;
+  /* The four brand colours. Every other token below is a mix of these. */
+  --brand-ink: #0b0b0c;
+  --brand-paper: #ffffff;
+  --brand-mint: #3ddc97;
+  --brand-coral: #ff5a36;
+
+  --bg: var(--brand-paper);
+  --ink: var(--brand-ink);
+  --surface: color-mix(in oklab, var(--brand-ink) 4%, var(--brand-paper));
+  --surface-2: color-mix(in oklab, var(--brand-ink) 7%, var(--brand-paper));
+  --muted: color-mix(in oklab, var(--brand-ink) 62%, var(--brand-paper));
+  --line: color-mix(in oklab, var(--brand-ink) 9%, var(--brand-paper));
+  --up: color-mix(in oklab, var(--brand-mint) 50%, var(--brand-ink));
+  --up-bg: color-mix(in oklab, var(--brand-mint) 22%, var(--brand-paper));
+  --down: color-mix(in oklab, var(--brand-coral) 82%, var(--brand-ink));
+  --down-bg: color-mix(in oklab, var(--brand-coral) 14%, var(--brand-paper));
+  --mint-1: color-mix(in oklab, var(--brand-mint) 6%, var(--brand-paper));
+  --mint-2: color-mix(in oklab, var(--brand-mint) 22%, var(--brand-paper));
+  --mint-3: color-mix(in oklab, var(--brand-mint) 34%, var(--brand-paper));
   --card-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
   --lift-shadow: 0 24px 60px rgb(0 0 0 / 0.18);
   color-scheme: light;
@@ -23,19 +28,19 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0b0b0c;
-    --surface: #16171a;
-    --surface-2: #1d1f23;
-    --ink: #f4f5f7;
-    --muted: #9aa1ad;
-    --line: #24262b;
-    --up: #3ddc97;
-    --up-bg: #0e2a20;
-    --down: #fb923c;
-    --down-bg: #2a1a0e;
-    --mint-1: #121715;
-    --mint-2: #13241c;
-    --mint-3: #173327;
+    --bg: var(--brand-ink);
+    --ink: var(--brand-paper);
+    --surface: color-mix(in oklab, var(--brand-paper) 6%, var(--brand-ink));
+    --surface-2: color-mix(in oklab, var(--brand-paper) 9%, var(--brand-ink));
+    --muted: color-mix(in oklab, var(--brand-paper) 60%, var(--brand-ink));
+    --line: color-mix(in oklab, var(--brand-paper) 12%, var(--brand-ink));
+    --up: var(--brand-mint);
+    --up-bg: color-mix(in oklab, var(--brand-mint) 14%, var(--brand-ink));
+    --down: var(--brand-coral);
+    --down-bg: color-mix(in oklab, var(--brand-coral) 14%, var(--brand-ink));
+    --mint-1: color-mix(in oklab, var(--brand-mint) 4%, var(--brand-ink));
+    --mint-2: color-mix(in oklab, var(--brand-mint) 10%, var(--brand-ink));
+    --mint-3: color-mix(in oklab, var(--brand-mint) 18%, var(--brand-ink));
     --card-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
     --lift-shadow: 0 24px 60px rgb(0 0 0 / 0.6);
     color-scheme: dark;
@@ -43,19 +48,19 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: #0b0b0c;
-  --surface: #16171a;
-  --surface-2: #1d1f23;
-  --ink: #f4f5f7;
-  --muted: #9aa1ad;
-  --line: #24262b;
-  --up: #3ddc97;
-  --up-bg: #0e2a20;
-  --down: #fb923c;
-  --down-bg: #2a1a0e;
-  --mint-1: #121715;
-  --mint-2: #13241c;
-  --mint-3: #173327;
+  --bg: var(--brand-ink);
+  --ink: var(--brand-paper);
+  --surface: color-mix(in oklab, var(--brand-paper) 6%, var(--brand-ink));
+  --surface-2: color-mix(in oklab, var(--brand-paper) 9%, var(--brand-ink));
+  --muted: color-mix(in oklab, var(--brand-paper) 60%, var(--brand-ink));
+  --line: color-mix(in oklab, var(--brand-paper) 12%, var(--brand-ink));
+  --up: var(--brand-mint);
+  --up-bg: color-mix(in oklab, var(--brand-mint) 14%, var(--brand-ink));
+  --down: var(--brand-coral);
+  --down-bg: color-mix(in oklab, var(--brand-coral) 14%, var(--brand-ink));
+  --mint-1: color-mix(in oklab, var(--brand-mint) 4%, var(--brand-ink));
+  --mint-2: color-mix(in oklab, var(--brand-mint) 10%, var(--brand-ink));
+  --mint-3: color-mix(in oklab, var(--brand-mint) 18%, var(--brand-ink));
   --card-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
   --lift-shadow: 0 24px 60px rgb(0 0 0 / 0.6);
   color-scheme: dark;
@@ -72,7 +77,10 @@
   --color-up-bg: var(--up-bg);
   --color-down: var(--down);
   --color-down-bg: var(--down-bg);
-  --color-bnb: var(--bnb);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-paper: var(--brand-paper);
+  --color-brand-mint: var(--brand-mint);
+  --color-brand-coral: var(--brand-coral);
 
   --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
@@ -139,7 +147,7 @@ body {
 /* Stock card ticker: one line filled, one outlined (Kickoff player-card type). */
 .ticker-outline {
   color: transparent;
-  -webkit-text-stroke: 1.5px var(--outline, #fff);
+  -webkit-text-stroke: 1.5px var(--outline, var(--brand-paper));
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -31,7 +31,7 @@ function CandleRange() {
 export function SiteFooter() {
   return (
     <footer className="px-3 pb-3 md:px-6 md:pb-6">
-      <div className="overflow-hidden rounded-[32px] bg-[#0B0B0C] text-[#F4F5F7] md:rounded-[48px]">
+      <div className="overflow-hidden rounded-[32px] bg-brand-ink text-brand-paper md:rounded-[48px]">
         <div className="mx-auto grid max-w-[1180px] gap-12 px-6 pt-16 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:px-12">
           <div>
             <span className="inline-flex items-center gap-2">

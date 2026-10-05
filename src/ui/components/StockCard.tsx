@@ -1,5 +1,5 @@
 // Stock card: Kickoff's player card redrawn for stocks (docs/UI.md §3.3).
-// Brand-colour portrait card, huge ticker stacked twice (filled + outlined),
+// Portrait card in one of the brand colours (ink, mint or paper), huge ticker stacked twice (filled + outlined),
 // logo top-right, League of Stocks mark bottom-right, frosted price strip.
 //
 // Everything is sized in `em` off the card's own font-size, so one design
@@ -7,6 +7,7 @@
 
 import type { StockInfo } from "../data/stocks";
 import { LogoMark } from "./Logo";
+import { BRAND } from "../data/palette";
 
 export const CARD_W = 218;
 export const CARD_H = 312;
@@ -28,7 +29,7 @@ export interface StockCardProps {
 export function StockCard({ stock, width = CARD_W, changePct, weightPct, logoUrl, compact, className = "", style }: StockCardProps) {
   const dark = stock.ink === "dark";
   const logo = logoUrl ?? stock.logo;
-  const fg = dark ? "#0B0B0C" : "#FFFFFF";
+  const fg = dark ? BRAND.ink : BRAND.paper;
   const len = stock.ticker.length;
   // Fit the ticker to the card: ~0.68em per glyph (semibold, tight) across
   // ~11.4em of usable width (the card is 13.6em wide).
@@ -44,6 +45,8 @@ export function StockCard({ stock, width = CARD_W, changePct, weightPct, logoUrl
         borderRadius: "1.75em",
         background: stock.color,
         color: fg,
+        // A paper card needs an edge to stand off a paper page.
+        boxShadow: stock.color === BRAND.paper ? "inset 0 0 0 1px rgb(0 0 0 / .08)" : undefined,
         ...style,
       }}
       aria-label={`${stock.name} (${stock.ticker}) card`}
@@ -95,8 +98,8 @@ export function StockCard({ stock, width = CARD_W, changePct, weightPct, logoUrl
             width: logo ? "2.5em" : "2.1em",
             height: logo ? "2.5em" : "2.1em",
             borderRadius: 999,
-            background: dark ? "#0B0B0C" : "#FFFFFF",
-            color: stock.color,
+            background: dark ? BRAND.ink : BRAND.paper,
+            color: dark ? BRAND.paper : BRAND.ink,
             fontSize: "0.95em",
             boxShadow: "0 2px 8px rgb(0 0 0 / .18)",
           }}
