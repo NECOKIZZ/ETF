@@ -69,6 +69,12 @@ Each entry: **what we tried → what happened → why it matters**. The technica
 - **What happened:** it worked. bStocks behave like normal tokens: no allowlist blocked a brand-new contract from holding them. This wasn't documented anywhere; we had to test it.
 - _Technical detail:_ Foundry fork test `contracts/test/LeagueEscrowFork.t.sol`. bStock contracts are small proxies (no standard EIP-1967 slot), so you can't easily read the token logic. The public BSC RPC refused log searches over ~2,000 blocks (`-32005 limit exceeded`).
 
+### Mon 5 Oct: other snags noticed while building
+- **The "docs for AI agents" files didn't load for our tools.** The hackathon page links `llms.txt` and `llms-full.txt` for feeding the docs to an AI agent. When our tools downloaded them outside a browser, the server answered "202" with an empty file. That defeats the purpose of files meant for AI agents. _(Detail: `curl` to `web3.binance.com/en/dev-docs/llms-full.txt` returned HTTP 202, 0 bytes, from a US cloud machine; may also be the location block.)_
+- **The response "envelope" isn't documented.** We had to guess how success and errors are wrapped (a `code` field, `"000000"` for success?, `data` holding the result). Errors arrive as HTTP 200 with an error code inside.
+- **"Include approval" is unclear.** The swap endpoint has `approveTransaction=true` to include the token-approval step, but the docs don't show where that approval appears in the response. We still have to check it live.
+- **Two styles of trade, no way to know in advance.** A stock purchase can come back as a normal swap or as "RFQ" (sign a message, submit an order, poll for the result). An app must handle both, and the docs don't say which stocks use which or whether creator fees work on RFQ.
+
 ## Sections the report asks for (fill in from the log on Saturday)
 
 ### Onboarding: time from reading the docs to the first successful call; what got in the way

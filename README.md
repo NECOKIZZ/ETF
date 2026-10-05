@@ -55,6 +55,8 @@ The Binance Web3 API refuses requests from restricted regions (including the US)
 ## Docs
 - [`docs/BNB.md`](docs/BNB.md): rules, architecture, day-by-day plan
 - [`docs/dx-notes.md`](docs/dx-notes.md): developer-experience log for the hackathon report
+- [`docs/YOUR-TODO.md`](docs/YOUR-TODO.md): what the team still has to do · [`docs/HANDOFF.md`](docs/HANDOFF.md): state of the build
+- [`docs/KEEPER.md`](docs/KEEPER.md): running rounds
 - [`docs/prototype-results.md`](docs/prototype-results.md): stress tests of the payout rules (Python prototype)
 - [`docs/robinhood-colosseum-spec.md`](docs/robinhood-colosseum-spec.md): the Robinhood Chain version (parked)
 
