@@ -1,9 +1,11 @@
 // Server-side loaders for the API routes: live prices (Binance, or the latest
 // saved sample when Binance isn't reachable) and round views from the chain.
 
+import { existsSync, readFileSync } from "node:fs";
 import { rwaTokens } from "../bsc/binanceWeb3";
+import { BSTOCKS, demoChangePct } from "../ui/data/stocks";
 import { clientsFromEnv, escrowFromEnv } from "./chain";
-import { leagueEscrowAbi, readEntries, readRound, roundTokens } from "./escrow";
+import { leagueEscrowAbi, readEntries, readRound, readTeamMeta, roundTokens } from "./escrow";
 import { buildSnapshot, sampleFromTokens, type PriceMode, type PriceSample, type Snapshot } from "./snapshot";
 import { FileStore } from "./store";
 import { buildRoundView, type RoundView } from "./view";
@@ -12,10 +14,31 @@ import { tickerOf } from "./registry";
 const MODE: PriceMode = (process.env.LEAGUE_PRICE_MODE as PriceMode) ?? "reference";
 let liveCache: { at: number; sample: Map<string, PriceSample> } | null = null;
 
+/**
+ * Local demo chain: the mock tokens' snapshot prices, moved by the showcase
+ * movement (demoChangePct) with a slow wobble, so standings change over time.
+ */
+function localDemoPrices(): Map<string, PriceSample> | null {
+  const f = process.env.LEAGUE_DATA_DIR ? `${process.env.LEAGUE_DATA_DIR}/local-demo.json` : "data/local-demo.json";
+  if (!existsSync(f)) return null;
+  const { tokens } = JSON.parse(readFileSync(f, "utf8")) as { tokens: Record<string, string> };
+  const at = Date.now();
+  const wobble = 0.75 + 0.25 * Math.sin(at / 600_000);
+  const m = new Map<string, PriceSample>();
+  for (const [ticker, addr] of Object.entries(tokens)) {
+    const s = BSTOCKS.find((x) => x.ticker === ticker);
+    if (!s) continue;
+    const price = s.price * (1 + (demoChangePct(ticker) / 100) * wobble);
+    const token = addr.toLowerCase();
+    m.set(token, { token, value: BigInt(Math.round(price * 1e6)) * 10n ** 12n, decimals: 18, trading: true, at });
+  }
+  return m;
+}
+
 /** Live prices from Binance, cached for 20 s. Null when the API is unreachable. */
 export async function livePrices(): Promise<Map<string, PriceSample> | null> {
+  if (process.env.LEAGUE_CHAIN === "local") return localDemoPrices(); // mock tokens: demo prices
   if (liveCache && Date.now() - liveCache.at < 20_000) return liveCache.sample;
-  if (process.env.LEAGUE_CHAIN === "local") return null; // mock tokens: no live prices
   try {
     const at = Date.now();
     const sample = sampleFromTokens(await rwaTokens(), MODE, at);
@@ -58,7 +81,14 @@ export async function loadRoundView(roundId?: bigint): Promise<RoundView | null>
     : live
       ? one(live, tokens)
       : start;
-  const priceSource = endSamples.length ? "saved end samples" : live ? `Binance ${MODE} price, live` : "saved start samples";
+  const priceSource = endSamples.length
+    ? "saved end samples"
+    : process.env.LEAGUE_CHAIN === "local"
+      ? "local demo prices"
+      : live
+        ? `Binance ${MODE} price, live`
+        : "saved start samples";
 
-  return buildRoundView({ info, entries, start, now, nowSec: Number(block.timestamp), seasonPot, tickerOf, priceSource });
+  const meta = await readTeamMeta(pub, escrow, id, entries.filter((e) => e.isCreator).map((e) => e.teamKey));
+  return buildRoundView({ info, entries, start, now, nowSec: Number(block.timestamp), seasonPot, tickerOf, priceSource, meta });
 }

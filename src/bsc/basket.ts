@@ -14,7 +14,12 @@ export const WEIGHT_BUCKET_BPS = 100;
  */
 export function teamKeyOf(tokens: string[], values: bigint[]): Hex {
   if (tokens.length !== values.length) throw new Error("teamKeyOf: length mismatch");
-  const weights = basketWeightsBps(values);
+  return teamKeyFromWeights(tokens, basketWeightsBps(values));
+}
+
+/** Team key from declared weights (bps): what creators sign up with. */
+export function teamKeyFromWeights(tokens: string[], weights: number[]): Hex {
+  if (tokens.length !== weights.length) throw new Error("teamKeyFromWeights: length mismatch");
   const rows = tokens
     .map((t, i) => ({
       token: getAddress(t),

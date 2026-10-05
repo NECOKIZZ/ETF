@@ -152,6 +152,46 @@ contract LeagueEscrowTest is Test {
         assertTrue(escrow.entryAt(roundId, 3).isCreator);
     }
 
+    function _w(uint16 a, uint16 b, uint16 c) internal pure returns (uint16[] memory w) {
+        w = new uint16[](3);
+        (w[0], w[1], w[2]) = (a, b, c);
+    }
+
+    function test_namedEntryStoresCaptainNameAndFee() public {
+        _fund(alice);
+        (address[] memory t, uint256[] memory a) = _basket();
+        vm.prank(alice);
+        escrow.enterCreatorNamed(roundId, TEAM_A, t, a, _w(5000, 3000, 2000), "Silicon Crown", 150);
+        (string memory name, uint16 fee) = escrow.teamMeta(roundId, TEAM_A);
+        assertEq(name, "Silicon Crown");
+        assertEq(fee, 150);
+        assertEq(escrow.weightsOf(roundId, alice)[0], 5000);
+
+        // A clone with another name joins the captain's ETF; the name stays.
+        _fund(dave);
+        vm.prank(dave);
+        escrow.enterCreatorNamed(roundId, TEAM_A, t, a, _w(5000, 3000, 2000), "Copycat", 0);
+        (name, fee) = escrow.teamMeta(roundId, TEAM_A);
+        assertEq(name, "Silicon Crown");
+        assertEq(fee, 150);
+        assertEq(escrow.membersOf(roundId, TEAM_A), 1);
+    }
+
+    function test_namedEntryRejectsBadNameOrFee() public {
+        _fund(alice);
+        (address[] memory t, uint256[] memory a) = _basket();
+        vm.startPrank(alice);
+        vm.expectRevert(LeagueEscrow.BadName.selector);
+        escrow.enterCreatorNamed(roundId, TEAM_A, t, a, _w(5000, 3000, 2000), "", 100);
+        vm.expectRevert(LeagueEscrow.BadName.selector);
+        escrow.enterCreatorNamed(roundId, TEAM_A, t, a, _w(5000, 3000, 2000), "This name is far too long for an ETF", 100);
+        vm.expectRevert(LeagueEscrow.BadName.selector);
+        escrow.enterCreatorNamed(roundId, TEAM_A, t, a, _w(5000, 3000, 2000), "Fine", 201);
+        vm.expectRevert(LeagueEscrow.BadBasket.selector);
+        escrow.enterCreatorNamed(roundId, TEAM_A, t, a, _w(5000, 3000, 1000), "Fine", 100);
+        vm.stopPrank();
+    }
+
     function test_rejectsBadBaskets() public {
         _fund(alice);
         (address[] memory t, uint256[] memory a) = _basket();

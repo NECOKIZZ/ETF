@@ -18,7 +18,13 @@ export interface HoldingView {
 export interface TeamView {
   teamKey: Hex;
   rank: number;
+  /** The captain's chosen name; "" for an unnamed team. */
+  name: string;
+  /** Fee the creator asks from people who buy the ETF, in bps. */
+  buyFeeBps: number;
   captain: Hex;
+  /** USD value of the captain's basket at round start (or now, before start), 18 decimals. */
+  basketValue: string;
   holdings: HoldingView[];
   /** Live return so far, percent (e.g. 2.147). */
   returnPct: number;
@@ -51,6 +57,7 @@ export function buildRoundView(opts: {
   seasonPot: bigint;
   tickerOf: (token: string) => string | null;
   priceSource: string;
+  meta?: Map<string, { name: string; buyFeeBps: number }>;
 }): RoundView {
   const { info, entries, start, now } = opts;
   const phase: RoundView["phase"] =
@@ -76,7 +83,9 @@ export function buildRoundView(opts: {
       const p = start.get(tok.toLowerCase());
       return p ? valueOf(b.amounts[i], p) : 0n;
     });
-    const w = basketWeightsBps(values);
+    // Declared weights when the creator gave them, else measured at start.
+    const w = b.weightsBps ?? basketWeightsBps(values);
+    const meta = opts.meta?.get(t.teamKey.toLowerCase());
     // A plain ticket's payout: any playing non-captain member, else the captain.
     const member = entries.find(
       (e) => e.teamKey.toLowerCase() === t.teamKey && e.wallet.toLowerCase() !== t.captain.toLowerCase() && s.statuses[e.index].kind === "playing",
@@ -85,7 +94,10 @@ export function buildRoundView(opts: {
     return {
       teamKey: t.teamKey,
       rank: 0,
+      name: meta?.name ?? "",
+      buyFeeBps: meta?.buyFeeBps ?? 100,
       captain: t.captain,
+      basketValue: values.reduce((a, v) => a + v, 0n).toString(),
       holdings: b.tokens.map((tok, i) => ({ token: tok, ticker: opts.tickerOf(tok), weightBps: w[i] })),
       returnPct: Number(t.ret) / 1e10,
       members: t.members,

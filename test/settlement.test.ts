@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { Hex } from "viem";
 import { settleRound, maxPayoutOf, type ChainEntry, type RoundInput } from "../src/league/settlement";
-import { teamKeyOf } from "../src/bsc/basket";
+import { teamKeyOf, teamKeyFromWeights } from "../src/bsc/basket";
 import type { Snapshot } from "../src/league/snapshot";
 
 const E18 = 10n ** 18n;
@@ -114,5 +114,34 @@ describe("settleRound", () => {
       const ceiling = maxPayoutOf(STAKE, 100, 20);
       expect(s.payouts.every((p) => p >= 0n && p <= ceiling)).toBe(true);
     }
+  });
+});
+
+describe("declared weights (enterCreatorNamed)", () => {
+  const others = [1, 2, 3].map((k) => creator(k, k, TOKENS.slice(k * 2 + 1, k * 2 + 4), [5, 4, 3]));
+  const end = flat(101);
+  /** Declared 40/35/25, bought at entry for $10; `startPrices` are the round-start prices. */
+  function named(startPrices: number[], declared = [4000, 3500, 2500]): ChainEntry {
+    const tokens = [TOKENS[0], TOKENS[8], TOKENS[9]];
+    const amounts = [4, 3.5, 2.5].map((u) => BigInt(Math.round(u * 1e6)) * 10n ** 12n / 100n);
+    return { index: 0, wallet: W(0), teamKey: teamKeyFromWeights(tokens, declared), isCreator: true, basket: { tokens, amounts, weightsBps: declared } };
+  }
+  const run = (e: ChainEntry, startPrices: number[]) =>
+    settleRound(round([e, ...others.map((o, i) => ({ ...o, index: i + 1 }))], end, { start: snap({ ...flat(100), [TOKENS[0]]: startPrices[0], [TOKENS[8]]: startPrices[1], [TOKENS[9]]: startPrices[2] }) }));
+
+  it("keeps a creator whose basket drifted a little between entry and round start", () => {
+    // The first stock rose 6% and the others fell 3%: weights ≈ 41.6/34.3/24.1, value ≈ $9.89.
+    const s = run(named([100, 100, 100]), [106, 97, 97]);
+    expect(s.statuses[0]).toEqual({ kind: "playing", team: named([100, 100, 100]).teamKey.toLowerCase(), captain: true });
+  });
+
+  it("refunds a basket far from its declared weights", () => {
+    const e = named([100, 100, 100], [2000, 3500, 4500]); // declares 20/35/45 but locked 40/35/25
+    expect(run(e, [100, 100, 100]).statuses[0]).toEqual({ kind: "refunded", reason: "weights-mismatch" });
+  });
+
+  it("refunds a key that doesn't match the declared weights", () => {
+    const e = { ...named([100, 100, 100]), teamKey: teamKeyFromWeights([TOKENS[0], TOKENS[8], TOKENS[9]], [5000, 2500, 2500]) };
+    expect(run(e, [100, 100, 100]).statuses[0]).toEqual({ kind: "refunded", reason: "team-key-mismatch" });
   });
 });

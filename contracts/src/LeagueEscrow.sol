@@ -88,6 +88,21 @@ contract LeagueEscrow {
 
     mapping(address => bool) public allowedToken; // stock tokens a basket may hold
 
+    /// @notice Set by the captain on entry: the ETF's display name and the fee
+    ///         (basis points) the creator asks from people who buy the ETF.
+    ///         The fee is charged by the swap (Binance referral fee), not here.
+    struct TeamMeta {
+        string name;
+        uint16 buyFeeBps;
+    }
+    mapping(uint256 => mapping(bytes32 => TeamMeta)) public teamMeta;
+    /// @notice Weights (bps, summing to 10000) a creator declared for their
+    ///         basket. The team key is derived from them off-chain, so price
+    ///         moves between entry and round start can't change a team.
+    mapping(uint256 => mapping(address => uint16[])) internal _basketWeights;
+    uint16 public constant MAX_BUY_FEE_BPS = 200;
+    uint256 public constant MAX_NAME_BYTES = 32;
+
     uint256 public seasonPot;
     uint256 public platformBalance;
 
@@ -98,6 +113,7 @@ contract LeagueEscrow {
     event RoundOpened(uint256 indexed roundId, uint64 entryClose, uint64 end, uint128 stake);
     event CreatorEntered(uint256 indexed roundId, address indexed wallet, bytes32 indexed teamKey, bool captain, address[] tokens, uint256[] amounts);
     event BackerEntered(uint256 indexed roundId, address indexed wallet, bytes32 indexed teamKey);
+    event TeamNamed(uint256 indexed roundId, bytes32 indexed teamKey, string name, uint16 buyFeeBps);
     event RoundSettled(uint256 indexed roundId, bytes32 inputsHash, uint256 platformCut, uint256 seasonIn, uint256 seasonOut);
     event RoundVoided(uint256 indexed roundId);
     event Claimed(uint256 indexed roundId, address indexed wallet, uint256 payout);
@@ -121,6 +137,7 @@ contract LeagueEscrow {
     error EntriesClosed();
     error AlreadyEntered();
     error BadBasket();
+    error BadName();
     error TokenNotAllowed(address token);
     error NoSuchTeam();
     error TeamFull();
@@ -221,12 +238,43 @@ contract LeagueEscrow {
         external
         nonReentrant
     {
+        _enterCreator(roundId, teamKey, tokens, amounts);
+    }
+
+    /// @notice enterCreator plus the declared weights, the ETF's name and buy fee. Only the captain's
+    ///         name and fee are kept; a clone joins the captain's ETF as is.
+    function enterCreatorNamed(
+        uint256 roundId,
+        bytes32 teamKey,
+        address[] calldata tokens,
+        uint256[] calldata amounts,
+        uint16[] calldata weightsBps,
+        string calldata name,
+        uint16 buyFeeBps
+    ) external nonReentrant {
+        uint256 len = bytes(name).length;
+        if (len == 0 || len > MAX_NAME_BYTES || buyFeeBps > MAX_BUY_FEE_BPS) revert BadName();
+        if (weightsBps.length != tokens.length) revert LengthMismatch();
+        uint256 total;
+        for (uint256 i; i < weightsBps.length; ++i) total += weightsBps[i];
+        if (total != 10_000) revert BadBasket();
+        _basketWeights[roundId][msg.sender] = weightsBps;
+        if (_enterCreator(roundId, teamKey, tokens, amounts)) {
+            teamMeta[roundId][teamKey] = TeamMeta({name: name, buyFeeBps: buyFeeBps});
+            emit TeamNamed(roundId, teamKey, name, buyFeeBps);
+        }
+    }
+
+    function _enterCreator(uint256 roundId, bytes32 teamKey, address[] calldata tokens, uint256[] calldata amounts)
+        internal
+        returns (bool captain)
+    {
         Round storage r = _openRound(roundId);
         uint256 n = tokens.length;
         if (n != amounts.length) revert LengthMismatch();
         if (n < MIN_BASKET_TOKENS || n > MAX_BASKET_TOKENS || teamKey == bytes32(0)) revert BadBasket();
 
-        bool captain = captainOf[roundId][teamKey] == address(0);
+        captain = captainOf[roundId][teamKey] == address(0);
         if (captain) {
             captainOf[roundId][teamKey] = msg.sender;
         } else {
@@ -350,6 +398,10 @@ contract LeagueEscrow {
         returns (address[] memory tokens, uint256[] memory amounts)
     {
         return (_basketTokens[roundId][wallet], _basketAmounts[roundId][wallet]);
+    }
+
+    function weightsOf(uint256 roundId, address wallet) external view returns (uint16[] memory) {
+        return _basketWeights[roundId][wallet];
     }
 
     // --- internals -------------------------------------------------------------

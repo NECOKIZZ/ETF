@@ -20,7 +20,33 @@ export interface BuyLegPlan {
   mode: "SWAP" | "RFQ" | null;
   tx: SwapTx["tx"] | null;
   rfq: SwapTx["rfq"] | null;
+  /** Who must be allowed to spend the USDT: the approval Binance returned, else the quote's approve target, else the router. */
+  spender: string | null;
+  /** An approval transaction Binance included (approveTransaction=true), if any. */
+  approveTx: { to: string; data: string } | null;
   error: string | null;
+}
+
+/**
+ * Binance's docs don't say where `approveTransaction=true` puts the approval
+ * (docs/dx-notes.md), so look for any {to, data} object under an "approve" key.
+ */
+export function findApproveTx(swap: Record<string, unknown>): { to: string; data: string } | null {
+  for (const [k, v] of Object.entries(swap)) {
+    if (!/approv/i.test(k) || !v || typeof v !== "object") continue;
+    const o = v as Record<string, unknown>;
+    if (typeof o.to === "string" && typeof o.data === "string") return { to: o.to, data: o.data };
+    if (typeof o.tx === "object" && o.tx) {
+      const t = o.tx as Record<string, unknown>;
+      if (typeof t.to === "string" && typeof t.data === "string") return { to: t.to, data: t.data };
+    }
+  }
+  return null;
+}
+
+/** The spender named inside an ERC-20 approve(spender, amount) calldata. */
+export function spenderOfApprove(data: string): string | null {
+  return /^0x095ea7b3/i.test(data) && data.length >= 74 ? `0x${data.slice(34, 74)}` : null;
 }
 
 export interface BuyPlan {
@@ -61,13 +87,15 @@ export async function planBasketBuy(
       referrer: fee > 0 ? opts.creator : undefined,
       slippagePercent: opts.slippagePercent,
     };
-    const base: BuyLegPlan = { token: leg.token, weightBps: leg.weightBps, amountIn: leg.amountIn.toString(), expectedOut: null, vendor: null, mode: null, tx: null, rfq: null, error: null };
+    const base: BuyLegPlan = { token: leg.token, weightBps: leg.weightBps, amountIn: leg.amountIn.toString(), expectedOut: null, vendor: null, mode: null, tx: null, rfq: null, spender: null, approveTx: null, error: null };
     try {
       const routes: QuoteRoute[] = await api.quote(req);
       const best = routes[0];
       if (!best) throw new Error("no route");
       const swap = await api.buildSwap(req, best.quoteId);
-      out.push({ ...base, expectedOut: best.toTokenAmount, vendor: best.vendorName, mode: swap.executionMode, tx: swap.tx ?? null, rfq: swap.rfq ?? null });
+      const approveTx = findApproveTx(swap);
+      const spender = (approveTx && spenderOfApprove(approveTx.data)) ?? best.approveTarget ?? swap.tx?.to ?? null;
+      out.push({ ...base, expectedOut: best.toTokenAmount, vendor: best.vendorName, mode: swap.executionMode, tx: swap.tx ?? null, rfq: swap.rfq ?? null, spender, approveTx });
     } catch (e) {
       out.push({ ...base, error: e instanceof Error ? e.message : String(e) });
     }

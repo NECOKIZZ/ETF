@@ -2,8 +2,12 @@
 // LeagueEscrow.settle(), plus the published inputs anyone can recompute.
 //
 //   1. Check every creator's locked basket at the START prices: eligible
-//      (≥ 3 tokens, ≤ 50% each, ≥ $10) and its team key matches the basket.
-//      An invalid entry is refunded its stake and takes no part in the round.
+//      (≥ 3 tokens, ≤ 50% each, ≥ $10, checked at entry; at settlement prices
+//      may have drifted, so ≤ 55% and ≥ $9.50) and its team key matches.
+//      A creator who declared weights (enterCreatorNamed) gets the key of
+//      those weights, and the start-price weights must be within 5 points of
+//      them. Without declared weights, the key must match the start-price
+//      weights exactly. An invalid entry is refunded its stake.
 //   2. Teams = valid creators grouped by team key, in entry order. The first
 //      valid creator is the captain; the team's return is the captain's basket
 //      return (clones have the same weights, so the same return to ~1%).
@@ -18,13 +22,14 @@ import {
   DEFAULT_LEAGUE_PARAMS,
   basketEligibility,
   basketReturn,
+  basketWeightsBps,
   settleLeague,
   type EligibilityRules,
   type LeagueParams,
   type LeagueTeam,
   type LeagueVoidReason,
 } from "../engine/league";
-import { teamKeyOf } from "../bsc/basket";
+import { teamKeyFromWeights, teamKeyOf } from "../bsc/basket";
 import { valueOf, type Snapshot } from "./snapshot";
 
 export interface ChainEntry {
@@ -32,7 +37,11 @@ export interface ChainEntry {
   wallet: Hex;
   teamKey: Hex;
   isCreator: boolean;
-  basket?: { tokens: Hex[]; amounts: bigint[] };
+  /** On-chain claim state (not used by settlement). */
+  claimed?: boolean;
+  payout?: bigint;
+  /** weightsBps: declared at entry (enterCreatorNamed); absent for plain enterCreator. */
+  basket?: { tokens: Hex[]; amounts: bigint[]; weightsBps?: number[] };
 }
 
 export interface RoundInput {
@@ -48,11 +57,22 @@ export interface RoundInput {
   priceProblems: string[];
 }
 
+/** Rules a basket must meet when it is entered (the app and agents enforce these). */
 export const DEFAULT_RULES: EligibilityRules = { minTokens: 3, maxWeightBps: 5000, minValue: 10n * 10n ** 18n };
+
+/** How far prices may move a basket between entry and round start. */
+export const DRIFT_BPS = 500;
+
+/** The same rules at settlement, loosened by the drift allowance. */
+export const SETTLE_RULES: EligibilityRules = {
+  minTokens: DEFAULT_RULES.minTokens,
+  maxWeightBps: DEFAULT_RULES.maxWeightBps + DRIFT_BPS,
+  minValue: (DEFAULT_RULES.minValue * BigInt(10_000 - DRIFT_BPS)) / 10_000n,
+};
 
 export type EntryStatus =
   | { kind: "playing"; team: Hex; captain: boolean }
-  | { kind: "refunded"; reason: "ineligible-basket" | "team-key-mismatch" | "no-valid-team" | "missing-price" };
+  | { kind: "refunded"; reason: "ineligible-basket" | "team-key-mismatch" | "weights-mismatch" | "no-valid-team" | "missing-price" };
 
 export interface Settlement {
   void: LeagueVoidReason | "PriceProblem" | null;
@@ -71,7 +91,7 @@ const lower = (x: string) => x.toLowerCase();
 export function settleRound(
   input: RoundInput,
   params: LeagueParams = { ...DEFAULT_LEAGUE_PARAMS, capMultiple: BigInt(input.capMultiple) },
-  rules: EligibilityRules = DEFAULT_RULES,
+  rules: EligibilityRules = SETTLE_RULES,
 ): Settlement {
   const n = input.entries.length;
   const statuses: EntryStatus[] = new Array(n);
@@ -100,15 +120,24 @@ export function settleRound(
       statuses[e.index] = { kind: "refunded", reason: "ineligible-basket" };
       continue;
     }
-    if (lower(teamKeyOf(b.tokens, values)) !== lower(e.teamKey)) {
+    const declared = b.weightsBps;
+    const key = declared ? teamKeyFromWeights(b.tokens, declared) : teamKeyOf(b.tokens, values);
+    if (lower(key) !== lower(e.teamKey)) {
       statuses[e.index] = { kind: "refunded", reason: "team-key-mismatch" };
       continue;
     }
-    const key = lower(e.teamKey) as Hex;
-    const team = teams.get(key);
+    if (declared) {
+      const measured = basketWeightsBps(values);
+      if (measured.some((w, i) => Math.abs(w - declared[i]) > DRIFT_BPS)) {
+        statuses[e.index] = { kind: "refunded", reason: "weights-mismatch" };
+        continue;
+      }
+    }
+    const teamKey = lower(e.teamKey) as Hex;
+    const team = teams.get(teamKey);
     if (team) {
       team.members.push(e);
-      statuses[e.index] = { kind: "playing", team: key, captain: false };
+      statuses[e.index] = { kind: "playing", team: teamKey, captain: false };
     } else {
       // Return in common units: value per base unit, so decimals cancel out.
       const ret = basketReturn(
@@ -116,9 +145,9 @@ export function settleRound(
         startP.map((p) => p!.value * 10n ** BigInt(18 - p!.decimals)),
         endP.map((p) => p!.value * 10n ** BigInt(18 - p!.decimals)),
       );
-      teams.set(key, { captain: e, ret, members: [e] });
-      teamOrder.push(key);
-      statuses[e.index] = { kind: "playing", team: key, captain: true };
+      teams.set(teamKey, { captain: e, ret, members: [e] });
+      teamOrder.push(teamKey);
+      statuses[e.index] = { kind: "playing", team: teamKey, captain: true };
     }
   }
 
@@ -189,7 +218,7 @@ export function settleRound(
         wallet: e.wallet,
         teamKey: e.teamKey,
         isCreator: e.isCreator,
-        basket: e.basket ? { tokens: e.basket.tokens, amounts: e.basket.amounts.map(String) } : null,
+        basket: e.basket ? { tokens: e.basket.tokens, amounts: e.basket.amounts.map(String), weightsBps: e.basket.weightsBps ?? null } : null,
         status: statuses[e.index],
         payout: pays[e.index].toString(),
       })),
