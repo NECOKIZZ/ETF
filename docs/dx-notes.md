@@ -29,6 +29,14 @@ Each entry: **what we tried → what happened → why it matters**. The technica
   - A developer outside the US can still be blocked just because their tools are hosted there.
   - Nothing in the docs warns about this or suggests a workaround, such as a test environment open from any location, or a clear list of allowed hosting regions.
 
+### Mon 5 Oct: first successful call, from Google Cloud Shell
+- **What we tried:** ran the same "list all tokenized stocks on BSC" request from Google Cloud Shell, a free browser-based terminal, instead of our US cloud computer.
+- **What happened:** it worked. **488 tokens came back in about 0.6 seconds**: roughly 60 bStocks and the rest Ondo. No xStocks showed up in this list.
+- **Why it matters:**
+  - Time from first reading the docs to a successful call was mostly spent on the location block, not on the API itself. Signing requests worked first time.
+  - The docs list xStocks as a hackathon option, but the stock-list endpoint only knows two platforms (`ondo`, `bstock`). Builders who want xStocks need another way to find them.
+- _Technical detail:_ `GET /api/v1/dex/market/rwa/tokens?binanceChainId=56`, 603 ms. Our first printout showed addresses and prices but **blank names and market status**. Still checking whether that's our code guessing the field names wrong or fields missing from the API (the docs describe fields in prose, without exact names or an example response).
+
 ## Sections the report asks for (fill in from the log on Saturday)
 
 ### Onboarding: time from reading the docs to the first successful call; what got in the way
