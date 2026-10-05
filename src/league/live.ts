@@ -3,13 +3,14 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { rwaTokens } from "../bsc/binanceWeb3";
+import { cryptoSamples } from "../bsc/cryptoPrices";
 import { BSTOCKS, demoChangePct } from "../ui/data/stocks";
 import { clientsFromEnv, escrowFromEnv } from "./chain";
 import { leagueEscrowAbi, readEntries, readRound, readTeamMeta, roundTokens } from "./escrow";
 import { buildSnapshot, sampleFromTokens, type PriceMode, type PriceSample, type Snapshot } from "./snapshot";
 import { FileStore } from "./store";
 import { buildRoundView, type RoundView } from "./view";
-import { tickerOf } from "./registry";
+import { cryptoTokensForChain, tickerOf } from "./registry";
 
 const MODE: PriceMode = (process.env.LEAGUE_PRICE_MODE as PriceMode) ?? "reference";
 let liveCache: { at: number; sample: Map<string, PriceSample> } | null = null;
@@ -42,6 +43,8 @@ export async function livePrices(): Promise<Map<string, PriceSample> | null> {
   try {
     const at = Date.now();
     const sample = sampleFromTokens(await rwaTokens(), MODE, at);
+    // Crypto slice: Binance spot prices (a failure leaves crypto out, not the stocks).
+    for (const [k, v] of await cryptoSamples(at).catch(() => new Map())) sample.set(k, v);
     liveCache = { at, sample };
     return sample;
   } catch {
@@ -90,5 +93,5 @@ export async function loadRoundView(roundId?: bigint): Promise<RoundView | null>
         : "saved start samples";
 
   const meta = await readTeamMeta(pub, escrow, id, entries.filter((e) => e.isCreator).map((e) => e.teamKey));
-  return buildRoundView({ info, entries, start, now, nowSec: Number(block.timestamp), seasonPot, tickerOf, priceSource, meta });
+  return buildRoundView({ info, entries, start, now, nowSec: Number(block.timestamp), seasonPot, tickerOf, priceSource, meta, cryptoTokens: cryptoTokensForChain() });
 }

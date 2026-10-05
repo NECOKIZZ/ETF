@@ -12,12 +12,12 @@ Chain, contract and rules.
 | `escrow` | the league contract (all `lock`, `back`, `claim` steps call it) |
 | `usdt` | the ticket token (BSC USDT, 18 decimals) |
 | `currentRound` | latest round id |
-| `rules` | `minTokens` 3, `maxTokens` 10, `maxWeightPct` 50, `minBasketUsd` 10, `ticketUsd` 5, `maxBuyFeePct` 2, `driftPct` 5 |
+| `rules` | `minStocks` 3 (stocks or funds), `maxTokens` 10, `maxWeightPct` 50, `maxCryptoPct` 20 (BNB+BTC+ETH together), `minBasketUsd` 10, `ticketUsd` 5, `maxBuyFeePct` 2, `driftPct` 5 |
 | `buyEnabled` | whether `buy-basket` / `buy-etf` plans work on this deployment |
 
 ## `GET {LEAGUE_API}/api/stocks`
 
-`stocks[]`: `ticker` (NVDA), `symbol` (NVDAB), `name`, `kind` (`stock` | `etf`), `address` (the token
+`stocks[]`: `ticker` (NVDA), `symbol` (NVDAB), `name`, `kind` (`stock` | `etf` | `crypto`), `address` (the token
 on this chain: use this, never a guessed address), `price` (USD per token), `trading`.
 `source` says whether prices are live from Binance or a snapshot.
 

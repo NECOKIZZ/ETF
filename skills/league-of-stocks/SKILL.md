@@ -19,8 +19,8 @@ metadata:
 
 # League of Stocks skill
 
-League of Stocks is a weekly game on BNB Chain. Creators build an on-chain "ETF": a basket of 3
-to 10 tokenized stocks worth at least $10, locked in the league contract for the round, plus a
+League of Stocks is a weekly game on BNB Chain. Creators build an on-chain "ETF": a basket of at
+least 3 tokenized stocks (up to 10 assets, optionally with up to 20% in BNB, BTC or ETH) worth at least $10, locked in the league contract for the round, plus a
 $5 ticket. When the round ends, ETFs are ranked by return. **The top half wins the bottom half's
 tickets**, split by team size and by how close each winner came to the best return. Backers can
 join a creator's team with their own $5 ticket, and/or buy the creator's ETF (they own the stocks;

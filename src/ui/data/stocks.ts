@@ -1,17 +1,19 @@
-// bStocks on BSC: a snapshot of Binance's RWA token list (5 Oct 2026, ~11:40
-// UTC) used for the UI showcase and as a fallback when the live API is not
-// reachable. Live pages read the same fields from /rwa/tokens.
+// League assets on BSC: bStocks (a snapshot of Binance's RWA token list, 5 Oct
+// 2026, ~11:40 UTC) plus a small crypto slice (BNB, BTC, ETH as BEP-20 tokens).
+// Used for the UI and as a fallback when live prices aren't reachable.
 //
 // Leveraged funds (TQQQ, SOXL, KORU, MUU, INTW, SNXX, MVLL) are left out:
-// they are banned from the league.
+// they are banned from the league. Crypto is capped at 20% of a basket.
 
 import { assignCardColors } from "./palette";
+
+export type AssetKind = "stock" | "etf" | "crypto";
 
 export interface StockInfo {
   symbol: string;   // token symbol, e.g. NVDAB
   ticker: string;   // underlying ticker, e.g. NVDA
   name: string;     // company / fund name
-  kind: "stock" | "etf";
+  kind: AssetKind;
   price: number;    // USD per token
   address: `0x${string}`;
   /** Company brand colour: only a hint for picking `color`. */
@@ -34,7 +36,7 @@ const s = (
   address: string,
   brand: string,
   _ink?: "light" | "dark",
-  kind: "stock" | "etf" = "stock",
+  kind: AssetKind = "stock",
 ): Raw => ({ symbol, ticker, name, price, address: address as `0x${string}`, brand, kind });
 
 // Most recognisable first: they get first pick of the colours.
@@ -78,17 +80,25 @@ const RAW: Raw[] = [
   s("QQQB", "QQQ", "Invesco QQQ", 749.45, "0x205812cdbed920aff76c6580abd681a46d11efc7", "#00205B", "light", "etf"),
   s("EWYB", "EWY", "iShares MSCI South Korea", 191.36, "0xbe82f76637dba2c114c41df856c2c51e522e2cb8", "#000000", "light", "etf"),
   s("DRAMB", "DRAM", "Memory ETF", 61.63, "0x93862d63fd9fd488b1328e9b47717d75e994a84b", "#2B2D42", "light", "etf"),
+  // Crypto slice (max 20% of a basket). BNB is held as WBNB, BTC as BTCB
+  // (Binance-pegged), ETH as Binance-Peg Ethereum. Prices: Binance spot, 5 Oct 2026.
+  s("WBNB", "BNB", "BNB", 787.52, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", "#F0B90B", "dark", "crypto"),
+  s("BTCB", "BTC", "Bitcoin", 85308, "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c", "#F7931A", "dark", "crypto"),
+  s("ETH", "ETH", "Ethereum", 2696.79, "0x2170Ed0880ac9A755fd29B2688956BD959F933F8", "#627EEA", "light", "crypto"),
 ];
 
-/** Tickers with a logo saved in public/logos/<TICKER>.png (Binance's bStock logos). */
+/** Tickers with a logo saved in public/logos/<TICKER>.png (Binance's bStock logos; crypto from Trust Wallet's open assets). */
 export const LOGOS = new Set<string>([
+  "BNB", "BTC", "ETH",
   "AAOI", "AMD", "ARM", "AVGO", "AXTI", "BABA", "CBRS", "COIN", "CRCL", "CRWV",
   "DRAM", "EWY", "GLW", "GOOGL", "HOOD", "IBM", "INTC", "LITE", "META", "MRVL",
   "MSFT", "MSTR", "MU", "NBIS", "NOK", "NVDA", "ORCL", "PLTR", "QCOM", "QNT",
   "QQQ", "RKLB", "SKHY", "SNDK", "SPCX", "SPY", "TSLA", "TSM", "WDC",
 ]);
 
-const COLORS = assignCardColors(RAW.map((r) => ({ key: r.ticker, brand: r.brand })));
+// Colour picking order: the top stocks, then crypto (their brand colours are iconic), then the rest.
+const colourOrder = [...RAW.slice(0, 5), ...RAW.filter((r) => r.kind === "crypto"), ...RAW.slice(5).filter((r) => r.kind !== "crypto")];
+const COLORS = assignCardColors(colourOrder.map((r) => ({ key: r.ticker, brand: r.brand })));
 
 export const BSTOCKS: StockInfo[] = RAW.map((r) => ({
   ...r,
@@ -98,6 +108,10 @@ export const BSTOCKS: StockInfo[] = RAW.map((r) => ({
 }));
 
 export const byTicker = (t: string): StockInfo | undefined => BSTOCKS.find((x) => x.ticker === t);
+
+export const isCrypto = (s: Pick<StockInfo, "kind">) => s.kind === "crypto";
+/** The crypto slice's tokens (lowercase addresses), for the basket rules. */
+export const CRYPTO_ADDRESSES = BSTOCKS.filter(isCrypto).map((s) => s.address.toLowerCase());
 
 /**
  * Showcase-only movement numbers (% since round start). Deterministic so the

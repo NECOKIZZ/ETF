@@ -19,12 +19,14 @@
 
 import { parseEther, formatEther } from "viem";
 import { rwaTokens } from "../src/bsc/binanceWeb3";
+import { cryptoSamples } from "../src/bsc/cryptoPrices";
 import { clientsFromEnv, escrowFromEnv } from "../src/league/chain";
 import { leagueEscrowAbi, readEntries, readRound, roundTokens, submitSettlement } from "../src/league/escrow";
 import { buildSnapshot, sampleFromTokens, type PriceMode } from "../src/league/snapshot";
 import { settleRound } from "../src/league/settlement";
 import { FileStore, type Phase } from "../src/league/store";
 import { livePrices } from "../src/league/live";
+import { cryptoTokensForChain } from "../src/league/registry";
 
 const args = process.argv.slice(2);
 const cmd = args[0];
@@ -71,6 +73,12 @@ async function sample(roundId: bigint, phase: Phase, mode: PriceMode) {
   const at = Date.now();
   const tokens = await rwaTokens();
   const s = sampleFromTokens(tokens, mode, at);
+  // Crypto slice (BNB, BTC, ETH): Binance spot prices.
+  try {
+    for (const [k, v] of await cryptoSamples(at)) s.set(k, v);
+  } catch (e) {
+    log(`crypto prices unavailable: ${e instanceof Error ? e.message : e}`);
+  }
   const file = store.saveSample(roundId, phase, s, at);
   log(`saved ${phase} sample (${s.size} tokens, ${Date.now() - at} ms) → ${file}`);
 }
@@ -111,6 +119,7 @@ async function settle(roundId: bigint) {
     start: start.prices,
     end: end.prices,
     priceProblems: problems,
+    cryptoTokens: cryptoTokensForChain(),
   });
   const file = store.saveInputs(roundId, s.inputs);
   log(`round ${roundId}: ${entries.length} entries, ${s.teams.length} teams, void=${s.void ?? "no"}`);

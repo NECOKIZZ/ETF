@@ -6,7 +6,8 @@ at the same weights (to 1%) joins that team instead of starting a new one.
 
 ## 0. Agree the ETF with the user
 
-- **Stocks:** 3 to 10 tickers from `/api/stocks` (leveraged funds are not listed and not allowed).
+- **Stocks:** at least 3 stocks or funds, up to 10 assets in all, from `/api/stocks` (leveraged funds are not listed and not allowed).
+- **Crypto (optional):** BNB, BTC and/or ETH (`kind: crypto`), together at most 20% of the weights. BNB is bought and locked as WBNB.
 - **Weights:** whole percents summing to 100, none above 50.
 - **Size:** at least $10 of stocks. Suggest about $10.50 or more: swap fees and price moves can push
   a basket bought for exactly $10 under the minimum before the round starts.

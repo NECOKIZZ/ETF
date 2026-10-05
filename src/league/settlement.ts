@@ -2,8 +2,9 @@
 // LeagueEscrow.settle(), plus the published inputs anyone can recompute.
 //
 //   1. Check every creator's locked basket at the START prices: eligible
-//      (≥ 3 tokens, ≤ 50% each, ≥ $10, checked at entry; at settlement prices
-//      may have drifted, so ≤ 55% and ≥ $9.50) and its team key matches.
+//      (≥ 3 stocks/funds, ≤ 50% each, ≥ $10, crypto ≤ 20%, checked at entry; at
+//      settlement prices may have drifted, so ≤ 55%, ≥ $9.50, crypto ≤ 25%)
+//      and its team key matches.
 //      A creator who declared weights (enterCreatorNamed) gets the key of
 //      those weights, and the start-price weights must be within 5 points of
 //      them. Without declared weights, the key must match the start-price
@@ -55,10 +56,13 @@ export interface RoundInput {
   end: Map<string, Snapshot>;
   /** Tokens whose snapshot failed (missing / not trading): voids the round. */
   priceProblems: string[];
+  /** The crypto slice's token addresses on this chain (recorded in the published rules). */
+  cryptoTokens?: string[];
 }
 
-/** Rules a basket must meet when it is entered (the app and agents enforce these). */
-export const DEFAULT_RULES: EligibilityRules = { minTokens: 3, maxWeightBps: 5000, minValue: 10n * 10n ** 18n };
+/** Rules a basket must meet when it is entered (the app and agents enforce these):
+ *  at least 3 stocks/funds, none above 50%, at least $10, crypto at most 20% in total. */
+export const DEFAULT_RULES: EligibilityRules = { minTokens: 3, maxWeightBps: 5000, minValue: 10n * 10n ** 18n, maxCryptoBps: 2000 };
 
 /** How far prices may move a basket between entry and round start. */
 export const DRIFT_BPS = 500;
@@ -68,6 +72,7 @@ export const SETTLE_RULES: EligibilityRules = {
   minTokens: DEFAULT_RULES.minTokens,
   maxWeightBps: DEFAULT_RULES.maxWeightBps + DRIFT_BPS,
   minValue: (DEFAULT_RULES.minValue * BigInt(10_000 - DRIFT_BPS)) / 10_000n,
+  maxCryptoBps: DEFAULT_RULES.maxCryptoBps! + DRIFT_BPS,
 };
 
 export type EntryStatus =
@@ -91,8 +96,12 @@ const lower = (x: string) => x.toLowerCase();
 export function settleRound(
   input: RoundInput,
   params: LeagueParams = { ...DEFAULT_LEAGUE_PARAMS, capMultiple: BigInt(input.capMultiple) },
-  rules: EligibilityRules = SETTLE_RULES,
+  baseRules: EligibilityRules = SETTLE_RULES,
 ): Settlement {
+  // Rounds settled before the crypto slice existed have no cryptoTokens: keep
+  // their rules untouched so their published inputs still hash the same.
+  const crypto = input.cryptoTokens ?? baseRules.cryptoTokens;
+  const rules: EligibilityRules = crypto ? { ...baseRules, cryptoTokens: crypto.map((t) => t.toLowerCase()) } : baseRules;
   const n = input.entries.length;
   const statuses: EntryStatus[] = new Array(n);
   const refundAll = (reason: Settlement["void"]): Settlement => finish(reason, input.entries.map(() => input.stake), 0n, 0n, 0n, []);

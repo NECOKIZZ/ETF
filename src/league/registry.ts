@@ -23,3 +23,11 @@ export function tokenRegistry(): Map<string, StockInfo> {
 }
 
 export const tickerOf = (token: string): string | null => tokenRegistry().get(token.toLowerCase())?.ticker ?? null;
+
+/** The crypto slice's token addresses on this chain (mock copies on the local demo chain). */
+export function cryptoTokensForChain(): string[] {
+  const crypto = BSTOCKS.filter((s) => s.kind === "crypto");
+  if (process.env.LEAGUE_CHAIN !== "local") return crypto.map((s) => s.address.toLowerCase());
+  const mainnet = new Set(crypto.map((s) => s.address.toLowerCase()));
+  return [...tokenRegistry()].filter(([a, s]) => s.kind === "crypto" && !mainnet.has(a)).map(([a]) => a);
+}

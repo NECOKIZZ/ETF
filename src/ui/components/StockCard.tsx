@@ -155,7 +155,7 @@ export function StockCard({ stock, size = "big", price, changePct, weightPct, sh
         <div className="flex items-center justify-between">
           <div className="flex" style={{ gap: 5 }}>
             <div style={{ fontSize: big ? 8 : 7, fontWeight: 700, letterSpacing: "0.12em", color: CARD.white, padding: big ? "5px 9px" : "4px 7px", borderRadius: 999, background: "rgba(255,255,255,.16)" }}>
-              {stock.kind === "etf" ? "FUND" : "BSTOCK"}
+              {stock.kind === "etf" ? "FUND" : stock.kind === "crypto" ? "CRYPTO" : "BSTOCK"}
             </div>
             {big && showWeight && weightPct !== undefined && (
               <div style={{ fontFamily: mono, fontSize: 8, fontWeight: 600, color: CARD.text, padding: "5px 8px", borderRadius: 999, background: CARD.white }}>{weightPct}%</div>

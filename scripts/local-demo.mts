@@ -48,12 +48,12 @@ async function send(i: number, address: Address, abi: readonly unknown[], fn: st
   if (r.status !== "success") throw new Error(`${fn} failed`);
 }
 
-// Mock copies of real bStocks, at their real prices.
-const PICKS = ["NVDA", "TSLA", "META", "MSFT", "GOOGL", "AMD", "AVGO", "TSM", "COIN", "HOOD", "SPY", "QQQ"];
+// Mock copies of real bStocks and the crypto slice (WBNB, BTCB, ETH), at their snapshot prices.
+const PICKS = ["NVDA", "TSLA", "META", "MSFT", "GOOGL", "AMD", "AVGO", "TSM", "COIN", "HOOD", "SPY", "QQQ", "BNB", "BTC", "ETH"];
 const stocks = PICKS.map((t) => BSTOCKS.find((s) => s.ticker === t)!);
 
 // Anvil only funds wallets 0-9: give every wallet we use some gas money.
-for (let i = 0; i <= 16; i++) await test.setBalance({ address: acct(i).address, value: 100n * E18 });
+for (let i = 0; i <= 17; i++) await test.setBalance({ address: acct(i).address, value: 100n * E18 });
 
 const usdt = await deploy("LeagueEscrow.t.sol", "MockToken", ["USDT"]);
 const addr: Record<string, Address> = {};
@@ -117,7 +117,7 @@ const R1: Creator[] = [
 ];
 await enterRound(1n, R1, [[6, "Silicon Crown"], [7, "Silicon Crown"], [8, "Silicon Crown"], [9, "Crypto Rails"], [10, "Index Plus"], [11, "Index Plus"], [12, "Big Tech Hold"]]);
 
-const MOVES: Record<string, number> = { NVDA: 2.4, TSLA: -1.8, META: 0.6, MSFT: 0.3, GOOGL: -0.4, AMD: 3.1, AVGO: 1.2, TSM: 0.9, COIN: -2.6, HOOD: -1.1, SPY: 0.2, QQQ: 0.5 };
+const MOVES: Record<string, number> = { NVDA: 2.4, TSLA: -1.8, META: 0.6, MSFT: 0.3, GOOGL: -0.4, AMD: 3.1, AVGO: 1.2, TSM: 0.9, COIN: -2.6, HOOD: -1.1, SPY: 0.2, QQQ: 0.5, BNB: 1.5, BTC: -0.8, ETH: 2.0 };
 for (let i = 0; i < 3; i++) {
   const atStart = (r1Close + 60 + i * 300) * 1000;
   store.saveSample(1n, "start", sampleAt(atStart, () => 1), atStart);
@@ -153,6 +153,8 @@ const R2: Creator[] = [
   ["Big Tech Five", 4, [["META", 3], ["GOOGL", 3], ["MSFT", 3], ["NVDA", 3], ["TSLA", 3]], 1],
   ["Speed & Chips", 5, [["TSLA", 5], ["NVDA", 4], ["AVGO", 3]], 2],
   ["Cloud Kings", 6, [["MSFT", 5], ["GOOGL", 4], ["META", 3], ["QQQ", 2]], 1],
+  // A crypto slice: BTC + BNB = 2.4 of 12.4 = 19.4% (cap 20%).
+  ["Chips & Coins", 17, [["NVDA", 4], ["AMD", 3], ["TSM", 3], ["BTC", 1.2], ["BNB", 1.2]], 1],
 ];
 await enterRound(2n, R2, [[7, "AI Chips Max"], [8, "AI Chips Max"], [9, "AI Chips Max"], [10, "Fintech Rails"], [11, "Steady Index"], [12, "Steady Index"], [13, "Big Tech Five"], [14, "Speed & Chips"], [15, "Cloud Kings"], [16, "AI Chips Max"]]);
 // Start samples at the snapshot prices; the app moves "now" prices over time.

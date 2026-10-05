@@ -8,15 +8,16 @@ import Link from "next/link";
 import { erc20Abi, formatUnits } from "viem";
 import { useConnection, useReadContracts } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
-import { BSTOCKS, type StockInfo } from "../../ui/data/stocks";
+import { BSTOCKS, isCrypto, type StockInfo } from "../../ui/data/stocks";
 import { StockCard } from "../../ui/components/StockCard";
 import { WeightBar } from "../../ui/components/WeightBar";
 import { useConfig, usePlanRunner, useRound, useStocks } from "../hooks";
 import { post } from "../api";
+import { equalWeights } from "../weights";
 import { ConnectButton } from "./ConnectButton";
 import { TxSteps } from "./TxSteps";
 
-type Filter = "all" | "stock" | "etf";
+type Filter = "all" | "stock" | "etf" | "crypto";
 
 export function CreateFlow() {
   const { data: cfg } = useConfig();
@@ -37,7 +38,7 @@ export function CreateFlow() {
   const [faucet, setFaucet] = useState<{ busy: boolean; msg: string | null }>({ busy: false, msg: null });
   const [entered, setEntered] = useState<string | null>(null);
 
-  const rules = cfg?.rules ?? { minTokens: 3, maxTokens: 10, maxWeightPct: 50, minBasketUsd: 10, ticketUsd: 5, maxBuyFeePct: 2, driftPct: 5 };
+  const rules = cfg?.rules ?? { minTokens: 3, minStocks: 3, maxCryptoPct: 20, maxTokens: 10, maxWeightPct: 50, minBasketUsd: 10, ticketUsd: 5, maxBuyFeePct: 2, driftPct: 5 };
   const live = useMemo(() => new Map(stocksData?.stocks.map((s) => [s.ticker, s]) ?? []), [stocksData]);
   const available = BSTOCKS.filter((s) => !stocksData || live.has(s.ticker));
   const shown = available.filter(
@@ -50,18 +51,20 @@ export function CreateFlow() {
     const t = new URLSearchParams(window.location.search).get("add");
     if (t && BSTOCKS.some((s) => s.ticker === t)) setPicked([t]);
   }, []);
-  // Equal weights whenever the selection changes.
+  // Equal weights whenever the selection changes, with crypto kept under its cap.
   useEffect(() => {
-    if (!picked.length) return setWeights({});
-    const base = Math.floor(100 / picked.length);
-    const w: Record<string, number> = {};
-    picked.forEach((t, i) => (w[t] = base + (i < 100 - base * picked.length ? 1 : 0)));
-    setWeights(w);
+    setWeights(equalWeights(picked.map((t) => ({ ticker: t, crypto: isCrypto(stock(t)) })), rules.maxCryptoPct));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [picked]);
 
   const toggle = (t: string) => setPicked((p) => (p.includes(t) ? p.filter((x) => x !== t) : p.length >= rules.maxTokens ? p : [...p, t]));
   const total = picked.reduce((s, t) => s + (weights[t] ?? 0), 0);
-  const weightsOk = picked.length >= rules.minTokens && total === 100 && picked.every((t) => (weights[t] ?? 0) > 0 && weights[t] <= rules.maxWeightPct);
+  const stockCount = picked.filter((t) => !isCrypto(stock(t))).length;
+  const cryptoCount = picked.length - stockCount;
+  const cryptoPct = picked.reduce((s, t) => s + (isCrypto(stock(t)) ? (weights[t] ?? 0) : 0), 0);
+  const enoughStocks = stockCount >= rules.minStocks;
+  const weightsOk =
+    enoughStocks && total === 100 && cryptoPct <= rules.maxCryptoPct && picked.every((t) => (weights[t] ?? 0) > 0 && weights[t] <= rules.maxWeightPct);
   const holdings = picked.map((t) => ({ stock: stock(t), weightPct: weights[t] ?? 0 }));
 
   // Wallet balances of the picked stocks (this chain's addresses).
@@ -100,7 +103,12 @@ export function CreateFlow() {
     <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
       <div className="space-y-6">
         {/* 1. Pick */}
-        <Panel n="1" title="Pick your stocks" done={picked.length >= rules.minTokens} hint={`${picked.length} of ${rules.minTokens}–${rules.maxTokens} picked`}>
+        <Panel
+          n="1"
+          title="Pick your stocks"
+          done={enoughStocks}
+          hint={`${stockCount} ${stockCount === 1 ? "stock" : "stocks"}${cryptoCount ? ` + ${cryptoCount} crypto` : ""} · need ${rules.minStocks}+ stocks, ${rules.maxTokens} max`}
+        >
           <div className="mb-5 flex flex-wrap items-center gap-3">
             <input
               value={q}
@@ -110,9 +118,9 @@ export function CreateFlow() {
               className="h-10 w-full rounded-full border border-line bg-bg px-4 text-[14px] outline-none focus:border-ink/40 sm:w-64"
             />
             <div className="flex gap-1 rounded-full bg-surface p-1 text-[13px]">
-              {(["all", "stock", "etf"] as Filter[]).map((f) => (
+              {(["all", "stock", "etf", "crypto"] as Filter[]).map((f) => (
                 <button key={f} type="button" onClick={() => setFilter(f)} className={`h-8 rounded-full px-3 ${filter === f ? "bg-bg font-medium shadow-card" : "text-muted"}`}>
-                  {f === "all" ? "All" : f === "stock" ? "Stocks" : "Funds"}
+                  {f === "all" ? "All" : f === "stock" ? "Stocks" : f === "etf" ? "Funds" : "Crypto"}
                 </button>
               ))}
             </div>
@@ -134,11 +142,19 @@ export function CreateFlow() {
               );
             })}
           </div>
-          <p className="mt-4 text-[12px] text-muted">Leveraged funds are not allowed in the league, so they aren&rsquo;t listed.</p>
+          <p className="mt-4 text-[12px] text-muted">
+            At least {rules.minStocks} stocks or funds. Add BNB, BTC or ETH as a crypto slice of up to {rules.maxCryptoPct}% in total. Leveraged funds aren&rsquo;t allowed, so they aren&rsquo;t listed.
+          </p>
         </Panel>
 
         {/* 2. Weights */}
-        <Panel n="2" title="Set the weights" done={weightsOk} hint={`total ${total}% · max ${rules.maxWeightPct}% each`} disabled={picked.length < rules.minTokens}>
+        <Panel
+          n="2"
+          title="Set the weights"
+          done={weightsOk}
+          hint={`total ${total}% · max ${rules.maxWeightPct}% each${cryptoCount ? ` · crypto ${cryptoPct}% of ${rules.maxCryptoPct}%` : ""}`}
+          disabled={!enoughStocks}
+        >
           <div className="space-y-3">
             {picked.map((t) => (
               <div key={t} className="grid grid-cols-[34px_64px_1fr_72px] items-center gap-3">
@@ -147,7 +163,7 @@ export function CreateFlow() {
                 <input
                   type="range"
                   min={1}
-                  max={rules.maxWeightPct}
+                  max={isCrypto(stock(t)) ? rules.maxCryptoPct : rules.maxWeightPct}
                   value={weights[t] ?? 0}
                   onChange={(e) => setWeights((w) => ({ ...w, [t]: Number(e.target.value) }))}
                   className="accent-[var(--ink)]"
@@ -170,7 +186,9 @@ export function CreateFlow() {
             <WeightBar holdings={holdings} legend={false} />
           </div>
           <div className="mt-4 flex items-center justify-between text-[13px]">
-            <span className={total === 100 ? "text-up" : "text-down"}>{total === 100 ? "Adds up to 100%" : `Adds up to ${total}%: needs 100%`}</span>
+            <span className={total === 100 && cryptoPct <= rules.maxCryptoPct ? "text-up" : "text-down"}>
+              {total !== 100 ? `Adds up to ${total}%: needs 100%` : cryptoPct > rules.maxCryptoPct ? `Crypto is ${cryptoPct}%: the cap is ${rules.maxCryptoPct}%` : "Adds up to 100%"}
+            </span>
             <button type="button" className="font-medium underline-offset-4 hover:underline" onClick={() => setPicked((p) => [...p])}>
               Equal weights
             </button>
@@ -251,10 +269,11 @@ export function CreateFlow() {
             </label>
           </div>
           <ul className="mt-5 space-y-1.5 text-[13px] text-muted">
-            <li>· Your whole balance of these {picked.length} stocks (${heldUsd.toFixed(2)}) is locked until the round ends, then returned.</li>
+            <li>· Your whole balance of these {picked.length} assets (${heldUsd.toFixed(2)}) is locked until the round ends, then returned.</li>
             <li>· Plus a ${rules.ticketUsd} USDT ticket. Top half wins the bottom half&rsquo;s tickets.</li>
             <li>· Same stocks and weights as an existing ETF? You join that team instead.</li>
-            <li>· If prices move your weights more than {rules.driftPct} points away before the round starts, the entry is refunded.</li>
+            <li>· If prices move your weights more than {rules.driftPct} points away before the round starts (or crypto above {rules.maxCryptoPct + rules.driftPct}%), the entry is refunded.</li>
+            {picked.includes("BNB") && <li>· BNB is held as WBNB (wrapped BNB), the token form the league can lock.</li>}
           </ul>
           <div className="mt-5">
             {entered ? (
@@ -292,7 +311,7 @@ export function CreateFlow() {
             {picked.length ? picked.map((t) => <StockCard key={t} stock={stock(t)} size="tiny64" weightPct={weights[t]} />) : <p className="self-center text-[14px] text-white/50">Pick stocks to see them here.</p>}
           </div>
           <dl className="mt-6 space-y-2 text-[14px]">
-            <div className="flex justify-between"><dt className="text-white/55">Stocks</dt><dd className="t-num">{picked.length}</dd></div>
+            <div className="flex justify-between"><dt className="text-white/55">Assets</dt><dd className="t-num">{stockCount}{cryptoCount ? ` + ${cryptoCount} crypto` : ""}</dd></div>
             <div className="flex justify-between"><dt className="text-white/55">Basket</dt><dd className="t-num">${(holdsAll ? heldUsd : Number(amount) || 0).toFixed(2)}</dd></div>
             <div className="flex justify-between"><dt className="text-white/55">Ticket</dt><dd className="t-num">${rules.ticketUsd}</dd></div>
             <div className="flex justify-between"><dt className="text-white/55">Buy fee</dt><dd className="t-num">{fee.toFixed(1)}%</dd></div>

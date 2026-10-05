@@ -73,3 +73,6 @@ What we take:
 - ✅ **bStocks transfer rules:** real NVDAB/MSFTB/TSLAB lock into and return from the escrow on a mainnet fork (`LeagueEscrowFork.t.sol`).
 - **Stake token:** BSC USDT `0x55d398326f99059fF775485246999027B3197955`. Check it on BscScan before deploying.
 - **Season pot payout:** still to decide (top creators / backers per season).
+
+## Update 5 Oct: crypto slice
+Baskets may include BNB, BTC and ETH (as WBNB, BTCB and Binance-Peg ETH on BSC), up to 20% of the basket together, and still need at least 3 stocks or funds. Stocks stay the centre of the game; crypto is a side slice. Crypto prices come from Binance spot (USDT pairs).

@@ -8,7 +8,10 @@ Repo: github.com/NECOKIZZ/ETF (main). Plan: docs/BNB.md · UI: docs/UI.md · Car
 - **Plans** `src/league/actions.ts` + `src/league/server.ts`: `POST /api/plan` (back, lock, buy-basket, buy-etf, claim, claim-basket) → calldata steps + `baw contract-call` commands. Also `/api/config`, `/api/stocks` (per chain, change since round start), `/api/me`, `/api/leaderboard`, `/api/rounds/:id/inputs`, local-only `/api/faucet` and `/api/rpc`.
 - **Agents**: skill `skills/league-of-stocks/` (SKILL.md + read/create/play references) driving the Binance Agentic Wallet (`baw contract-call preview/execute`, Developer Mode) and `scripts/agent.mts` (same plans, local key). Tested on anvil: agent created "Agent Alpha".
 - **Web**: wagmi (injected) + react-query. Pages `/`, `/league`, `/etf/[key]`, `/create`, `/me`, `/leaderboard`, `/round/[id]`, `/rules`, `/agents`, `/ui`. Stock card rebuilt from the user's design (`src/ui/components/StockCard.tsx`, sizes big/medium/tiny64/tiny48/tiny34).
-- **Tested**: 55 Vitest, 23 Foundry, production build; browser e2e (Playwright with an injected test wallet on anvil): create → back → claim all pass; keeper settled round 2 on a snapshot and it verified.
+- **Tested**: 65 Vitest, 23 Foundry, production build; browser e2e (Playwright with an injected test wallet on anvil): create → back → claim all pass; keeper settled round 2 on a snapshot and it verified.
+
+## Crypto slice (added 5 Oct, user's call)
+BNB (WBNB), BTC (BTCB), ETH (Binance-Peg) are `kind: "crypto"` in `src/ui/data/stocks.ts`. Rules: at least 3 stocks/funds, crypto ≤ 20% together at entry (≤ 25% at round start with drift), `DEFAULT_RULES.maxCryptoBps` / `SETTLE_RULES`. The chain's crypto addresses go into every settlement (`RoundInput.cryptoTokens`, recorded in the published rules; `cryptoTokensForChain()`). Prices: Binance spot via `src/bsc/cryptoPrices.ts` (data-api.binance.vision, fallback api.binance.com), merged into live prices and keeper samples. Deploy allowlist: `npx tsx scripts/league-tokens.mts` (42 tokens).
 
 ## Colours
 Site chrome uses only the four brand colours (Ink `#0B0B0C`, Paper `#FFFFFF`, Mint `#3DDC97`, Coral `#FF5A36`; everything else is a mix). Stock cards follow the user's card design: each stock's own colour (unique, `src/ui/data/palette.ts`) plus the card's fixed colours (`CARD`). `test/palette.test.ts` enforces both.
@@ -18,7 +21,7 @@ Site chrome uses only the four brand colours (Ink `#0B0B0C`, Paper `#FFFFFF`, Mi
 - Not deployed to mainnet yet (planned Thursday). Live-verified 5 Oct night: buy plans quote as SWAP via LiquidMesh, router `0xB44446b0c8E56988c34f7Ff73Ae904982b5FdDA5`; the approval spender comes in `tx.signatureData` (JSON strings with `approveContract`, = router), parsed by `approvalFromSignatureData`. Not live-verified: RFQ legs (reported as skipped), `baw` contract calls.
 
 ## Next
-1. Mainnet deploy (DeployLeague.s.sol, allowlist the 39 bStocks), host app + keeper together (shared `data/`), keeper `auto` for demo rounds.
+1. Mainnet deploy (DeployLeague.s.sol, `LEAGUE_TOKENS=$(npx tsx scripts/league-tokens.mts)`: 39 bStocks + BNB/BTC/ETH), host app + keeper together (shared `data/`), keeper `auto` for demo rounds.
 2. A real $5 mainnet buy through the app on Thursday (approve router + swap) to confirm end to end.
 3. Polish from the user's review; demo video script; README final.
 4. Optional: BSC testnet demo (mock tokens) so the user can click through with MetaMask before mainnet; WalletConnect.

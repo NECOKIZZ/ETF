@@ -60,6 +60,7 @@ export function buildRoundView(opts: {
   tickerOf: (token: string) => string | null;
   priceSource: string;
   meta?: Map<string, { name: string; buyFeeBps: number }>;
+  cryptoTokens?: string[];
 }): RoundView {
   const { info, entries, start, now } = opts;
   const phase: RoundView["phase"] =
@@ -75,6 +76,7 @@ export function buildRoundView(opts: {
     start,
     end: now,
     priceProblems: [],
+    cryptoTokens: opts.cryptoTokens,
   });
 
   const teams: TeamView[] = s.teams.map((t) => {

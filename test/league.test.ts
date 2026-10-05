@@ -186,3 +186,19 @@ describe("basket maths", () => {
     expect(basketEligibility(["a", "A", "c"], [4n * USD, 4n * USD, 4n * USD], rules)).toBe("DuplicateToken");
   });
 });
+
+describe("crypto slice rules", () => {
+  const USD = 10n ** 18n;
+  const rules = { minTokens: 3, maxWeightBps: 5000, minValue: 10n * USD, maxCryptoBps: 2000, cryptoTokens: ["0xb7c", "0xe7h"] };
+  it("needs 3 stocks besides crypto, and caps crypto at 20% together", async () => {
+    const { basketEligibility } = await import("../src/engine/league");
+    expect(basketEligibility(["0xa", "0xb", "0xc", "0xb7c"], [3n, 3n, 2n, 2n].map((x) => x * USD), rules)).toBeNull(); // 20% crypto
+    expect(basketEligibility(["0xa", "0xb", "0xb7c", "0xe7h"], [4n, 4n, 1n, 1n].map((x) => x * USD), rules)).toBe("TooFewTokens"); // only 2 stocks
+    expect(basketEligibility(["0xa", "0xb", "0xc", "0xb7c", "0xe7h"], [3n, 3n, 3n, 2n, 2n].map((x) => x * USD), rules)).toBe("TooMuchCrypto"); // 30.8%
+    expect(basketEligibility(["0xa", "0xb", "0xc", "0xB7C"], [3n, 3n, 2n, 3n].map((x) => x * USD), rules)).toBe("TooMuchCrypto"); // case-insensitive
+  });
+  it("without a crypto list, behaves as before", async () => {
+    const { basketEligibility } = await import("../src/engine/league");
+    expect(basketEligibility(["0xa", "0xb", "0xc"], [4n, 3n, 3n].map((x) => x * USD), { minTokens: 3, maxWeightBps: 5000, minValue: 10n * USD })).toBeNull();
+  });
+});

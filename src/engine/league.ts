@@ -308,19 +308,27 @@ export function basketWeightsBps(values: bigint[]): number[] {
 }
 
 export interface EligibilityRules {
-  minTokens: number;     // 3
+  minTokens: number;     // 3 — at least this many non-crypto tokens (stocks / funds)
   maxWeightBps: number;  // 5000 — no token above 50%
   minValue: bigint;      // $10 in the value units used
+  /** Crypto slice: tokens in this list count as crypto (lowercase addresses). */
+  cryptoTokens?: string[];
+  /** Max combined weight of crypto tokens, bps (2000 = 20%). Absent = no cap. */
+  maxCryptoBps?: number;
 }
 
-export type IneligibleReason = "TooFewTokens" | "TooConcentrated" | "TooSmall" | "DuplicateToken";
+export type IneligibleReason = "TooFewTokens" | "TooConcentrated" | "TooSmall" | "DuplicateToken" | "TooMuchCrypto";
 
 /** Check a creator's basket (token ids + current values) against the rules. */
 export function basketEligibility(tokens: string[], values: bigint[], rules: EligibilityRules): IneligibleReason | null {
   if (new Set(tokens.map((t) => t.toLowerCase())).size !== tokens.length) return "DuplicateToken";
-  const nonZero = values.filter((v) => v > 0n).length;
-  if (nonZero < rules.minTokens) return "TooFewTokens";
+  const crypto = new Set((rules.cryptoTokens ?? []).map((t) => t.toLowerCase()));
+  const isCrypto = tokens.map((t) => crypto.has(t.toLowerCase()));
+  const stocks = values.filter((v, i) => v > 0n && !isCrypto[i]).length;
+  if (stocks < rules.minTokens) return "TooFewTokens";
   if (sum(values) < rules.minValue) return "TooSmall";
-  if (basketWeightsBps(values).some((w) => w > rules.maxWeightBps)) return "TooConcentrated";
+  const weights = basketWeightsBps(values);
+  if (weights.some((w) => w > rules.maxWeightBps)) return "TooConcentrated";
+  if (rules.maxCryptoBps !== undefined && weights.reduce((s, w, i) => s + (isCrypto[i] ? w : 0), 0) > rules.maxCryptoBps) return "TooMuchCrypto";
   return null;
 }

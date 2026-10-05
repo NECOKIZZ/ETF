@@ -30,11 +30,12 @@ export default function Rules() {
           <article className="max-w-[68ch] text-[16px] leading-relaxed text-ink/85 [&_li]:mt-2 [&_p]:mt-4 [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5">
             <H>A round</H>
             <p>Each round has an entry window, then a running period. When entries close, the start prices are taken. When the round ends, the end prices are taken and the ETFs are ranked by return.</p>
-            <p>Prices are Binance&rsquo;s reference price for each tokenized stock, averaged over several samples at the start and at the end, so one odd tick can&rsquo;t decide a round.</p>
+            <p>Prices are Binance&rsquo;s reference price for each tokenized stock and Binance&rsquo;s spot price (USDT pair) for BNB, BTC and ETH, averaged over several samples at the start and at the end, so one odd tick can&rsquo;t decide a round.</p>
 
             <H>Creators</H>
             <ul>
-              <li>Pick 3 to 10 stocks, no stock above 50%, worth at least $10 in total.</li>
+              <li>Pick at least 3 stocks or funds (up to 10 assets in all), none above 50%, worth at least $10 in total.</li>
+              <li>Optional crypto slice: BNB, BTC and ETH, up to 20% of the basket together. BNB is held as WBNB.</li>
               <li>Lock the basket in the league contract with a $5 USDT ticket, and give the ETF a name.</li>
               <li>The basket comes back to you when the round ends, win or lose. Only the ticket is at stake.</li>
               <li>Same stocks at the same weights (to 1%) as an existing ETF? You join that team. The first creator is its captain.</li>
@@ -82,6 +83,7 @@ export default function Rules() {
 
             <H id="verify">Settlement you can check</H>
             <p>A keeper takes the prices and runs the open-source settlement. It publishes every input (prices, entries, payouts) and writes their hash on-chain with the payouts. The contract checks that the money adds up and that no payout is out of bounds. Anyone can re-run the maths with <code className="t-num text-[14px]">scripts/verify.mts</code> or on each round&rsquo;s results page.</p>
+            <p>Prices keep moving between your entry and the round start, so the check at the start allows a little drift: weights within 5 points of what you declared, a basket of at least $9.50, and crypto up to 25%. Beyond that, the entry is refunded.</p>
             <p>If a round isn&rsquo;t settled within 3 days of its end, anyone can void it and everyone is refunded. If a stock token is paused when you claim, your other tokens and your payout still arrive, and you can retry the paused one later.</p>
 
             <H id="risk">Risks</H>

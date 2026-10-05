@@ -21,7 +21,7 @@ function Section({ id, label, title, children, aside }: { id?: string; label: st
 }
 
 const STEPS = [
-  ["01", "Pick 3 to 10 stocks", "Real tokenized stocks on BNB Chain: NVIDIA, Tesla, Microsoft, the S&P 500 and more. Set the weights, no stock above 50%."],
+  ["01", "Pick 3 to 10 stocks", "Real tokenized stocks on BNB Chain: NVIDIA, Tesla, Microsoft, the S&P 500 and more. Add a slice of BNB, BTC or ETH if you like (up to 20%)."],
   ["02", "Lock it with a $5 ticket", "Your basket (at least $10) stays in the league contract for the round. You still own it: it comes back when the round ends."],
   ["03", "The top half wins", "ETFs are ranked by return. The top half wins the bottom half's tickets, and the closer you were to the best return, the bigger your share."],
 ] as const;
@@ -132,7 +132,8 @@ export default function Home() {
         >
           <StockField />
           <p className="mt-8 max-w-[70ch] text-[13px] text-muted">
-            bStocks are tokenized stocks on BNB Chain, priced from Binance&rsquo;s reference price. Leveraged funds are not allowed in the league.
+            bStocks are tokenized stocks on BNB Chain, priced from Binance&rsquo;s reference price. Baskets can also hold a crypto slice of BNB, BTC and ETH (up to 20%, Binance spot
+            price). Leveraged funds are not allowed in the league.
           </p>
         </Section>
       </Band>

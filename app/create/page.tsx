@@ -7,7 +7,7 @@ export default function Create() {
   return (
     <Shell>
       <PageHead label="Create" title="Build your ETF">
-        Pick 3 to 10 stocks, set the weights, buy them, then lock the basket with a $5 ticket. The basket comes back to you when the round ends.
+        Pick at least 3 stocks (add up to 20% in BNB, BTC or ETH if you like), set the weights, buy them, then lock the basket with a $5 ticket. The basket comes back to you when the round ends.
       </PageHead>
       <Container>
         <CreateFlow />
