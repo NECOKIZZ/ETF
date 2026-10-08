@@ -1,14 +1,13 @@
 "use client";
 
-// Client islands for the landing page: the hero deck and round pill with live
-// data, and the stock grid.
+// Client islands for the landing page: the hero deck with live prices, and
+// the stock grid.
 
 import Link from "next/link";
 import { StockDeck } from "../../ui/components/StockDeck";
 import { StockCard } from "../../ui/components/StockCard";
 import { BSTOCKS, byTicker } from "../../ui/data/stocks";
-import { useRound, useStocks } from "../hooks";
-import { RoundStats } from "./league";
+import { useStocks } from "../hooks";
 
 export function useLive() {
   const { data } = useStocks();
@@ -38,12 +37,6 @@ export function HeroDeck() {
       </div>
     </>
   );
-}
-
-export function HeroRound() {
-  const { data: r } = useRound();
-  if (!r) return <span className="inline-block h-7 w-56 animate-pulse rounded-full bg-white/50" />;
-  return <RoundStats r={r} />;
 }
 
 export function StockField({ limit = 12 }: { limit?: number }) {

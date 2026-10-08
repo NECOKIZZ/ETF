@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { Band } from "@/ui/components/Band";
 import { Button } from "@/ui/components/Button";
 import { Shell, Container } from "@/web/components/Shell";
-import { HeroDeck, HeroRound, StockField } from "@/web/components/landing";
-import { LeagueBoard } from "@/web/components/league";
+import { HeroDeck, StockField } from "@/web/components/landing";
+import { SimRound } from "@/web/components/SimRound";
 
 function Section({ id, label, title, children, aside }: { id?: string; label: string; title: React.ReactNode; children: React.ReactNode; aside?: React.ReactNode }) {
   return (
@@ -28,23 +27,13 @@ const STEPS = [
 
 export default function Home() {
   return (
-    <Shell
-      announce={
-        <>
-          <span className="mr-2 inline-block size-1.5 rounded-full bg-brand-mint align-middle" /> A new round is open.{" "}
-          <Link href="/create" className="font-medium text-brand-paper underline-offset-4 hover:underline">
-            Build an ETF in a minute →
-          </Link>
-        </>
-      }
-    >
+    <Shell landing>
       {/* Hero */}
       <div className="px-3 pt-3 md:px-6 md:pt-6">
         <div className="mint-gradient relative overflow-hidden rounded-[32px] md:rounded-[48px]">
           <div className="mx-auto grid max-w-[1280px] items-center gap-6 px-6 pb-10 pt-14 md:grid-cols-[1fr_1.15fr] md:gap-10 md:px-12 md:pb-14 md:pt-20">
             <div>
-              <HeroRound />
-              <h1 className="t-display mt-6 text-[48px] md:text-[60px] xl:text-[70px]">
+              <h1 className="t-display text-[48px] md:text-[60px] xl:text-[70px]">
                 Build an ETF.
                 <br />
                 Beat the league.
@@ -53,11 +42,11 @@ export default function Home() {
                 Pick real tokenized stocks on BNB Chain, lock your basket, and win the bottom half&rsquo;s stakes every round.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-6">
-                <Button size="lg" href="/create">
-                  Build your ETF
+                <Button size="lg" href="/league">
+                  Open app
                 </Button>
-                <Button variant="text" size="lg" href="/league">
-                  See this week&rsquo;s league →
+                <Button variant="text" size="lg" href="#how">
+                  How it works →
                 </Button>
               </div>
             </div>
@@ -82,24 +71,48 @@ export default function Home() {
         </Section>
       </Band>
 
-      <Band tone="surface" z={2}>
-        <Section
-          label="Live"
-          title="This week&rsquo;s league"
-          aside={
-            <Button variant="ghost" href="/league">
-              Full table →
-            </Button>
-          }
-        >
-          <div className="rounded-[28px] bg-bg p-2 shadow-card md:p-3">
-            <LeagueBoard limit={8} />
+      <Band tone="white" z={2}>
+        <Container className="py-16 md:py-24">
+          <div id="round" className="grid gap-3 md:grid-cols-2">
+            <div className="flex flex-col rounded-[32px] bg-surface p-7 md:p-10">
+              <div className="t-label opacity-60">A round, start to finish</div>
+              <h2 className="t-heading mt-3 text-[34px] md:text-[44px]">
+                Six ETFs, one hour.
+                <br />
+                The top half gets paid.
+              </h2>
+              <p className="mt-5 max-w-[46ch] text-[16px] text-muted">
+                Entries close and the starting prices are locked. For the next hour every ETF moves with its stocks. When the round ends, the top half splits the
+                bottom half&rsquo;s tickets: the closer to the best return, the bigger the share.
+              </p>
+              <dl className="mt-8 text-[15px]">
+                {[
+                  ["Entries close", "Start prices locked"],
+                  ["The round runs", "Ranked by live return"],
+                  ["The round ends", "Top half paid, baskets returned"],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex justify-between gap-4 border-t border-line py-3.5">
+                    <dt>{k}</dt>
+                    <dd className="text-right text-muted">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="mt-auto flex flex-wrap items-center gap-6 pt-8">
+                <Button href="/league">Open app</Button>
+                <Button variant="text" href="/rules">
+                  Read the rules →
+                </Button>
+              </div>
+            </div>
+            <div className="mint-gradient flex items-center rounded-[32px] px-4 py-10 md:px-10">
+              <SimRound />
+            </div>
           </div>
-        </Section>
+        </Container>
       </Band>
 
       <Band tone="mint" z={3}>
-        <Section label="Back a creator" title="Two ways to back a creator">
+        <Section id="back" label="Back a creator" title="Two ways to back a creator">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-[28px] bg-bg p-8 shadow-card">
               <div className="t-label text-muted">Own the stocks</div>
@@ -122,6 +135,7 @@ export default function Home() {
 
       <Band tone="white" z={4}>
         <Section
+          id="stocks"
           label="On the field"
           title="Every stock is a card"
           aside={
@@ -140,6 +154,7 @@ export default function Home() {
 
       <Band tone="black" z={5}>
         <Section
+          id="agents"
           label="Agents"
           title="Let your agent play"
           aside={

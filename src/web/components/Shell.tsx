@@ -1,14 +1,15 @@
 // Page frame: header, live ticker, content, footer.
 
-import { SiteHeader, AnnouncementBar } from "../../ui/components/SiteHeader";
+import { SiteHeader, LandingHeader, AnnouncementBar } from "../../ui/components/SiteHeader";
 import { SiteFooter } from "../../ui/components/SiteFooter";
 import { LiveTicker } from "./LiveTicker";
 
-export function Shell({ children, announce }: { children: React.ReactNode; announce?: React.ReactNode }) {
+/** `landing`: the info page, with a header that links to its sections and "Open app". */
+export function Shell({ children, announce, landing = false }: { children: React.ReactNode; announce?: React.ReactNode; landing?: boolean }) {
   return (
     <>
       {announce && <AnnouncementBar>{announce}</AnnouncementBar>}
-      <SiteHeader />
+      {landing ? <LandingHeader /> : <SiteHeader />}
       <LiveTicker />
       <main className="min-h-[60vh]">{children}</main>
       <div className="mt-16">

@@ -26,6 +26,49 @@ function MobileNav() {
   );
 }
 
+// Landing page: links to its own sections only. The app is one click away.
+const sections = [
+  { href: "#how", label: "How it works" },
+  { href: "#round", label: "A round" },
+  { href: "#back", label: "Back a creator" },
+  { href: "#stocks", label: "Stocks" },
+  { href: "#agents", label: "Agents" },
+];
+
+export function LandingHeader() {
+  return (
+    <header className="sticky top-0 z-50 border-b border-line/60 bg-bg/85 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4 md:px-6">
+        <Link href="/" aria-label="League of Stocks home">
+          <Logo />
+        </Link>
+        <nav className="hidden items-center gap-8 text-[14px] lg:flex">
+          {sections.map((l) => (
+            <a key={l.href} href={l.href} className="text-ink/80 transition hover:text-ink">
+              {l.label}
+            </a>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2">
+          <Link href="/rules" className="hidden h-9 items-center rounded-full bg-ink px-4 text-[13px] font-medium text-bg transition hover:opacity-90 sm:inline-flex">
+            Read the rules
+          </Link>
+          <Link href="/league" className="inline-flex h-9 items-center gap-1 rounded-full bg-up-bg px-4 text-[13px] font-medium text-up transition hover:brightness-95">
+            Open app <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
+      </div>
+      <nav className="flex gap-5 overflow-x-auto px-4 pb-3 text-[14px] lg:hidden">
+        {sections.map((l) => (
+          <a key={l.href} href={l.href} className="shrink-0 text-ink/80">
+            {l.label}
+          </a>
+        ))}
+      </nav>
+    </header>
+  );
+}
+
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-line/60 bg-bg/85 backdrop-blur-xl">
