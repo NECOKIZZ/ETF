@@ -6,6 +6,7 @@
 // no chain or API calls.
 
 import { useEffect, useRef, useState } from "react";
+import { LogoStack } from "../../ui/components/LogoStack";
 
 type Etf = { name: string; by: string; tickers: string[] };
 
@@ -66,17 +67,6 @@ function step(s: State): State {
   if (s.tick >= RUN_TICKS) return { ...s, phase: "settled", tick: 0, payouts: settle(s.returns) };
   const returns = s.returns.map((r, i) => Math.round((r + s.drift[i] + (Math.random() - 0.5) * 0.32) * 100) / 100);
   return { ...s, tick: s.tick + 1, returns };
-}
-
-function Logos({ tickers }: { tickers: string[] }) {
-  return (
-    <span className="flex shrink-0">
-      {tickers.map((t, i) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img key={t} src={`/logos/${t}.png`} alt="" className={`size-7 rounded-full bg-surface object-cover ring-2 ring-bg ${i ? "-ml-2" : ""}`} />
-      ))}
-    </span>
-  );
 }
 
 const usd = (x: number) => `$${x.toFixed(2)}`;
@@ -149,7 +139,7 @@ export function SimRound() {
               style={{ transform: `translateY(${p * ROW + (p >= half ? 10 : 0)}px)`, height: ROW - 10 }}
             >
               <span className="t-num w-4 text-[13px] text-muted">{p + 1}</span>
-              <Logos tickers={e.tickers} />
+              <LogoStack tickers={e.tickers} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[15px] font-medium">{e.name}</span>
                 <span className="block truncate text-[12px] text-muted">by {e.by}</span>

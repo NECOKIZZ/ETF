@@ -1,8 +1,9 @@
-// One ETF in the league table: rank, hand, name, return, team, odds, Back.
+// One ETF in the league table, in the landing page's round style: rank,
+// logos (3 + "+N"), name, return, and whether it's winning right now.
 
 import Link from "next/link";
-import { EtfChips, type Holding } from "./EtfHand";
-import { Change } from "./Pills";
+import type { Holding } from "./EtfHand";
+import { LogoStack } from "./LogoStack";
 
 export interface LeagueEntry {
   rank: number;
@@ -16,46 +17,47 @@ export interface LeagueEntry {
   href?: string;
 }
 
+const pct = (x: number) => `${x >= 0 ? "+" : "−"}${Math.abs(x).toFixed(2)}%`;
+
 export function LeagueRow({ e, winning }: { e: LeagueEntry; winning: boolean }) {
   const Row = e.href ? Link : "div";
   return (
-    <Row href={e.href ?? ""} className={`grid transition hover:bg-surface grid-cols-[28px_auto_1fr_auto] items-center gap-4 rounded-[20px] px-4 py-3 md:grid-cols-[32px_auto_1fr_110px_90px_130px_auto] md:gap-6 ${winning ? "bg-up-bg/50" : ""}`}>
-      <span className="t-num text-[15px] text-muted">{e.rank}</span>
-      <EtfChips holdings={e.holdings} />
-      <div className="min-w-0">
-        <div className="truncate font-medium">{e.name}</div>
-        <div className="truncate text-[13px] text-muted">by {e.creator}</div>
-      </div>
-      <Change pct={e.returnPct} className="text-[17px] font-medium md:justify-self-end" />
-      <span className="hidden text-[13px] text-muted md:block">
+    <Row href={e.href ?? ""} className="flex items-center gap-3 rounded-[16px] px-3 py-2.5 transition hover:bg-surface md:gap-4">
+      <span className="t-num w-5 text-[13px] text-muted">{e.rank}</span>
+      <span className="w-[92px] shrink-0 sm:w-[104px]">
+        <LogoStack tickers={e.holdings.map((h) => h.stock.ticker)} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[15px] font-medium">{e.name}</span>
+        <span className="block truncate text-[12px] text-muted">by {e.creator}</span>
+      </span>
+      <span className="hidden text-[12px] text-muted sm:block">
         <span className="t-num text-ink">{e.team}</span> on team
       </span>
-      <span className="hidden text-[13px] text-muted md:block">
-        {e.ifWins !== null ? (
-          <>
-            ticket now <span className="t-num text-ink">+${e.ifWins.toFixed(2)}</span>
-          </>
+      <span className="shrink-0 text-right sm:w-24">
+        <span className={`t-num block text-[15px] ${e.returnPct >= 0 ? "text-up" : "text-down"}`}>{pct(e.returnPct)}</span>
+        {winning ? (
+          <span className="t-num mt-0.5 inline-block rounded-full bg-up-bg px-2 text-[11px] font-medium text-up">{e.ifWins !== null ? `+$${e.ifWins.toFixed(2)}` : "Winning"}</span>
         ) : (
-          "below the cut"
+          <span className="mt-0.5 inline-block rounded-full bg-surface px-2 text-[11px] font-medium text-muted">Behind</span>
         )}
       </span>
-      <span className="hidden h-9 rounded-full border border-line px-4 text-[13px] font-medium md:inline-flex md:items-center">Back</span>
     </Row>
   );
 }
 
-/** `cutAfter`: rows above the winners' line (default: half). */
+/** `cutAfter`: rows above the winners' line (default: half; -1: no line). */
 export function LeagueTable({ entries, cutAfter }: { entries: LeagueEntry[]; cutAfter?: number }) {
   const cut = cutAfter ?? Math.floor(entries.length / 2);
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col">
       {entries.map((e, i) => (
         <div key={e.rank}>
           <LeagueRow e={e} winning={i < cut} />
-          {i === cut - 1 && (
-            <div className="my-2 flex items-center gap-3 px-4 text-[12px] text-muted">
+          {i === cut - 1 && i < entries.length - 1 && (
+            <div className="my-1.5 flex items-center gap-2 px-3">
               <span className="h-px flex-1 border-t border-dashed border-line" />
-              Top half wins the bottom half&rsquo;s tickets
+              <span className="t-label text-[10px] text-muted">top half wins</span>
               <span className="h-px flex-1 border-t border-dashed border-line" />
             </div>
           )}

@@ -107,7 +107,7 @@ export function CreateFlow() {
           n="1"
           title="Pick your stocks"
           done={enoughStocks}
-          hint={`${stockCount} ${stockCount === 1 ? "stock" : "stocks"}${cryptoCount ? ` + ${cryptoCount} crypto` : ""} · need ${rules.minStocks}+ stocks, ${rules.maxTokens} max`}
+          hint={<PickCount stocks={stockCount} crypto={cryptoCount} cryptoOptions={BSTOCKS.filter(isCrypto).length} minStocks={rules.minStocks} max={rules.maxTokens} />}
         >
           <div className="mb-5 flex flex-wrap items-center gap-3">
             <input
@@ -323,7 +323,32 @@ export function CreateFlow() {
   );
 }
 
-function Panel({ n, title, hint, done, disabled, children }: { n: string; title: string; hint?: string; done?: boolean; disabled?: boolean; children: React.ReactNode }) {
+/** "2/3 stocks · 0/3 crypto": red until there are enough stocks, green after; flagged when the basket is full. */
+function PickCount({ stocks, crypto, cryptoOptions, minStocks, max }: { stocks: number; crypto: number; cryptoOptions: number; minStocks: number; max: number }) {
+  const enough = stocks >= minStocks;
+  const full = stocks + crypto >= max;
+  const pill = "t-num inline-flex h-7 items-center gap-1 rounded-full px-3 text-[13px] font-semibold";
+  return (
+    <span className="flex flex-wrap items-center justify-end gap-2" aria-live="polite">
+      <span className={`${pill} ${enough ? "bg-up-bg text-up" : "bg-down-bg text-down"}`}>
+        {enough ? <span aria-hidden="true">✓</span> : null}
+        {stocks > minStocks ? `${stocks} stocks` : `${stocks}/${minStocks} stocks`}
+      </span>
+      <span className={`${pill} ${crypto ? "bg-up-bg text-up" : "bg-surface text-muted"}`}>
+        {crypto}/{cryptoOptions} crypto
+      </span>
+      {full ? (
+        <span className={`${pill} bg-down text-bg`}>{max}/{max} · basket full</span>
+      ) : (
+        <span className="text-[12px] text-muted">
+          {minStocks} stocks min · {max} max
+        </span>
+      )}
+    </span>
+  );
+}
+
+function Panel({ n, title, hint, done, disabled, children }: { n: string; title: string; hint?: React.ReactNode; done?: boolean; disabled?: boolean; children: React.ReactNode }) {
   return (
     <section className={`rounded-[32px] border border-line p-5 transition md:p-7 ${disabled ? "pointer-events-none opacity-45" : ""}`} aria-disabled={disabled}>
       <div className="mb-5 flex items-center justify-between gap-4">
@@ -331,7 +356,7 @@ function Panel({ n, title, hint, done, disabled, children }: { n: string; title:
           <span className={`t-num grid size-8 place-items-center rounded-full text-[13px] ${done ? "bg-brand-mint text-brand-ink" : "bg-surface"}`}>{done ? "✓" : n}</span>
           <h2 className="t-heading text-[22px]">{title}</h2>
         </div>
-        {hint && <span className="text-[13px] text-muted">{hint}</span>}
+        {hint && (typeof hint === "string" ? <span className="text-[13px] text-muted">{hint}</span> : hint)}
       </div>
       {children}
     </section>
