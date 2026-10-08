@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRound } from "../hooks";
 import { LeagueBoard, RoundStats, teamName, usd } from "./league";
 import { Change } from "../../ui/components/Pills";
+import { LeagueChart } from "./LeagueChart";
 
 export function LeaguePage() {
   const [q, setQ] = useState("");
@@ -12,7 +13,7 @@ export function LeaguePage() {
   const biggest = r ? [...r.teams].sort((a, b) => b.members - a.members).slice(0, 4) : [];
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
-      <div>
+      <div className="min-w-0">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
           {r ? <RoundStats r={r} /> : <span />}
           <input
@@ -23,7 +24,8 @@ export function LeaguePage() {
             aria-label="Search ETFs or tickers"
           />
         </div>
-        <div className="rounded-[28px] border border-line p-2 md:p-3">
+        <LeagueChart />
+        <div className="rounded-[24px] bg-bg p-2 shadow-card md:p-4">
           <LeagueBoard query={q} />
         </div>
       </div>

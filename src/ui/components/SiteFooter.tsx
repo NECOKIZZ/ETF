@@ -2,7 +2,7 @@ import { LogoMark } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
 const cols: { title: string; links: [string, string][] }[] = [
-  { title: "Play", links: [["League", "/league"], ["Create an ETF", "/create"], ["Leaderboard", "/leaderboard"], ["My entries", "/me"]] },
+  { title: "Play", links: [["League", "/league"], ["Create an ETF", "/create"], ["Leaderboard", "/leaderboard"], ["My entries", "/me"], ["Beginner's guide", "/league?guide"]] },
   { title: "Build", links: [["Agents", "/agents"], ["API", "/agents#api"], ["Contracts", "/rules#contracts"], ["Verify a round", "/rules#verify"]] },
   { title: "About", links: [["How it works", "/#how"], ["Rules", "/rules"], ["GitHub", "https://github.com/NECOKIZZ/ETF"], ["Risk notice", "/rules#risk"]] },
 ];

@@ -3,6 +3,7 @@
 import { SiteHeader, LandingHeader, AnnouncementBar } from "../../ui/components/SiteHeader";
 import { SiteFooter } from "../../ui/components/SiteFooter";
 import { LiveTicker } from "./LiveTicker";
+import { BeginnerGuide } from "./BeginnerGuide";
 
 /** `landing`: the info page, with a header that links to its sections and "Open app". */
 export function Shell({ children, announce, landing = false }: { children: React.ReactNode; announce?: React.ReactNode; landing?: boolean }) {
@@ -12,6 +13,7 @@ export function Shell({ children, announce, landing = false }: { children: React
       {landing ? <LandingHeader /> : <SiteHeader />}
       <LiveTicker />
       <main className="min-h-[60vh]">{children}</main>
+      {!landing && <BeginnerGuide />}
       <div className="mt-16">
         <SiteFooter />
       </div>

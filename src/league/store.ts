@@ -9,7 +9,8 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync, existsSync } from 
 import { join } from "node:path";
 import type { PriceSample } from "./snapshot";
 
-export type Phase = "start" | "end";
+/** start / end: the settlement windows. live: the keeper's samples while a round runs (charts only). */
+export type Phase = "start" | "end" | "live";
 export type SavedSample = { at: number; sample: Map<string, PriceSample> };
 type SampleRow = Omit<PriceSample, "value"> & { value: string };
 

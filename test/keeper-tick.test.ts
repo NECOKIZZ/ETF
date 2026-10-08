@@ -131,5 +131,7 @@ run("keeper tick on anvil", () => {
     const inputs = (await store.loadInputs(1n)) as { entries: unknown[] };
     expect(inputs.entries).toHaveLength(4);
     expect((await store.loadSamples(1n, "start")).length).toBe(3);
+    // While the round ran, the keeper also saved chart samples.
+    expect((await store.loadSamples(1n, "live")).length).toBeGreaterThan(0);
   }, 120_000);
 });

@@ -36,6 +36,8 @@ export interface TickOptions {
   /** Minutes between samples. */
   everyMin: number;
   windowMin: number;
+  /** Minutes between the "live" samples that draw the charts while a round runs (0: none). */
+  historyMin?: number;
   /** Open a new round when none is open. */
   autoOpen?: OpenOptions & { hoursUtc?: [from: number, to: number] };
 }
@@ -176,7 +178,15 @@ export async function tick(o: TickOptions, store: LeagueStore = getStore()): Pro
       log.push(`round ${id}: ${phase} sample ${have}/${o.samples} (${s.tokens} tokens)${s.warning ? `; ${s.warning}` : ""}`);
     }
     if (phase === "start") {
-      if (have >= o.samples || now > from + windowMs) log.push(`round ${id}: running, ends in ${Math.round((endAt - now) / 60_000)} min`);
+      if (have >= o.samples || now > from + windowMs) {
+        const historyMs = (o.historyMin ?? 30) * 60_000;
+        const lastLive = (await store.loadSamples(id, "live")).at(-1)?.at ?? 0;
+        if (historyMs > 0 && have >= o.samples && now - lastLive >= historyMs && now - (all.at(-1)?.at ?? 0) >= everyMs) {
+          await takeSample(id, "live", o.mode, store);
+          log.push(`round ${id}: chart sample`);
+        }
+        log.push(`round ${id}: running, ends in ${Math.round((endAt - now) / 60_000)} min`);
+      }
       continue;
     }
     if (have < o.samples && now <= from + windowMs) continue;
@@ -209,6 +219,7 @@ export function tickOptionsFromEnv(): TickOptions {
     samples: num("KEEPER_SAMPLES", 3),
     everyMin: num("KEEPER_EVERY_MIN", 4),
     windowMin: num("KEEPER_WINDOW_MIN", 30),
+    historyMin: num("KEEPER_HISTORY_MIN", 30),
     autoOpen:
       entryMin && runMin
         ? { entryMin: Number(entryMin), runMin: Number(runMin), hoursUtc: hours ? [Number(hours[1]), Number(hours[2])] : undefined }

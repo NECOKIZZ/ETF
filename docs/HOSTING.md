@@ -9,7 +9,8 @@ The owner/deployer key never goes to Vercel. Only the keeper's key does.
 
 ## 1. Supabase (once)
 1. Project in **Central EU (Frankfurt)**.
-2. **SQL Editor → New query**: paste `supabase/schema.sql` → **Run**.
+2. **SQL Editor → New query**: paste `supabase/schema.sql` → **Run**. Run it again after an update
+   that changes it (8 Oct: chart samples, the `live` phase); it is safe to re-run.
 3. Note for step 2:
    - **Project URL** (Project Settings → Data API, or the **Connect** button): `https://<ref>.supabase.co`
    - A **secret key** (Project Settings → API Keys → Secret keys, `sb_secret_…`). The legacy
@@ -45,7 +46,8 @@ Changing an environment variable needs a redeploy: Deployments → ⋯ → Redep
 4. Save, then **Test run**. The response lists what the tick did, e.g.
    `{"ok":true,"log":["round 1: entries open for 42 more min"]}`.
 
-Each tick takes the start samples (3, 4 minutes apart) once entries close, the end samples once
+While a round runs, ticks also save a price sample every 30 minutes (`KEEPER_HISTORY_MIN`) for
+the charts on the league and ETF pages. Each tick takes the start samples (3, 4 minutes apart) once entries close, the end samples once
 the round ends, then settles, and with auto-open set, opens the next round. If ticks stop during
 a sampling window, the round can't be priced and settles as a full refund.
 
