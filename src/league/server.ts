@@ -8,7 +8,7 @@ import { BSTOCKS, type AssetKind, type StockInfo } from "../ui/data/stocks";
 import { chainFromEnv, clientsFromEnv, escrowFromEnv, rpcFromEnv } from "./chain";
 import { erc20Abi, leagueEscrowAbi, readEntries, readRound, readTeamMeta, type RoundInfo } from "./escrow";
 import { livePrices, loadRoundView } from "./live";
-import { FileStore } from "./store";
+import { getStore } from "./store";
 import { DEFAULT_RULES, DRIFT_BPS } from "./settlement";
 import { basketWeightsBps } from "../engine/league";
 import { planBack, planClaim, planClaimBasket, planLock, buyPlanSteps, normaliseWeights, type TxStep } from "./actions";
@@ -43,7 +43,7 @@ async function roundStartPrices(): Promise<Map<string, number>> {
     const { pub } = clientsFromEnv();
     const id = await pub.readContract({ address: escrowFromEnv(), abi: leagueEscrowAbi, functionName: "roundCount" });
     if (id === 0n) return new Map();
-    const samples = new FileStore().loadSamples(id, "start");
+    const samples = await getStore().loadSamples(id, "start");
     if (!samples.length) return new Map();
     return new Map([...samples[0].sample.values()].map((p) => [p.token, Number(p.value) / 1e18]));
   } catch {
@@ -335,12 +335,12 @@ export async function loadLeaderboard() {
   const { pub } = clientsFromEnv();
   const escrow = escrowFromEnv();
   const count = Number(await pub.readContract({ address: escrow, abi: leagueEscrowAbi, functionName: "roundCount" }));
-  const store = new FileStore();
+  const store = getStore();
   const creators = new Map<string, CreatorRow & { wonWei: bigint }>();
   const backers = new Map<string, BackerRow & { netWei: bigint }>();
   let settled = 0;
   for (let id = 1; id <= count; id++) {
-    const inp = store.loadInputs(BigInt(id)) as null | {
+    const inp = (await store.loadInputs(BigInt(id))) as null | {
       stake: string;
       entries: { wallet: string; teamKey: string; isCreator: boolean; payout: string; status: { kind: string; captain?: boolean } }[];
       teams: { teamKey: string; captain: string; ret: string; members: number; isWinner: boolean }[];

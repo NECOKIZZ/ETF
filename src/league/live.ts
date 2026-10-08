@@ -8,7 +8,7 @@ import { BSTOCKS, demoChangePct } from "../ui/data/stocks";
 import { clientsFromEnv, escrowFromEnv } from "./chain";
 import { leagueEscrowAbi, readEntries, readRound, readTeamMeta, roundTokens } from "./escrow";
 import { buildSnapshot, sampleFromTokens, type PriceMode, type PriceSample, type Snapshot } from "./snapshot";
-import { FileStore } from "./store";
+import { getStore } from "./store";
 import { buildRoundView, type RoundView } from "./view";
 import { cryptoTokensForChain, tickerOf } from "./registry";
 
@@ -66,14 +66,12 @@ export async function loadRoundView(roundId?: bigint): Promise<RoundView | null>
     pub.getBlock(),
   ]);
   const tokens = roundTokens(entries);
-  const store = new FileStore();
-  const saved = (phase: "start" | "end") => store.loadSamples(id, phase).map((s) => s.sample);
+  const store = getStore();
+  const saved = async (phase: "start" | "end") => (await store.loadSamples(id, phase)).map((s) => s.sample);
 
   // Start prices: the saved start samples, else (entries still open) current prices.
   // Current prices: live Binance, else the latest saved end sample, else the start.
-  const live = await livePrices();
-  const startSamples = saved("start");
-  const endSamples = saved("end");
+  const [live, startSamples, endSamples] = await Promise.all([livePrices(), saved("start"), saved("end")]);
   const start: Map<string, Snapshot> = startSamples.length
     ? buildSnapshot(startSamples, tokens, 1).prices
     : live

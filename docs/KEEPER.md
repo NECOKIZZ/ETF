@@ -11,7 +11,10 @@ pnpm keeper sample <roundId> start|end            # one price sample (saved to d
 pnpm keeper settle <roundId> --dry-run            # preview payouts, nothing sent
 pnpm keeper settle <roundId>                      # submit settlement
 pnpm keeper status <roundId>
+pnpm keeper tick [--open 60/60]                   # do whatever is due once (what the hosted cron runs)
 ```
+**Hosted:** the app's `/api/keeper/tick` runs the same tick from a cron every 5 minutes, with
+samples in Supabase. Setup: [`HOSTING.md`](HOSTING.md).
 **Price modes:**
 - `reference` (default): share price × token→share ratio. Use for real rounds during US market hours.
 - `onchain`: the token's on-chain price. bStocks trade 24/7, so this works for demo rounds at any time.
@@ -22,6 +25,7 @@ pnpm keeper status <roundId>
 - `KEEPER_PRIVATE_KEY`
 - `BSC_RPC_URL`
 - `LEAGUE_CHAIN` (`bsc` or `local`)
+- `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (optional: keep samples in Supabase, shared with the hosted app)
 
 ## What settle does
 1. Reads every entry and locked basket from the contract.

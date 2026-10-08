@@ -16,7 +16,8 @@ Hackathon week, 5–11 Oct 2026. Rules and plan: [`docs/BNB.md`](docs/BNB.md).
 | Settlement engine | `src/engine/league.ts` | ✅ tested |
 | League contract (BSC) | `contracts/src/LeagueEscrow.sol` | ✅ tested; mainnet deploy planned Thu 8 Oct |
 | Binance Web3 API (RWA prices, swaps with creator fee) | `src/bsc/` | ✅ live-checked from an allowed region |
-| Keeper + verifiable settlement | `scripts/keeper.mts`, `scripts/verify.mts` | ✅ tested on a local chain |
+| Keeper + verifiable settlement | `src/league/keeper.ts`, `/api/keeper/tick` (cron), `scripts/keeper.mts`, `scripts/verify.mts` | ✅ tested on a local chain |
+| Hosting | Vercel (Frankfurt) + Supabase + cron, [`docs/HOSTING.md`](docs/HOSTING.md) | setting up |
 | Web app | `app/` | ✅ landing, league, ETF, create, my entries, leaderboard, results, rules, agents |
 | Agents (Binance Agentic Wallet) | `skills/league-of-stocks/`, `/api/plan`, `scripts/agent.mts` | ✅ plans tested on a local chain |
 
@@ -60,7 +61,7 @@ The Binance Web3 API refuses requests from restricted regions (including the US)
 - [`docs/BNB.md`](docs/BNB.md): rules, architecture, day-by-day plan
 - [`docs/dx-notes.md`](docs/dx-notes.md): developer-experience log for the hackathon report
 - [`docs/YOUR-TODO.md`](docs/YOUR-TODO.md): what the team still has to do · [`docs/HANDOFF.md`](docs/HANDOFF.md): state of the build
-- [`docs/KEEPER.md`](docs/KEEPER.md): running rounds · [`docs/LOCAL.md`](docs/LOCAL.md): local demo chain
+- [`docs/HOSTING.md`](docs/HOSTING.md): Vercel + Supabase + cron · [`docs/KEEPER.md`](docs/KEEPER.md): running rounds · [`docs/LOCAL.md`](docs/LOCAL.md): local demo chain
 - [`docs/UI.md`](docs/UI.md): design · [`docs/design/stock-card`](docs/design/stock-card): stock card handoff
 - [`docs/prototype-results.md`](docs/prototype-results.md): stress tests of the payout rules (Python prototype)
 - [`docs/robinhood-colosseum-spec.md`](docs/robinhood-colosseum-spec.md): the Robinhood Chain version (parked)

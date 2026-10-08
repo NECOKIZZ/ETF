@@ -120,9 +120,9 @@ await enterRound(1n, R1, [[6, "Silicon Crown"], [7, "Silicon Crown"], [8, "Silic
 const MOVES: Record<string, number> = { NVDA: 2.4, TSLA: -1.8, META: 0.6, MSFT: 0.3, GOOGL: -0.4, AMD: 3.1, AVGO: 1.2, TSM: 0.9, COIN: -2.6, HOOD: -1.1, SPY: 0.2, QQQ: 0.5, BNB: 1.5, BTC: -0.8, ETH: 2.0 };
 for (let i = 0; i < 3; i++) {
   const atStart = (r1Close + 60 + i * 300) * 1000;
-  store.saveSample(1n, "start", sampleAt(atStart, () => 1), atStart);
+  await store.saveSample(1n, "start", sampleAt(atStart, () => 1), atStart);
   const atEnd = (r1End + 60 + i * 300) * 1000;
-  store.saveSample(1n, "end", sampleAt(atEnd, (t) => 1 + MOVES[t] / 100), atEnd);
+  await store.saveSample(1n, "end", sampleAt(atEnd, (t) => 1 + MOVES[t] / 100), atEnd);
 }
 await test.setNextBlockTimestamp({ timestamp: BigInt(r1End + 1) });
 await test.mine({ blocks: 1 });
@@ -131,11 +131,11 @@ await test.mine({ blocks: 1 });
   const info = await readRound(pub as never, escrow, 1n);
   const entries = await readEntries(pub as never, escrow, 1n);
   const tokens = Object.values(addr).map((a) => a.toLowerCase());
-  const start = buildSnapshot(store.loadSamples(1n, "start").map((x) => x.sample), tokens, 3);
-  const end = buildSnapshot(store.loadSamples(1n, "end").map((x) => x.sample), tokens, 3);
+  const start = buildSnapshot((await store.loadSamples(1n, "start")).map((x) => x.sample), tokens, 3);
+  const end = buildSnapshot((await store.loadSamples(1n, "end")).map((x) => x.sample), tokens, 3);
   const seasonPot = (await pub.readContract({ address: escrow, abi: leagueEscrowAbi, functionName: "seasonPot" })) as bigint;
   const s = settleRound({ roundId: 1n, stake: info.stake, capMultiple: info.capMultiple, maxBackers: info.maxBackers, seasonPot, entries, start: start.prices, end: end.prices, priceProblems: [] });
-  store.saveInputs(1n, s.inputs);
+  await store.saveInputs(1n, s.inputs);
   await submitSettlement(pub as never, w(0) as never, escrow, 1n, s, acct(0), foundry);
   const meta = await readTeamMeta(pub as never, escrow, 1n, s.teams.map((t) => t.teamKey));
   for (const t of s.teams) console.log(`  round 1 ${t.isWinner ? "WIN " : "    "}${meta.get(t.teamKey)?.name} ${(Number(t.ret) / 1e10).toFixed(2)}%`);
@@ -160,7 +160,7 @@ await enterRound(2n, R2, [[7, "AI Chips Max"], [8, "AI Chips Max"], [9, "AI Chip
 // Start samples at the snapshot prices; the app moves "now" prices over time.
 for (let i = 0; i < 3; i++) {
   const at = (r2Close + 60 + i * 300) * 1000;
-  store.saveSample(2n, "start", sampleAt(at, () => 1), at);
+  await store.saveSample(2n, "start", sampleAt(at, () => 1), at);
 }
 
 const info = { chainId: foundry.id, rpc: RPC, escrow, usdt, roundId: "2", tokens: addr, creators: Object.fromEntries([...R1, ...R2].map(([n, who]) => [n, acct(who).address])) };
