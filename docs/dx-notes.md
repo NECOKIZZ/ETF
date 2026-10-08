@@ -98,6 +98,11 @@ Each entry: **what we tried → what happened → why it matters**. The technica
 ### Mon 5 Oct: a rule we had to fix in our own design (for context)
 - Our first settlement checked each basket's weights and $10 minimum at the round-start price. Real prices move between entry and start, so honest creators could have been refunded. Binance's price API was fine; we fixed our rules (declared weights stored on-chain, 5-point drift allowed). Worth a sentence in the report only as "what we learned: prices keep moving between entry and round start".
 
+### Thu 8 Oct: hosting has to avoid US servers too
+- **What we tried:** putting the app online on a normal serverless host (Vercel), the usual choice for a Next.js app.
+- **What happened:** the app's server calls Binance for prices and swap quotes, and Vercel runs code in a US region by default, which Binance refuses. We pinned the app to Frankfurt (`vercel.json` `regions`). _(team: add whether Frankfurt worked on the first try)_
+- **Why it matters:** the location block doesn't only hit developers' laptops; it decides where you can host. Hosts' default regions are often in the US, so a builder can deploy, see their app quietly fall back to no live prices, and not know why. A list of allowed regions (or cloud regions known to work) would save time.
+
 ## Sections the report asks for (fill in from the log on Saturday)
 
 ### Onboarding: time from reading the docs to the first successful call; what got in the way

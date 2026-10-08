@@ -27,7 +27,7 @@ real clicks on mainnet Thursday with small amounts, or ask Claude for a BSC test
 ## Before Thursday (mainnet deploy)
 - [ ] Make a **new wallet** just for the app (deployer + keeper). Fund on BNB Smart Chain: ~0.02 BNB (gas) + ~$40 USDT (BEP-20) for demo rounds.
 - [ ] Put its private key in `.env.local` as `DEPLOYER_PRIVATE_KEY` and `KEEPER_PRIVATE_KEY` (never in chat or git). Tell Claude the **public** address.
-- [ ] Hosting: the app and the keeper must share the `data/` folder (price samples, settlement inputs). Simplest: one small server in an allowed region (e.g. a Singapore VM) running `pnpm start` and the keeper. Vercel works for the pages but can't keep `data/`.
+- [ ] Hosting: Vercel + Supabase + cron-job.org, step by step in `docs/HOSTING.md` (the keeper runs as a cron route, data in Supabase).
 - [ ] (Optional) WalletConnect project ID from cloud.reown.com, for phone wallets.
 
 ## Thu–Fri (demo)
