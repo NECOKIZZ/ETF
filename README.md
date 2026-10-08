@@ -61,6 +61,7 @@ The Binance Web3 API refuses requests from restricted regions (including the US)
 - [`docs/BNB.md`](docs/BNB.md): rules, architecture, day-by-day plan
 - [`docs/dx-notes.md`](docs/dx-notes.md): developer-experience log for the hackathon report
 - [`docs/YOUR-TODO.md`](docs/YOUR-TODO.md): what the team still has to do · [`docs/HANDOFF.md`](docs/HANDOFF.md): state of the build
+- [`docs/DEMO.md`](docs/DEMO.md): demo video shot list
 - [`docs/HOSTING.md`](docs/HOSTING.md): Vercel + Supabase + cron · [`docs/KEEPER.md`](docs/KEEPER.md): running rounds · [`docs/LOCAL.md`](docs/LOCAL.md): local demo chain
 - [`docs/UI.md`](docs/UI.md): design · [`docs/design/stock-card`](docs/design/stock-card): stock card handoff
 - [`docs/prototype-results.md`](docs/prototype-results.md): stress tests of the payout rules (Python prototype)

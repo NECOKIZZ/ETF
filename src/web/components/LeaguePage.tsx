@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRound } from "../hooks";
 import { LeagueBoard, RoundStats, teamName, usd } from "./league";
 import { Change } from "../../ui/components/Pills";
+import { LeagueChart } from "./LeagueChart";
 
 export function LeaguePage() {
   const [q, setQ] = useState("");
@@ -23,6 +24,7 @@ export function LeaguePage() {
             aria-label="Search ETFs or tickers"
           />
         </div>
+        <LeagueChart />
         <div className="rounded-[24px] bg-bg p-2 shadow-card md:p-4">
           <LeagueBoard query={q} />
         </div>

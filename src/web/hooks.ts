@@ -6,13 +6,14 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { useConnection, usePublicClient, useSendTransaction, useSwitchChain } from "wagmi";
-import { fetchConfig, fetchMe, fetchPlan, fetchRound, fetchStocks, type PlanResponse, type TxStep } from "./api";
+import { fetchConfig, fetchHistory, fetchMe, fetchPlan, fetchRound, fetchStocks, type PlanResponse, type TxStep } from "./api";
 import type { StockInfo } from "../ui/data/stocks";
 import { BSTOCKS } from "../ui/data/stocks";
 
 export const useConfig = () => useQuery({ queryKey: ["config"], queryFn: fetchConfig, staleTime: 60_000 });
 export const useStocks = () => useQuery({ queryKey: ["stocks"], queryFn: fetchStocks, refetchInterval: 30_000 });
 export const useRound = (id?: string) => useQuery({ queryKey: ["round", id ?? "current"], queryFn: () => fetchRound(id), refetchInterval: 20_000 });
+export const useHistory = (id?: string) => useQuery({ queryKey: ["history", id ?? "current"], queryFn: () => fetchHistory(id), refetchInterval: 60_000 });
 export function useMe() {
   const { address } = useConnection();
   return useQuery({ queryKey: ["me", address], queryFn: () => fetchMe(address!), enabled: !!address, refetchInterval: 30_000 });

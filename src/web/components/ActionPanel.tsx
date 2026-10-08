@@ -11,8 +11,8 @@ import { ConnectButton } from "./ConnectButton";
 import { TxSteps } from "./TxSteps";
 import { teamName, usd } from "./league";
 
-export function ActionPanel({ r, t }: { r: RoundView; t: TeamView }) {
-  const [tab, setTab] = useState<"back" | "buy">("back");
+export function ActionPanel({ r, t, initialTab = "back" }: { r: RoundView; t: TeamView; initialTab?: "back" | "buy" }) {
+  const [tab, setTab] = useState<"back" | "buy">(initialTab);
   const [amount, setAmount] = useState("25");
   const { isConnected } = useConnection();
   const { data: cfg } = useConfig();

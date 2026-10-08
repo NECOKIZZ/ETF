@@ -59,5 +59,14 @@ export async function post<T>(path: string, body: unknown): Promise<T> {
 export const fetchConfig = () => get<LeagueConfig>("/api/config");
 export const fetchStocks = () => get<{ source: string; stocks: PublicStock[] }>("/api/stocks");
 export const fetchRound = (id?: string) => get<RoundView>(id ? `/api/rounds/${id}` : "/api/rounds/current");
+
+export interface RoundHistory {
+  roundId: string;
+  entryClose: number;
+  end: number;
+  teams: { teamKey: string; tickers: string[] }[];
+  points: { at: number; teams: Record<string, number>; median: number; stocks: Record<string, number> }[];
+}
+export const fetchHistory = (id?: string) => get<RoundHistory>(`/api/rounds/${id ?? "current"}/history`);
 export const fetchMe = (wallet: string) => get<{ wallet: string; entries: MeEntry[] }>(`/api/me?wallet=${wallet}`);
 export const fetchPlan = (body: Record<string, unknown>) => post<PlanResponse>("/api/plan", body);

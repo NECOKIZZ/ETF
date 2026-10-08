@@ -10,6 +10,7 @@ import { leagueEscrowAbi, readEntries, readRound, readTeamMeta, roundTokens } fr
 import { buildSnapshot, sampleFromTokens, type PriceMode, type PriceSample, type Snapshot } from "./snapshot";
 import { getStore } from "./store";
 import { buildRoundView, type RoundView } from "./view";
+import { buildHistory } from "./history";
 import { cryptoTokensForChain, tickerOf } from "./registry";
 
 const MODE: PriceMode = (process.env.LEAGUE_PRICE_MODE as PriceMode) ?? "reference";
@@ -92,4 +93,19 @@ export async function loadRoundView(roundId?: bigint): Promise<RoundView | null>
 
   const meta = await readTeamMeta(pub, escrow, id, entries.filter((e) => e.isCreator).map((e) => e.teamKey));
   return buildRoundView({ info, entries, start, now, nowSec: Number(block.timestamp), seasonPot, tickerOf, priceSource, meta, cryptoTokens: cryptoTokensForChain() });
+}
+
+/** A round's chart data: every ETF's return, the median and each stock's move at each saved sample. */
+export async function loadHistory(roundId?: bigint) {
+  const { pub } = clientsFromEnv();
+  const escrow = escrowFromEnv();
+  const id = roundId ?? ((await pub.readContract({ address: escrow, abi: leagueEscrowAbi, functionName: "roundCount" })) as bigint);
+  const [info, entries] = await Promise.all([readRound(pub, escrow, id), readEntries(pub, escrow, id)]);
+  const store = getStore();
+  const [start, liveS, end] = await Promise.all([store.loadSamples(id, "start"), store.loadSamples(id, "live"), store.loadSamples(id, "end")]);
+  const base = { roundId: id.toString(), entryClose: info.entryClose, end: info.end };
+  if (!start.length) return { ...base, teams: [], points: [] };
+  const startSnap = buildSnapshot(start.map((s) => s.sample), roundTokens(entries), 1).prices;
+  const h = buildHistory({ entries, start: startSnap, samples: [{ at: info.entryClose * 1000, sample: start[0].sample }, ...liveS, ...end], tickerOf });
+  return { ...base, ...h };
 }
