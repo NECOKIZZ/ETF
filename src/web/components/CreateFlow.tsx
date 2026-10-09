@@ -236,7 +236,7 @@ export function CreateFlow() {
               <p className="text-[13px] text-muted">Buying isn&rsquo;t available on this deployment yet. If you already hold the stocks, go to step 4.</p>
             )}
             {faucet.msg && <p className="mt-3 text-[13px] text-muted">{faucet.msg}</p>}
-            <TxSteps plan={buyRunner.plan} states={buyRunner.states} hashes={buyRunner.hashes} error={buyRunner.error} />
+            <TxSteps plan={buyRunner.plan} states={buyRunner.states} hashes={buyRunner.hashes} error={buyRunner.error} batched={buyRunner.batched} />
           </div>
           {isConnected && picked.length > 0 && (
             <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -297,7 +297,7 @@ export function CreateFlow() {
                 {lockRunner.busy ? "Working…" : !open ? "Entries are closed" : `Lock and enter · $${heldUsd.toFixed(2)} + $${rules.ticketUsd} ticket`}
               </button>
             )}
-            <TxSteps plan={lockRunner.plan} states={lockRunner.states} hashes={lockRunner.hashes} error={lockRunner.error} />
+            <TxSteps plan={lockRunner.plan} states={lockRunner.states} hashes={lockRunner.hashes} error={lockRunner.error} batched={lockRunner.batched} />
           </div>
         </Panel>
       </div>

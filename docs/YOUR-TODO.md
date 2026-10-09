@@ -4,7 +4,7 @@ Deadline: **Sun 11 Oct 2026, 12:00 UTC**. Submit form: https://forms.gle/yToDUza
 
 ## Now (Mon–Wed)
 - [ ] **Look at the app** in Cloud Shell (commands below). Pages: `/` `/league` `/create` `/me` `/leaderboard` `/rules` `/agents` `/round/1` `/ui`. Tell Claude what to change.
-- [ ] **Make the GitHub repo public** (needed for the agent skill install `npx skills add NECOKIZZ/ETF/skills/league-of-stocks`, and for judging).
+- [x] **Make the GitHub repo public** (needed for the agent skill install `npx skills add NECOKIZZ/ETF/skills/league-of-stocks`, and for judging).
 - [x] (1 min) Live check of "Buy the ETF" in Cloud Shell (done 5 Oct: approval found in `tx.signatureData`):
   ```
   cd ~/ETF && npx pnpm buy-plan 20 --raw
@@ -29,6 +29,9 @@ real clicks on mainnet Thursday with small amounts, or ask Claude for a BSC test
 - [ ] Put its private key in `.env.local` as `DEPLOYER_PRIVATE_KEY` and `KEEPER_PRIVATE_KEY` (never in chat or git). Tell Claude the **public** address.
 - [ ] Hosting: Vercel + Supabase + cron-job.org, step by step in `docs/HOSTING.md` (the keeper runs as a cron route, data in Supabase).
 - [ ] (Optional) WalletConnect project ID from cloud.reown.com, for phone wallets.
+
+## Fri 9 Oct
+- [ ] **First real-money test on mainnet** (small: ~$10). Buy an ETF with MetaMask: it should ask for **one** signature for the whole basket (EIP-5792 batch; first time it offers to upgrade the account to a smart account, accept). Then try a wallet without batching (e.g. Binance Web3 Wallet extension): it should fall back to one signature per step. Tell Claude what each wallet did.
 
 ## Thu–Fri (demo)
 - [ ] Run demo rounds during US market hours (13:30–20:00 UTC) with 4+ ETFs (a round needs at least 4); record the video (≤ 4 min): landing → create → back → league → agent → results + verify.

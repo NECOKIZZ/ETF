@@ -10,7 +10,7 @@ import { useConfig } from "../hooks";
 const icon: Record<StepState, string> = { waiting: "○", signing: "◔", confirming: "◑", done: "●", failed: "×" };
 const text: Record<StepState, string> = { waiting: "", signing: "Sign in your wallet", confirming: "Confirming…", done: "Done", failed: "Failed" };
 
-export function TxSteps({ plan, states, hashes, error }: { plan: PlanResponse | null; states: StepState[]; hashes: (string | null)[]; error: string | null }) {
+export function TxSteps({ plan, states, hashes, error, batched }: { plan: PlanResponse | null; states: StepState[]; hashes: (string | null)[]; error: string | null; batched?: boolean }) {
   const { data: cfg } = useConfig();
   if (!plan && !error) return null;
   return (
@@ -20,6 +20,11 @@ export function TxSteps({ plan, states, hashes, error }: { plan: PlanResponse | 
           {n}
         </p>
       ))}
+      {batched && plan && plan.steps.length > 1 && (
+        <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-brand-mint/20 px-3 py-1 text-[12px] font-medium">
+          One signature: all {plan.steps.length} steps run together, or none do
+        </p>
+      )}
       <ol className="space-y-2">
         {plan?.steps.map((s, i) => {
           const st = states[i] ?? "waiting";
@@ -31,7 +36,7 @@ export function TxSteps({ plan, states, hashes, error }: { plan: PlanResponse | 
               <span className="min-w-0 flex-1">
                 <span className={st === "waiting" ? "text-muted" : ""}>{s.label}</span>
                 {text[st] && <span className="ml-2 text-[12px] text-muted">{text[st]}</span>}
-                {hashes[i] && cfg?.explorer && (
+                {hashes[i] && cfg?.explorer && (!batched || i === (plan?.steps.length ?? 0) - 1) && (
                   <a className="ml-2 text-[12px] underline" href={`${cfg.explorer}/tx/${hashes[i]}`} target="_blank" rel="noreferrer">
                     view ↗
                   </a>

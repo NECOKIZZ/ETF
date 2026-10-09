@@ -1,9 +1,22 @@
 import { Shell, PageHead, Container } from "@/web/components/Shell";
 import { AgentPrompt } from "@/web/components/AgentPrompt";
+import { AgentIdeas } from "@/web/components/AgentIdeas";
 
 export const metadata = { title: "Agents · League of Stocks" };
 
-const ASKS = ["What's happening in this round?", "Back the top ETF with $5", "Build me an AI chips ETF for $12", "Did I win? Claim it for me"];
+const POWERED = [
+  { name: "Binance Agentic Wallet", note: "holds the keys, previews and risk-checks every transaction", href: "https://developers.binance.com/docs/agentic-wallet/welcome" },
+  { name: "Binance Wallet Skills", note: "teach your agent the wallet commands (baw)", href: "https://github.com/binance/binance-skills-hub" },
+  { name: "BNB Smart Chain", note: "where the league contract and your stocks live", href: "https://www.bnbchain.org" },
+];
+
+const FLOW: [string, string][] = [
+  ["You ask", "in plain words, to any AI agent"],
+  ["Agent plans", "our /api/plan returns the exact transactions"],
+  ["Agentic Wallet checks", "simulates, risk-scans and shows you each one"],
+  ["You approve", "in the Binance App, within your daily limit"],
+  ["Done on BNB Chain", "settled on-chain, verifiable by anyone"],
+];
 
 const ENDPOINTS: [string, string, string][] = [
   ["GET", "/agent.md", "the guide agents follow (setup + play)"],
@@ -21,6 +34,20 @@ export default function Agents() {
         Bring your own AI agent (Claude, ChatGPT, Copilot or any agent that can run commands). Paste one message and it walks you through the rest.
       </PageHead>
       <Container>
+        <section aria-label="Powered by" className="mb-10 rounded-[28px] bg-brand-ink p-5 text-brand-paper md:p-6">
+          <div className="t-label text-brand-paper/60">Powered by BNB agentic infrastructure</div>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            {POWERED.map((p) => (
+              <a key={p.name} href={p.href} target="_blank" rel="noreferrer" className="rounded-[18px] border border-brand-paper/10 p-4 transition hover:border-brand-mint">
+                <div className="flex items-center gap-2 text-[16px] font-medium">
+                  <span className="size-2 rounded-full bg-brand-mint" /> {p.name}
+                </div>
+                <div className="mt-1 text-[13px] text-brand-paper/65">{p.note}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+
         <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
           <section>
             <div className="t-label text-muted">1 · Copy this</div>
@@ -34,13 +61,7 @@ export default function Agents() {
               </div>
               <div>
                 <div className="t-label text-muted">3 · Just ask</div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {ASKS.map((a) => (
-                    <span key={a} className="rounded-full bg-surface px-4 py-2 text-[14px]">
-                      &ldquo;{a}&rdquo;
-                    </span>
-                  ))}
-                </div>
+                <p className="mt-2 text-[16px] text-ink/80">Ask for anything below in your own words, or tap an idea to copy it with the setup message included.</p>
               </div>
             </div>
           </section>
@@ -55,6 +76,28 @@ export default function Agents() {
             </ul>
           </aside>
         </div>
+
+        <section className="mt-14">
+          <div className="t-label text-muted">Ideas · tap to copy</div>
+          <h2 className="t-heading mt-2 text-[26px]">Things your agent can do for you</h2>
+          <div className="mt-5">
+            <AgentIdeas />
+          </div>
+        </section>
+
+        <section className="mt-14">
+          <div className="t-label text-muted">How it works</div>
+          <h2 className="t-heading mt-2 text-[26px]">Your agent proposes. You approve. Nothing moves without you.</h2>
+          <ol className="mt-5 grid gap-3 md:grid-cols-5">
+            {FLOW.map(([t, d], i) => (
+              <li key={t} className="relative rounded-[22px] bg-surface p-5">
+                <span className="t-num inline-flex size-7 items-center justify-center rounded-full bg-brand-mint text-[13px] font-medium text-brand-ink">{i + 1}</span>
+                <div className="t-heading mt-3 text-[17px]">{t}</div>
+                <div className="mt-1 text-[13px] text-muted">{d}</div>
+              </li>
+            ))}
+          </ol>
+        </section>
 
         <details className="group mt-16 rounded-[28px] border border-line p-6 md:p-8">
           <summary className="t-heading cursor-pointer list-none text-[20px]">
