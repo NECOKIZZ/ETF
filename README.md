@@ -49,7 +49,7 @@ pnpm typecheck
 pnpm test:contracts  # Foundry tests for LeagueEscrow
 ```
 
-Live Binance API calls: copy `.env.example` to `.env.local`, add your Web3 API keys, then:
+Live Binance API calls: create `.env.local` from the example without overwriting one you already have (`[ -f .env.local ] || cp .env.example .env.local`), add your Web3 API keys, then:
 
 ```bash
 pnpm rwa:tokens      # list tokenized stocks on BSC with prices

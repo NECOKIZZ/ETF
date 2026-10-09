@@ -1,6 +1,8 @@
 import { Shell, PageHead, Container } from "@/web/components/Shell";
 import { AgentPrompt } from "@/web/components/AgentPrompt";
 import { AgentIdeas } from "@/web/components/AgentIdeas";
+import { ChampionCard } from "@/web/components/ChampionCard";
+import { championUrl } from "@/league/champion";
 
 export const metadata = { title: "Agents · Median Markets" };
 
@@ -9,6 +11,9 @@ const POWERED = [
   { name: "Binance Wallet Skills", note: "teach your agent the wallet commands (baw)", href: "https://github.com/binance/binance-skills-hub" },
   { name: "BNB Smart Chain", note: "where the league contract and your stocks live", href: "https://www.bnbchain.org" },
 ];
+
+// Listed once Champion is live there.
+const STUDIO = { name: "BNB Agent Studio", note: "runs Champion, our own agent, with its on-chain identity", href: "https://www.bnbchain.org/en/bnb-agent-studio" };
 
 const FLOW: [string, string][] = [
   ["You ask", "in plain words, to any AI agent"],
@@ -34,10 +39,12 @@ export default function Agents() {
         Bring your own AI agent (Claude, ChatGPT, Copilot or any agent that can run commands). Paste one message and it walks you through the rest.
       </PageHead>
       <Container>
+        <ChampionCard />
+
         <section aria-label="Powered by" className="mb-10 rounded-[28px] bg-brand-ink p-5 text-brand-paper md:p-6">
           <div className="t-label text-brand-paper/60">Powered by BNB agentic infrastructure</div>
-          <div className="mt-4 grid gap-3 md:grid-cols-3">
-            {POWERED.map((p) => (
+          <div className={`mt-4 grid gap-3 sm:grid-cols-2 ${championUrl() ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
+            {[...POWERED, ...(championUrl() ? [STUDIO] : [])].map((p) => (
               <a key={p.name} href={p.href} target="_blank" rel="noreferrer" className="rounded-[18px] border border-brand-paper/10 p-4 transition hover:border-brand-mint">
                 <div className="flex items-center gap-2 text-[16px] font-medium">
                   <span className="size-2 rounded-full bg-brand-mint" /> {p.name}
@@ -57,7 +64,7 @@ export default function Agents() {
             <div className="mt-8 space-y-6">
               <div>
                 <div className="t-label text-muted">2 · Paste it to your agent</div>
-                <p className="mt-2 text-[16px] text-ink/80">It reads our guide and sets things up with you, one step at a time: the Binance Agentic Wallet, signing in with the Binance App, and a little USDT and BNB.</p>
+                <p className="mt-2 text-[16px] text-ink/80">It reads our guide and sets things up with you, one step at a time: the Binance Agentic Wallet, signing in with the Binance App, and some USDT plus a little BNB for network fees.</p>
               </div>
               <div>
                 <div className="t-label text-muted">3 · Just ask</div>
@@ -71,8 +78,8 @@ export default function Agents() {
               <li>· Your agent shows you every transaction and waits for your yes. Nothing moves without it.</li>
               <li>· Your keys stay in the Binance Agentic Wallet. The agent and this site never see them.</li>
               <li>· You set a daily spending limit in the Binance App.</li>
-              <li>· You&rsquo;ll need the Binance App, and USDT plus a little BNB on BNB Smart Chain.</li>
-              <li>· We don&rsquo;t run agents or give tips: your agent reads the same public data you see here.</li>
+              <li>· You&rsquo;ll need the Binance App, and USDT plus a little BNB for network fees, on BNB Smart Chain.</li>
+              <li>· Champion aside, we don&rsquo;t run agents or give tips: your agent reads the same public data you see here.</li>
             </ul>
           </aside>
         </div>

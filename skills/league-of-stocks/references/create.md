@@ -39,12 +39,14 @@ curl -s -X POST {LEAGUE_API}/api/plan -H 'content-type: application/json' -d '{
   "tickers": ["NVDA", "AMD", "TSM"],
   "weightsPct": [40, 35, 25],
   "name": "AI Chips",
-  "buyFeePct": 1
+  "buyFeePct": 1,
+  "usd": 12
 }'
 ```
 
-- By default it locks the wallet's **whole balance** of each chosen stock. To lock less, add
-  `"amounts": ["<wei>", …]` in the same order as `tickers`.
+- `usd` is the basket size: it locks usd × weight ÷ price of each stock (capped at what the
+  wallet holds), never the wallet's whole balance. Use the same amount the user spent in step 1.
+  For exact amounts instead, pass `"amounts": ["<wei>", …]` in the same order as `tickers`.
 - `notes` may warn that a stock's share at current prices is far from the declared weight. Over
   5 points apart at round start refunds the entry (the ticket comes back, nothing is lost but gas).
   Show the warning; the user may buy a little more of one stock first.

@@ -11,14 +11,16 @@ import type { RoundView, TeamView } from "../api";
 import { LogoStack } from "../../ui/components/LogoStack";
 import { fmtPrice } from "../../ui/components/StockCard";
 import { RoundPill } from "../../ui/components/RoundPill";
+import { OfficialBadge } from "../../ui/components/LeagueRow";
 import { ActionPanel } from "./ActionPanel";
 import { holdingsOf, teamName, usd } from "./league";
 import { short } from "./ConnectButton";
 import { Container } from "./Shell";
 import { ReturnChart, SERIES, type Series } from "./ReturnChart";
 
-const pct = (v: number) => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(2)}%`;
-const tone = (v: number) => (v >= 0 ? "text-up" : "text-down");
+// null: no score yet (the round hasn't started), shown as a state, never as 0%.
+const pct = (v: number | null) => (v === null ? "—" : `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(2)}%`);
+const tone = (v: number | null) => (v === null ? "text-muted" : v >= 0 ? "text-up" : "text-down");
 const medianOf = (xs: number[]) => {
   const s = [...xs].sort((a, b) => a - b);
   const m = Math.floor(s.length / 2);
@@ -52,6 +54,8 @@ export function EtfPage({ teamKey, roundId }: { teamKey: string; roundId?: strin
   const key = t.teamKey.toLowerCase();
   const holdings = holdingsOf(t);
   const live = new Map(stocks?.stocks.map((s) => [s.ticker, s]) ?? []);
+  const started = r.phase !== "entries-open";
+  const score = (x: TeamView) => (started ? x.returnPct : null);
   const med = medianOf(r.teams.map((x) => x.returnPct));
   const running = r.phase === "running" || r.phase === "ended";
   const from = r.entryClose * 1000;
@@ -87,10 +91,11 @@ export function EtfPage({ teamKey, roundId }: { teamKey: string; roundId?: strin
           </Link>
           <div className="mt-2 flex flex-wrap items-center gap-4">
             <h1 className="t-display text-[38px] md:text-[46px]">{teamName(t)}</h1>
+            {t.official && <OfficialBadge big />}
             <LogoStack tickers={holdings.map((h) => h.stock.ticker)} size={32} max={holdings.length} />
           </div>
           <p className="mt-2 text-[14px] text-muted">
-            by <span className="t-num text-ink">{short(t.captain)}</span> &nbsp;·&nbsp; {t.members} {t.members === 1 ? "backer" : "backers"} &nbsp;·&nbsp; basket locked{" "}
+            by <span className="t-num text-ink">{short(t.captain)}</span> &nbsp;·&nbsp; {t.members - 1} {t.members - 1 === 1 ? "backer" : "backers"} &nbsp;·&nbsp; basket locked{" "}
             <span className="t-num text-ink">${usd(t.basketValue)}</span> &nbsp;·&nbsp; buy fee {t.buyFeeBps / 100}%
           </p>
         </div>
@@ -105,9 +110,10 @@ export function EtfPage({ teamKey, roundId }: { teamKey: string; roundId?: strin
               <div className="flex flex-wrap gap-x-12 gap-y-3">
                 <div>
                   <div className="t-label text-muted">Return since round start</div>
-                  <div className={`t-num mt-1.5 text-[44px] font-medium leading-none tracking-[-0.04em] md:text-[52px] ${tone(t.returnPct)}`}>{pct(t.returnPct)}</div>
+                  <div className={`t-num mt-1.5 text-[44px] font-medium leading-none tracking-[-0.04em] md:text-[52px] ${tone(score(t))}`}>{pct(score(t))}</div>
+                  {!started && <div className="mt-1 text-[12px] text-muted">Scoring starts when entries close</div>}
                 </div>
-                <div>
+                {started && <div>
                   <div className="t-label text-muted">League median</div>
                   <div className={`t-num mt-2.5 text-[22px] ${tone(med)}`}>{pct(med)}</div>
                   <div className="mt-1 text-[12px] text-muted">
@@ -117,7 +123,7 @@ export function EtfPage({ teamKey, roundId }: { teamKey: string; roundId?: strin
                     </span>{" "}
                     pts {t.returnPct - med >= 0 ? "above" : "below"} it
                   </div>
-                </div>
+                </div>}
                 <div>
                   <div className="t-label text-muted">Rank</div>
                   <div className="t-num mt-2.5 text-[22px]">
@@ -213,6 +219,7 @@ export function EtfPage({ teamKey, roundId }: { teamKey: string; roundId?: strin
 
 /** The table around this ETF: the top rows, the cut, and this ETF highlighted even when it's further down. */
 function LiveTable({ r, me, median }: { r: RoundView; me: string; median: number }) {
+  const score = (x: TeamView) => (r.phase !== "entries-open" ? x.returnPct : null);
   const winners = r.teams.filter((x) => x.winningNow).length || Math.floor(r.teams.length / 2);
   const mine = r.teams.findIndex((x) => x.teamKey.toLowerCase() === me);
   const rows: (TeamView | "gap")[] = mine < 8 ? r.teams.slice(0, 8) : [...r.teams.slice(0, 6), "gap", r.teams[mine]];
@@ -249,7 +256,7 @@ function LiveTable({ r, me, median }: { r: RoundView; me: string; median: number
                 <span className="t-num w-4 text-[12px] text-muted">{x.rank}</span>
                 <span className="min-w-0 flex-1 truncate text-[14px] font-medium">{teamName(x)}</span>
                 <LogoStack tickers={x.holdings.flatMap((h) => (h.ticker ? [h.ticker] : []))} size={20} />
-                <span className={`t-num w-16 text-right text-[13px] ${tone(x.returnPct)}`}>{pct(x.returnPct)}</span>
+                <span className={`t-num w-16 text-right text-[13px] ${tone(score(x))}`}>{pct(score(x))}</span>
               </Link>
             </div>
           ),
