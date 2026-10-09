@@ -1,4 +1,4 @@
-// Binance Web3 Wallet API client (server only) for the League of Stocks on BSC.
+// Binance Web3 Wallet API client (server only) for the Median Markets on BSC.
 //
 // Docs: https://web3.binance.com/en/dev-docs/introduction
 //   - Auth: HMAC-SHA256 over timestamp + METHOD + requestPath(+query, incl.

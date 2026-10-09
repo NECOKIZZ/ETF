@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* League of Stocks design tokens (docs/UI.md §2). */
+/* Median Markets design tokens (docs/UI.md §2). */
 :root {
   /* The four brand colours. Every other token below is a mix of these. */
   --brand-ink: #0b0b0c;

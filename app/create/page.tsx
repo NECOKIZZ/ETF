@@ -1,7 +1,7 @@
 import { Shell, PageHead, Container } from "@/web/components/Shell";
 import { CreateFlow } from "@/web/components/CreateFlow";
 
-export const metadata = { title: "Create an ETF · League of Stocks" };
+export const metadata = { title: "Create an ETF · Median Markets" };
 
 export default function Create() {
   return (

@@ -1,4 +1,4 @@
--- League of Stocks keeper data (src/league/store.ts, SupabaseStore).
+-- Median Markets keeper data (src/league/store.ts, SupabaseStore).
 -- Paste into Supabase → SQL Editor → Run. Safe to run again.
 -- Only the server's secret key reads and writes these tables: row level
 -- security is on with no policies, so the public (anon) key sees nothing.

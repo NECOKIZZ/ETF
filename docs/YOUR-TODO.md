@@ -1,4 +1,4 @@
-# Your to-do list (League of Stocks, BNB Hack)
+# Your to-do list (Median Markets, BNB Hack)
 
 Deadline: **Sun 11 Oct 2026, 12:00 UTC**. Submit form: https://forms.gle/yToDUzaDMwWnq6R6A · DX report form: https://forms.gle/EUQ39xf54GHjC2ys5
 

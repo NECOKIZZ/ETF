@@ -36,7 +36,7 @@ export function SiteFooter() {
           <div>
             <span className="inline-flex items-center gap-2">
               <LogoMark />
-              <span className="t-heading text-[19px]">League of Stocks</span>
+              <span className="t-heading text-[19px]">Median Markets</span>
             </span>
             <p className="t-display mt-6 max-w-[16ch] text-[30px]">Build an ETF. Beat the league.</p>
           </div>
@@ -58,7 +58,7 @@ export function SiteFooter() {
         </div>
         <div className="mx-auto mt-14 flex max-w-[1180px] flex-col gap-4 px-6 md:flex-row md:items-center md:justify-between md:px-12">
           <p className="max-w-[60ch] text-[13px] text-white/55">
-            © 2026 League of Stocks. &ldquo;ETF&rdquo; here means an on-chain basket of tokenized stocks, not a regulated fund. Capital is at risk. Not available in restricted
+            © 2026 Median Markets. &ldquo;ETF&rdquo; here means an on-chain basket of tokenized stocks, not a regulated fund. Capital is at risk. Not available in restricted
             regions.
           </p>
           <ThemeToggle />

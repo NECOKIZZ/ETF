@@ -11,7 +11,8 @@ const jbMono = JetBrains_Mono({ subsets: ["latin"], weight: ["500", "600"], vari
 const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono" });
 
 export const metadata: Metadata = {
-  title: "League of Stocks",
+  title: "Median Markets",
+  icons: { icon: "/brand/mark.svg", apple: "/brand/mark.svg" },
   description: "Build an ETF from real tokenized stocks on BNB Chain. The top half wins every round.",
 };
 

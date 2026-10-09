@@ -1,4 +1,4 @@
-// League of Stocks agent CLI: asks the League API for a plan and signs the
+// Median Markets agent CLI: asks the League API for a plan and signs the
 // steps with a local key. The same plans drive the Binance Agentic Wallet
 // skill (skills/league-of-stocks/SKILL.md) through `baw contract-call`.
 //

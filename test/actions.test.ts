@@ -77,6 +77,6 @@ describe("agent guide", () => {
     expect(g).toContain("baw contract-call preview");
     expect(g).toMatch(/Never ask for or accept private keys/);
     expect(g).not.toMatch(/\$\{|undefined/);
-    expect(agentPrompt("https://league.example")).toBe("Read https://league.example/agent.md and follow it to help me play League of Stocks. Guide me one step at a time, in plain words.");
+    expect(agentPrompt("https://league.example")).toBe("Read https://league.example/agent.md and follow it to help me play Median Markets. Guide me one step at a time, in plain words.");
   });
 });

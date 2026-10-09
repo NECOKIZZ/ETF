@@ -1,10 +1,10 @@
 ---
 name: league-of-stocks
 description: |
-  Use when the user wants to play League of Stocks on BNB Chain: see this round's ETFs and
+  Use when the user wants to play Median Markets on BNB Chain: see this round's ETFs and
   standings, build an ETF from tokenized stocks (bStocks) and enter it, back a creator's team
   with a $5 ticket, buy a creator's ETF (the creator earns a small fee), check entries, or
-  claim winnings. Drives the League of Stocks API for plans and the Binance Agentic Wallet
+  claim winnings. Drives the Median Markets API for plans and the Binance Agentic Wallet
   (`baw`) to sign them.
 metadata:
   author: league-of-stocks
@@ -17,9 +17,9 @@ metadata:
       - curl
 ---
 
-# League of Stocks skill
+# Median Markets skill
 
-League of Stocks is a weekly game on BNB Chain. Creators build an on-chain "ETF": a basket of at
+Median Markets is a weekly game on BNB Chain. Creators build an on-chain "ETF": a basket of at
 least 3 tokenized stocks (up to 10 assets, optionally with up to 20% in BNB, BTC or ETH) worth at least $10, locked in the league contract for the round, plus a
 $5 ticket. When the round ends, ETFs are ranked by return. **The top half wins the bottom half's
 tickets**, split by team size and by how close each winner came to the best return. Backers can
@@ -34,7 +34,7 @@ Agentic Wallet previews, checks and signs them.
 
 ## Setup
 
-- `LEAGUE_API`: the League of Stocks app URL, e.g. `https://<deployment>`. Ask the user if unset.
+- `LEAGUE_API`: the Median Markets app URL, e.g. `https://<deployment>`. Ask the user if unset.
 - The `binance-agentic-wallet` skill must be installed and signed in. Contract calls need
   **Developer Mode**: run `baw wallet settings --json` and check `devMode.enabled=true`. If it is
   false, tell the user to enable Developer Mode in the Binance App. Do not try to work around it.

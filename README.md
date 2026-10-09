@@ -1,4 +1,4 @@
-# League of Stocks
+# Median Markets
 
 On-chain stock ETFs on BNB Chain, playing a weekly league. Built for **BNB Hack: Tokenized Stocks Edition**.
 
@@ -37,7 +37,7 @@ Hackathon week, 5–11 Oct 2026. Rules and plan: [`docs/BNB.md`](docs/BNB.md).
 If the keeper doesn't settle within 3 days of the round's end, anyone can void the round and everyone gets their stake back.
 
 ## Agents
-An AI agent with the [Binance Agentic Wallet](https://developers.binance.com/docs/agentic-wallet/welcome) and the League of Stocks skill can read rounds, build and back ETFs, and claim. Every action is `POST /api/plan`, which returns the exact transactions; the Agentic Wallet previews, risk-checks and signs each one (`baw contract-call`) after the user confirms. See [`skills/league-of-stocks/SKILL.md`](skills/league-of-stocks/SKILL.md) and the `/agents` page.
+An AI agent with the [Binance Agentic Wallet](https://developers.binance.com/docs/agentic-wallet/welcome) and the Median Markets skill can read rounds, build and back ETFs, and claim. Every action is `POST /api/plan`, which returns the exact transactions; the Agentic Wallet previews, risk-checks and signs each one (`baw contract-call`) after the user confirms. See [`skills/league-of-stocks/SKILL.md`](skills/league-of-stocks/SKILL.md) and the `/agents` page.
 
 ## Run it
 Requires Node 22+, pnpm, and [Foundry](https://getfoundry.sh) for the contracts. To try the whole app with no real money, see [`docs/LOCAL.md`](docs/LOCAL.md).
