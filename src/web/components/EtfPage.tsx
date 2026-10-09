@@ -11,6 +11,7 @@ import type { RoundView, TeamView } from "../api";
 import { LogoStack } from "../../ui/components/LogoStack";
 import { fmtPrice } from "../../ui/components/StockCard";
 import { RoundPill } from "../../ui/components/RoundPill";
+import { OfficialBadge } from "../../ui/components/LeagueRow";
 import { ActionPanel } from "./ActionPanel";
 import { holdingsOf, teamName, usd } from "./league";
 import { short } from "./ConnectButton";
@@ -87,6 +88,7 @@ export function EtfPage({ teamKey, roundId }: { teamKey: string; roundId?: strin
           </Link>
           <div className="mt-2 flex flex-wrap items-center gap-4">
             <h1 className="t-display text-[38px] md:text-[46px]">{teamName(t)}</h1>
+            {t.official && <OfficialBadge big />}
             <LogoStack tickers={holdings.map((h) => h.stock.ticker)} size={32} max={holdings.length} />
           </div>
           <p className="mt-2 text-[14px] text-muted">

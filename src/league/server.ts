@@ -14,6 +14,7 @@ import { basketWeightsBps } from "../engine/league";
 import { planBack, planClaim, planClaimBasket, planLock, buyPlanSteps, normaliseWeights, type TxStep } from "./actions";
 import { planBasketBuy, BSC_USDT } from "../bsc/buyBasket";
 import { isLeveraged } from "../bsc/tokens";
+import { canUseName } from "./champion";
 
 export const isLocal = () => process.env.LEAGUE_CHAIN === "local";
 
@@ -240,6 +241,7 @@ export async function makePlan(req: PlanRequest): Promise<Plan> {
       if (picks.some((p) => isLeveraged({ underlyingTicker: p.ticker, underlyingName: p.name, tokenName: p.name }))) throw new PlanError("leveraged funds are banned");
       const name = (req.name ?? "").trim();
       if (!name || new TextEncoder().encode(name).length > 32) throw new PlanError("name: 1 to 32 bytes");
+      if (!canUseName(name, req.wallet)) throw new PlanError(`"${name}" is reserved for Champion, Median Markets' official agent. Pick another name.`);
       const feeBps = Math.round((req.buyFeePct ?? 1) * 100);
       if (feeBps < 0 || feeBps > 200) throw new PlanError("buy fee: 0% to 2%");
       const weights = normaliseWeights(req.weightsPct);

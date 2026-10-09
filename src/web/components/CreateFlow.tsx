@@ -16,6 +16,7 @@ import { post } from "../api";
 import { equalWeights } from "../weights";
 import { ConnectButton } from "./ConnectButton";
 import { TxSteps } from "./TxSteps";
+import { canUseName } from "../../league/champion";
 
 type Filter = "all" | "stock" | "etf" | "crypto";
 
@@ -82,7 +83,8 @@ export function CreateFlow() {
   const holdsAll = picked.length > 0 && held.every((h) => h.raw > 0n);
   const basketOk = holdsAll && heldUsd >= rules.minBasketUsd;
   const open = round?.phase === "entries-open";
-  const nameOk = name.trim().length > 0 && new TextEncoder().encode(name.trim()).length <= 32;
+  const nameReserved = !canUseName(name, address);
+  const nameOk = name.trim().length > 0 && new TextEncoder().encode(name.trim()).length <= 32 && !nameReserved;
 
   async function getTestStocks() {
     if (!address) return;
@@ -262,6 +264,7 @@ export function CreateFlow() {
                 placeholder="e.g. AI Chips Max"
                 className="mt-1 h-11 w-full rounded-[14px] border border-line bg-bg px-4 text-[15px] outline-none focus:border-ink/40"
               />
+              {nameReserved && <span className="mt-1 block text-[12px] text-down">That name is reserved for Champion, our official agent. Pick another.</span>}
             </label>
             <label className="block">
               <span className="text-[13px] text-muted">Buy fee for people who buy your ETF: {fee.toFixed(1)}%</span>

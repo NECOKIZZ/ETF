@@ -8,6 +8,7 @@ import { settleRound, type ChainEntry } from "./settlement";
 import { valueOf, type Snapshot } from "./snapshot";
 import { basketWeightsBps } from "../engine/league";
 import type { RoundInfo } from "./escrow";
+import { canUseName, isChampion } from "./champion";
 
 export interface HoldingView {
   token: Hex;
@@ -23,6 +24,8 @@ export interface TeamView {
   /** Fee the creator asks from people who buy the ETF, in bps. */
   buyFeeBps: number;
   captain: Hex;
+  /** Created by Champion, the league's own agent. */
+  official: boolean;
   /** USD value of the captain's basket at round start (or now, before start), 18 decimals. */
   basketValue: string;
   holdings: HoldingView[];
@@ -98,7 +101,9 @@ export function buildRoundView(opts: {
     return {
       teamKey: t.teamKey,
       rank: 0,
-      name: meta?.name ?? "",
+      // A reserved name ("Champion"…) from anyone but the official wallet is withheld.
+      name: meta?.name && canUseName(meta.name, t.captain) ? meta.name : "",
+      official: isChampion(t.captain),
       buyFeeBps: meta?.buyFeeBps ?? 100,
       captain: t.captain,
       basketValue: values.reduce((a, v) => a + v, 0n).toString(),

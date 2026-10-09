@@ -15,6 +15,8 @@ export interface LeagueEntry {
   /** Profit per $5 ticket if the round ended now (null: this ETF is losing now). */
   ifWins: number | null;
   href?: string;
+  /** Entered by Champion, the league's own agent. */
+  official?: boolean;
 }
 
 const pct = (x: number) => `${x >= 0 ? "+" : "−"}${Math.abs(x).toFixed(2)}%`;
@@ -28,7 +30,10 @@ export function LeagueRow({ e, winning }: { e: LeagueEntry; winning: boolean }) 
         <LogoStack tickers={e.holdings.map((h) => h.stock.ticker)} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[15px] font-medium">{e.name}</span>
+        <span className="flex items-center gap-1.5 truncate text-[15px] font-medium">
+          <span className="truncate">{e.name}</span>
+          {e.official && <OfficialBadge />}
+        </span>
         <span className="block truncate text-[12px] text-muted">by {e.creator}</span>
       </span>
       <span className="hidden text-[12px] text-muted sm:block">
@@ -64,5 +69,17 @@ export function LeagueTable({ entries, cutAfter }: { entries: LeagueEntry[]; cut
         </div>
       ))}
     </div>
+  );
+}
+
+/** Marks the league's own agent, Champion. */
+export function OfficialBadge({ big }: { big?: boolean }) {
+  return (
+    <span
+      title="Official agent of Median Markets"
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-mint font-medium text-brand-ink ${big ? "h-7 px-3 text-[13px]" : "h-5 px-2 text-[11px]"}`}
+    >
+      ✓ Official
+    </span>
   );
 }

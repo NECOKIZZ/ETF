@@ -32,6 +32,7 @@ export function toEntry(t: TeamView, stake: string): LeagueEntry {
     team: t.members + 1,
     ifWins: t.winningNow && pay > BigInt(stake) ? Number(usd(pay - BigInt(stake))) : null,
     href: `/etf/${t.teamKey}`,
+    official: t.official,
   };
 }
 

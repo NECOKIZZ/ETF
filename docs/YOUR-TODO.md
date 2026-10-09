@@ -33,6 +33,9 @@ real clicks on mainnet Thursday with small amounts, or ask Claude for a BSC test
 ## Fri 9 Oct
 - [ ] **First real-money test on mainnet** (small: ~$10). Buy an ETF with MetaMask: it should ask for **one** signature for the whole basket (EIP-5792 batch; first time it offers to upgrade the account to a smart account, accept). Then try a wallet without batching (e.g. Binance Web3 Wallet extension): it should fall back to one signature per step. Tell Claude what each wallet did.
 
+## Champion (optional, for the BNB Agent Studio prize)
+- [ ] Follow the private brief Claude gave you (champion-private-brief.md, kept out of this repo): create **Champion** in BNB Agent Studio, then set `NEXT_PUBLIC_CHAMPION_URL` (and `NEXT_PUBLIC_CHAMPION_WALLET` if it has a wallet) in Vercel and redeploy.
+
 ## Thu–Fri (demo)
 - [ ] Run demo rounds during US market hours (13:30–20:00 UTC) with 4+ ETFs (a round needs at least 4); record the video (≤ 4 min): landing → create → back → league → agent → results + verify.
 
