@@ -64,7 +64,7 @@ export default function Agents() {
             <div className="mt-8 space-y-6">
               <div>
                 <div className="t-label text-muted">2 · Paste it to your agent</div>
-                <p className="mt-2 text-[16px] text-ink/80">It reads our guide and sets things up with you, one step at a time: the Binance Agentic Wallet, signing in with the Binance App, and a little USDT and BNB.</p>
+                <p className="mt-2 text-[16px] text-ink/80">It reads our guide and sets things up with you, one step at a time: the Binance Agentic Wallet, signing in with the Binance App, and some USDT plus a little BNB for network fees.</p>
               </div>
               <div>
                 <div className="t-label text-muted">3 · Just ask</div>
@@ -78,7 +78,7 @@ export default function Agents() {
               <li>· Your agent shows you every transaction and waits for your yes. Nothing moves without it.</li>
               <li>· Your keys stay in the Binance Agentic Wallet. The agent and this site never see them.</li>
               <li>· You set a daily spending limit in the Binance App.</li>
-              <li>· You&rsquo;ll need the Binance App, and USDT plus a little BNB on BNB Smart Chain.</li>
+              <li>· You&rsquo;ll need the Binance App, and USDT plus a little BNB for network fees, on BNB Smart Chain.</li>
               <li>· Champion aside, we don&rsquo;t run agents or give tips: your agent reads the same public data you see here.</li>
             </ul>
           </aside>

@@ -10,7 +10,8 @@ export interface LeagueEntry {
   name: string;
   creator: string;
   holdings: Holding[];
-  returnPct: number;
+  /** null: the round hasn't started, so there is no score yet (not 0%). */
+  returnPct: number | null;
   team: number;
   /** Profit per $5 ticket if the round ended now (null: this ETF is losing now). */
   ifWins: number | null;
@@ -40,8 +41,10 @@ export function LeagueRow({ e, winning }: { e: LeagueEntry; winning: boolean }) 
         <span className="t-num text-ink">{e.team}</span> on team
       </span>
       <span className="shrink-0 text-right sm:w-24">
-        <span className={`t-num block text-[15px] ${e.returnPct >= 0 ? "text-up" : "text-down"}`}>{pct(e.returnPct)}</span>
-        {winning ? (
+        <span className={`t-num block text-[15px] ${e.returnPct === null ? "text-muted" : e.returnPct >= 0 ? "text-up" : "text-down"}`}>{e.returnPct === null ? "—" : pct(e.returnPct)}</span>
+        {e.returnPct === null ? (
+          <span className="mt-0.5 inline-block rounded-full bg-surface px-2 text-[11px] font-medium text-muted">Not started</span>
+        ) : winning ? (
           <span className="t-num mt-0.5 inline-block rounded-full bg-up-bg px-2 text-[11px] font-medium text-up">{e.ifWins !== null ? `+$${e.ifWins.toFixed(2)}` : "Winning"}</span>
         ) : (
           <span className="mt-0.5 inline-block rounded-full bg-surface px-2 text-[11px] font-medium text-muted">Behind</span>

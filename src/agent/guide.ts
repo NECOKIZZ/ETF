@@ -67,7 +67,7 @@ Actions (money moves; always plan, explain, confirm):
   to 100 (none above 50), a name (≤ 32 characters), a buy fee 0–2%, and an amount of $12 or more. Then:
   1. Buy each asset: \`baw market-order swap --fromTokenQty <usdt × weight> --fromToken 0x55d398326f99059fF775485246999027B3197955 --toToken <address from /api/stocks> --binanceChainId 56 --json\`,
      and poll \`baw market-order list --orderId <id> --json\` until FINISHED (follow the wallet skill's rules).
-  2. Plan \`{"action":"lock","wallet":WALLET,"tickers":[…],"weightsPct":[…],"name":"…","buyFeePct":1}\`.
+  2. Plan \`{"action":"lock","wallet":WALLET,"tickers":[…],"weightsPct":[…],"name":"…","buyFeePct":1,"usd":<amount spent in step 1>}\`. It locks that basket, never the whole wallet.
 - **Claim winnings** (after a round is settled) → plan \`{"action":"claim","wallet":WALLET,"roundId":"<id>"}\`
 
 To plan: \`curl -s -X POST ${API}/api/plan -H 'content-type: application/json' -d '<json>'\`.

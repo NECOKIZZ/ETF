@@ -29,7 +29,7 @@ const STEPS: { title: string; body: string; cta?: [string, string] }[] = [
   },
   {
     title: "What you need",
-    body: "A wallet on BNB Chain (Binance Wallet, MetaMask, Trust…) with some USDT (BEP-20) and a little BNB for gas. That's it.",
+    body: "A wallet on BNB Chain (Binance Wallet, MetaMask, Trust…) with some USDT (BEP-20) and a little BNB to pay network fees. That's it.",
     cta: ["Read the full rules", "/rules"],
   },
 ];

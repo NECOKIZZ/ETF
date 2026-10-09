@@ -68,3 +68,25 @@ export function clampCreatorFee(pct: number | undefined): number {
   if (pct === undefined || !Number.isFinite(pct)) return DEFAULT_CREATOR_BUY_FEE_PCT;
   return Math.min(MAX_CREATOR_BUY_FEE_PCT, Math.max(0, Math.round(pct * 100) / 100));
 }
+
+/**
+ * How much of each token to lock for a basket worth `usd`: usd × weight ÷ price,
+ * capped at what the wallet holds. Sized from the creator's intent, never from
+ * the wallet's whole balance (leftover tokens would swamp the weights). The
+ * server builds the lock with this and the create page previews it with this.
+ */
+export function lockAmounts(o: { usd: number; weightsBps: number[]; prices: number[]; balances: bigint[]; decimals?: number }): bigint[] {
+  const dec = BigInt(o.decimals ?? 18);
+  return o.weightsBps.map((w, i) => {
+    const p = o.prices[i];
+    if (!(p > 0) || !(o.usd > 0)) return 0n;
+    // Tokens wanted, at 12-decimal precision (enough for $0.01 of BTC).
+    const want = (BigInt(Math.floor(((o.usd * w) / 10_000 / p) * 1e12)) * 10n ** dec) / 10n ** 12n;
+    const have = o.balances[i] ?? 0n;
+    return want < have ? want : have;
+  });
+}
+
+/** USD value of token amounts at these prices (18-decimal tokens), for display. */
+export const usdOf = (amounts: bigint[], prices: number[], decimals = 18) =>
+  amounts.reduce((s, a, i) => s + (Number(a) / 10 ** decimals) * (prices[i] ?? 0), 0);

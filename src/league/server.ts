@@ -15,6 +15,7 @@ import { planBack, planClaim, planClaimBasket, planLock, buyPlanSteps, normalise
 import { planBasketBuy, BSC_USDT } from "../bsc/buyBasket";
 import { isLeveraged } from "../bsc/tokens";
 import { canUseName } from "./champion";
+import { lockAmounts } from "../bsc/basket";
 
 export const isLocal = () => process.env.LEAGUE_CHAIN === "local";
 
@@ -99,6 +100,8 @@ export async function publicConfig() {
   }
   return {
     chain: isLocal() ? "local" : "bsc",
+    /** The deployed commit: check it matches before testing anything that moves money. */
+    version: (process.env.VERCEL_GIT_COMMIT_SHA ?? "dev").slice(0, 7),
     chainId: chain.id,
     rpcUrl: isLocal() ? rpcFromEnv() : (process.env.NEXT_PUBLIC_BSC_RPC_URL ?? "https://bsc-dataseed.bnbchain.org"),
     explorer: isLocal() ? null : "https://bscscan.com",
@@ -169,7 +172,7 @@ export async function loadMe(wallet: Address, lastRounds = 6) {
 
 export type PlanRequest =
   | { action: "back"; wallet: string; teamKey: string; roundId?: string }
-  | { action: "lock"; wallet: string; tickers: string[]; weightsPct: number[]; name: string; buyFeePct?: number; roundId?: string; amounts?: string[] }
+  | { action: "lock"; wallet: string; tickers: string[]; weightsPct: number[]; name: string; buyFeePct?: number; roundId?: string; usd?: number; amounts?: string[] }
   | { action: "buy-basket"; wallet: string; tickers: string[]; weightsPct: number[]; usdt: number; creator?: string; feePct?: number }
   | { action: "buy-etf"; wallet: string; teamKey: string; usdt: number; roundId?: string }
   | { action: "claim"; wallet: string; roundId: string }
@@ -249,11 +252,16 @@ export async function makePlan(req: PlanRequest): Promise<Plan> {
       const cryptoBps = weights.reduce((s, w, i) => s + (picks[i].kind === "crypto" ? w : 0), 0);
       if (cryptoBps > DEFAULT_RULES.maxCryptoBps!) throw new PlanError(`crypto is ${cryptoBps / 100}% of the basket; the cap is ${DEFAULT_RULES.maxCryptoBps! / 100}%`);
       const tokens = picks.map((p) => p.address);
-      // Lock what the wallet holds (or the amounts given).
+      // Lock the basket the creator asked for (usd × weight ÷ price, capped at
+      // what the wallet holds), or exact amounts. Never the whole balance.
+      if (!req.amounts?.length && !(Number(req.usd) > 0)) throw new PlanError("usd: how many dollars of these stocks to lock (e.g. 12), or exact amounts");
+      const balances = await Promise.all(tokens.map((t) => pub.readContract({ address: t, abi: erc20Abi, functionName: "balanceOf", args: [wallet] })));
       const amounts = req.amounts?.length
         ? req.amounts.map((a) => BigInt(a))
-        : await Promise.all(tokens.map((t) => pub.readContract({ address: t, abi: erc20Abi, functionName: "balanceOf", args: [wallet] })));
+        : lockAmounts({ usd: Number(req.usd), weightsBps: weights, prices: picks.map((p) => p.price), balances });
       if (amounts.some((a) => a === 0n)) throw new PlanError(`the wallet holds none of: ${picks.filter((_, i) => amounts[i] === 0n).map((p) => p.ticker).join(", ")}`);
+      const short = picks.filter((_, i) => amounts[i] > balances[i]);
+      if (short.length) throw new PlanError(`the wallet holds less than that of: ${short.map((p) => p.ticker).join(", ")}`);
       const values = amounts.map((a, i) => (a * BigInt(Math.round(picks[i].price * 1e6))) / 10n ** 6n);
       const total = values.reduce((s, v) => s + v, 0n);
       const notes: string[] = [];

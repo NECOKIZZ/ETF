@@ -31,6 +31,7 @@ export interface TeamView {
   holdings: HoldingView[];
   /** Live return so far, percent (e.g. 2.147). */
   returnPct: number;
+  /** Tickets on this team, the captain's included (so a lone captain is 1). */
   members: number;
   winningNow: boolean;
   /** Payout per $5 ticket if the round ended at these prices (stake included). */

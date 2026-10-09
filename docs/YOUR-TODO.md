@@ -14,9 +14,10 @@ Deadline: **Sun 11 Oct 2026, 12:00 UTC**. Submit form: https://forms.gle/yToDUza
 
 ## Cloud Shell setup (home folder, now that it has space)
 ```
-cd ~ && git clone https://github.com/NECOKIZZ/ETF.git     # first time only; later: cd ~/ETF && git pull
+[ -d ~/ETF ] && (cd ~/ETF && git pull) || git clone https://github.com/NECOKIZZ/ETF.git ~/ETF   # clones once, then updates
 cd ~/ETF && npx pnpm install
-cp .env.example .env.local && nano .env.local               # first time only: paste your Binance keys
+[ -f .env.local ] && cp .env.local .env.local.bak || cp .env.example .env.local   # never overwrites your keys (backs them up instead)
+nano .env.local                                             # paste your Binance keys if empty
 npx pnpm dev:8080                                           # then Web Preview → Preview on port 8080
 ```
 Without a deployed contract the pages show "not reachable" for the league. To see everything with
@@ -31,6 +32,7 @@ real clicks on mainnet Thursday with small amounts, or ask Claude for a BSC test
 - [ ] (Optional) WalletConnect project ID from cloud.reown.com, for phone wallets.
 
 ## Fri 9 Oct
+- [ ] **Before any real-money test, check the live site runs the latest code**: open `<site>/api/config` and compare `"version"` with the newest commit on GitHub main (first 7 characters). If they differ, wait for Vercel to finish deploying.
 - [ ] **First real-money test on mainnet** (small: ~$10). Buy an ETF with MetaMask: it should ask for **one** signature for the whole basket (EIP-5792 batch; first time it offers to upgrade the account to a smart account, accept). Then try a wallet without batching (e.g. Binance Web3 Wallet extension): it should fall back to one signature per step. Tell Claude what each wallet did.
 
 ## Champion (optional, for the BNB Agent Studio prize)

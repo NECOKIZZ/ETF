@@ -186,7 +186,7 @@ export default function UiKit() {
                       <WeightBar holdings={e.holdings} legend={false} height={6} />
                     </div>
                   </div>
-                  <Change pct={e.returnPct} className="text-[17px]" />
+                  <Change pct={e.returnPct ?? 0} className="text-[17px]" />
                 </div>
               ))}
             </div>

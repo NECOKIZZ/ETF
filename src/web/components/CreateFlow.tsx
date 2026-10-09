@@ -17,6 +17,7 @@ import { equalWeights } from "../weights";
 import { ConnectButton } from "./ConnectButton";
 import { TxSteps } from "./TxSteps";
 import { canUseName } from "../../league/champion";
+import { lockAmounts, usdOf } from "../../bsc/basket";
 
 type Filter = "all" | "stock" | "etf" | "crypto";
 
@@ -79,9 +80,14 @@ export function CreateFlow() {
     const price = live.get(t)?.price ?? stock(t).price;
     return { t, raw, usd: Number(formatUnits(raw, 18)) * price };
   });
-  const heldUsd = held.reduce((s, h) => s + h.usd, 0);
-  const holdsAll = picked.length > 0 && held.every((h) => h.raw > 0n);
-  const basketOk = holdsAll && heldUsd >= rules.minBasketUsd;
+  // What step 4 will lock: the basket you asked for (amount × weight ÷ price),
+  // capped at what you hold. Same function the server uses to build the lock.
+  const prices = picked.map((t) => live.get(t)?.price ?? stock(t).price);
+  const lockRaw = lockAmounts({ usd: Number(amount) || 0, weightsBps: picked.map((t) => (weights[t] ?? 0) * 100), prices, balances: held.map((h) => h.raw) });
+  const lock = picked.map((t, i) => ({ t, usd: usdOf([lockRaw[i]], [prices[i]]), want: ((Number(amount) || 0) * (weights[t] ?? 0)) / 100, have: held[i].usd }));
+  const lockUsd = lock.reduce((s, l) => s + l.usd, 0);
+  const holdsAll = picked.length > 0 && lockRaw.every((a) => a > 0n);
+  const basketOk = holdsAll && lockUsd >= rules.minBasketUsd;
   const open = round?.phase === "entries-open";
   const nameReserved = !canUseName(name, address);
   const nameOk = name.trim().length > 0 && new TextEncoder().encode(name.trim()).length <= 32 && !nameReserved;
@@ -95,7 +101,7 @@ export function CreateFlow() {
       await post("/api/faucet", { wallet: address, usdt: 10, stocks });
       await refetchBals();
       await qc.invalidateQueries();
-      setFaucet({ busy: false, msg: `Sent test ${picked.join(", ")} worth $${usd.toFixed(2)}, 10 test USDT and gas.` });
+      setFaucet({ busy: false, msg: `Sent test ${picked.join(", ")} worth $${usd.toFixed(2)}, 10 test USDT and test BNB for network fees.` });
     } catch (e) {
       setFaucet({ busy: false, msg: e instanceof Error ? e.message : String(e) });
     }
@@ -198,7 +204,7 @@ export function CreateFlow() {
         </Panel>
 
         {/* 3. Buy */}
-        <Panel n="3" title="Buy the stocks" done={basketOk || !!entered} hint={holdsAll ? `you hold $${heldUsd.toFixed(2)} of them` : `at least $${rules.minBasketUsd}`} disabled={!weightsOk}>
+        <Panel n="3" title="Buy the stocks" done={basketOk || !!entered} hint={holdsAll ? `$${lockUsd.toFixed(2)} ready to lock` : `at least $${rules.minBasketUsd}`} disabled={!weightsOk}>
           <label className="block rounded-[20px] bg-surface p-5">
             <span className="text-[13px] text-muted">Spend</span>
             <span className="mt-1 flex items-baseline gap-2">
@@ -241,11 +247,20 @@ export function CreateFlow() {
             <TxSteps plan={buyRunner.plan} states={buyRunner.states} hashes={buyRunner.hashes} error={buyRunner.error} batched={buyRunner.batched} />
           </div>
           {isConnected && picked.length > 0 && (
-            <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {held.map((h) => (
-                <div key={h.t} className="flex items-center justify-between rounded-[14px] bg-surface px-3 py-2 text-[13px]">
-                  <span className="font-semibold">{h.t}</span>
-                  <span className={`t-num ${h.raw > 0n ? "" : "text-muted"}`}>${h.usd.toFixed(2)}</span>
+            <p className="mt-5 text-[12px] text-muted">
+              What step 4 will lock, out of your ${(Number(amount) || 0).toFixed(2)} basket. Anything else in your wallet stays there.
+              {lock.some((l) => l.usd < l.want * 0.95) && <span className="text-down"> Red: you hold less than the basket needs. Buy first, or lower the amount.</span>}
+            </p>
+          )}
+          {isConnected && picked.length > 0 && (
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {lock.map((l) => (
+                <div key={l.t} className="flex items-center justify-between rounded-[14px] bg-surface px-3 py-2 text-[13px]" title={`In your wallet: $${l.have.toFixed(2)}`}>
+                  <span className="font-semibold">{l.t}</span>
+                  <span className={`t-num ${l.usd >= l.want * 0.95 ? "" : "text-down"}`}>
+                    ${l.usd.toFixed(2)}
+                    <span className="text-muted"> / ${l.want.toFixed(2)}</span>
+                  </span>
                 </div>
               ))}
             </div>
@@ -272,11 +287,11 @@ export function CreateFlow() {
             </label>
           </div>
           <ul className="mt-5 space-y-1.5 text-[13px] text-muted">
-            <li>· Your whole balance of these {picked.length} assets (${heldUsd.toFixed(2)}) is locked until the round ends, then returned.</li>
+            <li>· Locks ${lockUsd.toFixed(2)} of these {picked.length} assets (your basket, not your whole wallet) until the round ends, then returns them.</li>
             <li>· Plus a ${rules.ticketUsd} USDT ticket. Top half wins the bottom half&rsquo;s tickets.</li>
             <li>· Same stocks and weights as an existing ETF? You join that team instead.</li>
             <li>· If prices move your weights more than {rules.driftPct} points away before the round starts (or crypto above {rules.maxCryptoPct + rules.driftPct}%), the entry is refunded.</li>
-            {picked.includes("BNB") && <li>· BNB is held as WBNB (wrapped BNB), the token form the league can lock.</li>}
+            {picked.includes("BNB") && <li>· The BNB in your basket is held as WBNB (wrapped BNB), separate from the BNB you keep for network fees.</li>}
           </ul>
           <div className="mt-5">
             {entered ? (
@@ -291,13 +306,13 @@ export function CreateFlow() {
                 disabled={!open || !nameOk || !basketOk || lockRunner.busy}
                 onClick={() =>
                   lockRunner.run(
-                    { action: "lock", tickers: picked, weightsPct: picked.map((t) => weights[t]), name: name.trim(), buyFeePct: fee },
+                    { action: "lock", tickers: picked, weightsPct: picked.map((t) => weights[t]), name: name.trim(), buyFeePct: fee, usd: Number(amount) },
                     { onDone: (p) => setEntered(p.teamKey ?? null) },
                   )
                 }
                 className="h-12 w-full rounded-full bg-ink text-[16px] font-medium text-bg disabled:opacity-40"
               >
-                {lockRunner.busy ? "Working…" : !open ? "Entries are closed" : `Lock and enter · $${heldUsd.toFixed(2)} + $${rules.ticketUsd} ticket`}
+                {lockRunner.busy ? "Working…" : !open ? "Entries are closed" : `Lock and enter · $${lockUsd.toFixed(2)} + $${rules.ticketUsd} ticket`}
               </button>
             )}
             <TxSteps plan={lockRunner.plan} states={lockRunner.states} hashes={lockRunner.hashes} error={lockRunner.error} batched={lockRunner.batched} />
@@ -315,7 +330,7 @@ export function CreateFlow() {
           </div>
           <dl className="mt-6 space-y-2 text-[14px]">
             <div className="flex justify-between"><dt className="text-white/55">Assets</dt><dd className="t-num">{stockCount}{cryptoCount ? ` + ${cryptoCount} crypto` : ""}</dd></div>
-            <div className="flex justify-between"><dt className="text-white/55">Basket</dt><dd className="t-num">${(holdsAll ? heldUsd : Number(amount) || 0).toFixed(2)}</dd></div>
+            <div className="flex justify-between"><dt className="text-white/55">Basket</dt><dd className="t-num">${(holdsAll ? lockUsd : Number(amount) || 0).toFixed(2)}</dd></div>
             <div className="flex justify-between"><dt className="text-white/55">Ticket</dt><dd className="t-num">${rules.ticketUsd}</dd></div>
             <div className="flex justify-between"><dt className="text-white/55">Buy fee</dt><dd className="t-num">{fee.toFixed(1)}%</dd></div>
             <div className="flex justify-between"><dt className="text-white/55">Round</dt><dd className="t-num">{round ? `#${round.id} · ${round.teams.length} ETFs` : "…"}</dd></div>

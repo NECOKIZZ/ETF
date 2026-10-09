@@ -28,7 +28,7 @@ MetaMask → add a network: RPC `http://localhost:3000/api/rpc` (the app relays 
 ```bash
 AGENT_PRIVATE_KEY=<any anvil key> LEAGUE_API=http://localhost:3000 npx tsx scripts/agent.mts round
 AGENT_PRIVATE_KEY=… LEAGUE_API=… npx tsx scripts/agent.mts faucet '{"usdt":20,"stocks":{"NVDA":5,"TSLA":4,"SPY":3}}'
-AGENT_PRIVATE_KEY=… LEAGUE_API=… npx tsx scripts/agent.mts run '{"action":"lock","tickers":["NVDA","TSLA","SPY"],"weightsPct":[42,33,25],"name":"Agent Alpha"}'
+AGENT_PRIVATE_KEY=… LEAGUE_API=… npx tsx scripts/agent.mts run '{"action":"lock","tickers":["NVDA","TSLA","SPY"],"weightsPct":[42,33,25],"name":"Agent Alpha","usd":12}'
 ```
 
 ## Finish a round early (keeper)

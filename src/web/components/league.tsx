@@ -21,16 +21,17 @@ export function holdingsOf(t: TeamView): Holding[] {
 
 export const teamName = (t: TeamView) => t.name || `ETF ${t.teamKey.slice(2, 8)}`;
 
-export function toEntry(t: TeamView, stake: string): LeagueEntry {
+/** `started`: false before the round starts; returns then show as "not started", not 0%. */
+export function toEntry(t: TeamView, stake: string, started = true): LeagueEntry {
   const pay = BigInt(t.payoutPerTicketNow);
   return {
     rank: t.rank,
     name: teamName(t),
     creator: short(t.captain),
     holdings: holdingsOf(t),
-    returnPct: t.returnPct,
-    team: t.members + 1,
-    ifWins: t.winningNow && pay > BigInt(stake) ? Number(usd(pay - BigInt(stake))) : null,
+    returnPct: started ? t.returnPct : null,
+    team: t.members, // already includes the captain
+    ifWins: started && t.winningNow && pay > BigInt(stake) ? Number(usd(pay - BigInt(stake))) : null,
     href: `/etf/${t.teamKey}`,
     official: t.official,
   };
@@ -59,8 +60,9 @@ export function LeagueBoard({ limit, query = "", roundId }: { limit?: number; qu
     );
   const q = query.trim().toLowerCase();
   const teams = r.teams.filter((t) => !q || teamName(t).toLowerCase().includes(q) || t.holdings.some((h) => h.ticker?.toLowerCase().includes(q)));
-  const entries = teams.slice(0, limit).map((t) => ({ ...toEntry(t, r.stake), href: `/etf/${t.teamKey}${roundId ? `?round=${roundId}` : ""}` }));
+  const started = r.phase !== "entries-open";
+  const entries = teams.slice(0, limit).map((t) => ({ ...toEntry(t, r.stake, started), href: `/etf/${t.teamKey}${roundId ? `?round=${roundId}` : ""}` }));
   if (!entries.length) return <div className="rounded-[24px] bg-surface p-8 text-muted">No ETFs match.</div>;
   const winners = r.teams.filter((t) => t.winningNow).length || Math.floor(r.teams.length / 2);
-  return <LeagueTable entries={entries} cutAfter={q ? -1 : winners} />;
+  return <LeagueTable entries={entries} cutAfter={q || !started ? -1 : winners} />;
 }
