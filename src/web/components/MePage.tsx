@@ -101,7 +101,7 @@ function EntryCard({ e }: { e: MeEntry }) {
               {runner.busy ? "Working…" : payout > 0n ? `Claim $${usd(payout)}${e.basket.length ? " + your stocks" : ""}` : e.basket.length ? "Get your stocks back" : "Close entry"}
             </button>
           )}
-          <TxSteps plan={runner.plan} states={runner.states} hashes={runner.hashes} error={runner.error} />
+          <TxSteps plan={runner.plan} states={runner.states} hashes={runner.hashes} error={runner.error} batched={runner.batched} />
         </div>
       )}
       {e.claimed && <p className="mt-4 text-[13px] text-up">Claimed.</p>}

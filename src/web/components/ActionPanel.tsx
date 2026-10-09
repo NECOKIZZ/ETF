@@ -110,7 +110,7 @@ export function ActionPanel({ r, t, initialTab = "back" }: { r: RoundView; t: Te
           </div>
         </div>
       )}
-      <TxSteps plan={runner.plan} states={runner.states} hashes={runner.hashes} error={runner.error} />
+      <TxSteps plan={runner.plan} states={runner.states} hashes={runner.hashes} error={runner.error} batched={runner.batched} />
     </div>
   );
 }
