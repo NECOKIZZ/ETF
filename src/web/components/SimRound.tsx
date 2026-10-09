@@ -99,7 +99,7 @@ export function SimRound() {
   const pot = (ETFS.length - winners) * STAKE * 0.9;
 
   return (
-    <div ref={box} className="mx-auto w-full max-w-[520px] rounded-[24px] bg-bg p-5 shadow-lift md:p-6" aria-label="A simulated League of Stocks round">
+    <div ref={box} className="mx-auto w-full max-w-[520px] rounded-[24px] bg-bg p-5 shadow-lift md:p-6" aria-label="A simulated Median Markets round">
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-[13px] text-muted">Round {s.round} · simulation</div>

@@ -2,7 +2,7 @@ import { Shell, PageHead, Container } from "@/web/components/Shell";
 import { AgentPrompt } from "@/web/components/AgentPrompt";
 import { AgentIdeas } from "@/web/components/AgentIdeas";
 
-export const metadata = { title: "Agents · League of Stocks" };
+export const metadata = { title: "Agents · Median Markets" };
 
 const POWERED = [
   { name: "Binance Agentic Wallet", note: "holds the keys, previews and risk-checks every transaction", href: "https://developers.binance.com/docs/agentic-wallet/welcome" },

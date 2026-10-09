@@ -1,7 +1,7 @@
 import { Shell, PageHead, Container } from "@/web/components/Shell";
 import { LeaguePage } from "@/web/components/LeaguePage";
 
-export const metadata = { title: "League · League of Stocks" };
+export const metadata = { title: "League · Median Markets" };
 
 export default function League() {
   return (

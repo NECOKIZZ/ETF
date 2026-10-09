@@ -10,7 +10,7 @@ const KEY = "los-guide-seen";
 
 const STEPS: { title: string; body: string; cta?: [string, string] }[] = [
   {
-    title: "Welcome to League of Stocks",
+    title: "Welcome to Median Markets",
     body: "A weekly game on BNB Chain. People build ETFs from real tokenized stocks, and every round the ETFs are ranked by how much they grew.",
   },
   {

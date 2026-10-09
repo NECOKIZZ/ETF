@@ -1,4 +1,4 @@
-// League of Stocks keeper. Runs rounds on LeagueEscrow.
+// Median Markets keeper. Runs rounds on LeagueEscrow.
 //
 //   npx tsx --env-file=.env.local scripts/keeper.mts <command> [options]
 //

@@ -39,7 +39,7 @@ export function LandingHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-line/60 bg-bg/85 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4 md:px-6">
-        <Link href="/" aria-label="League of Stocks home">
+        <Link href="/" aria-label="Median Markets home">
           <Logo />
         </Link>
         <nav className="hidden items-center gap-8 text-[14px] lg:flex">
@@ -73,7 +73,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-line/60 bg-bg/85 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4 md:px-6">
-        <Link href="/" aria-label="League of Stocks home">
+        <Link href="/" aria-label="Median Markets home">
           <Logo />
         </Link>
         <nav className="hidden items-center gap-8 text-[14px] md:flex">

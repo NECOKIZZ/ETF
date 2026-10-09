@@ -15,7 +15,7 @@ import { Band } from "@/ui/components/Band";
 import { Button } from "@/ui/components/Button";
 import { Pill, Change } from "@/ui/components/Pills";
 
-export const metadata = { title: "UI kit · League of Stocks" };
+export const metadata = { title: "UI kit · Median Markets" };
 
 const st = (t: string): StockInfo => byTicker(t)!;
 const changes = Object.fromEntries(BSTOCKS.map((s) => [s.ticker, demoChangePct(s.ticker)]));
@@ -53,7 +53,7 @@ export default function UiKit() {
   return (
     <main>
       <AnnouncementBar>
-        <span className="mr-2 inline-block size-1.5 rounded-full bg-up align-middle" /> <b className="text-white">UI kit.</b> Every League of Stocks component on one page.
+        <span className="mr-2 inline-block size-1.5 rounded-full bg-up align-middle" /> <b className="text-white">UI kit.</b> Every Median Markets component on one page.
       </AnnouncementBar>
       <SiteHeader />
       <TickerStrip stocks={BSTOCKS.slice(0, 18)} changes={changes} source="Binance reference · demo movements" />

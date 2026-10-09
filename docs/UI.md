@@ -1,4 +1,4 @@
-# League of Stocks: UI plan
+# Median Markets: UI plan
 
 **Status:** steps 1–2 built: app skeleton + signature components on `/ui` (run `pnpm dev`, open /ui).
 **Goal:** a web app that looks like a polished consumer product in a 4-minute demo. Judging counts product quality and UX for 20%, and the "Web2-adjacent" feel matters.
@@ -78,7 +78,7 @@ Every other shade (surface, muted, line, the darker green for "up" text on white
 2. **Round pill** (Sleeve's status pill). `● Round 12 · locks in 2d 04:13:22`, mint when open for entries, orange in the last hour, grey while running ("Running · settles Mon 13:30 UTC").
 3. **Stock card**: now built from the user's design handoff, `docs/design/stock-card/README.md` (sizes big 218×312, medium 150×215, tiny 64/48/34). The original notes below are superseded.
    - Portrait 7:10, 28px radius, the company's brand colour as the background (from a small colour map; fallback taken from the logo).
-   - **Huge ticker** stacked twice, one filled and one outlined (`NVDA` / `NVDA`); token logo top-right; League of Stocks mark bottom-right.
+   - **Huge ticker** stacked twice, one filled and one outlined (`NVDA` / `NVDA`); token logo top-right; Median Markets mark bottom-right.
    - A frosted strip at the bottom: price · ▲ 1.24% · "● Market open".
    - Used in the landing deck, in pickers and in ETF composition.
 4. **ETF hand.** An ETF *is* a hand of stock cards: its 3–8 cards fanned small (the Kickoff fan at 40% size), with weight % on each card. Shown on ETF rows, ETF pages and share cards. This is our most recognisable visual.
@@ -171,7 +171,7 @@ Short, exact, calm, like Gloam and Sleeve. Real numbers and times, no hype words
 | 7 | Agents page, share cards, polish, phone pass |
 
 ## 9. Decisions needed from you
-1. ✅ **Name:** League of Stocks.
+1. ✅ **Name:** Median Markets.
 2. **Logo:** a simple mark, e.g. three stacked rounded cards. I can draw a first version.
 3. **Footer illustration:** etching-style bull (Gloam-like). I'd draw a simplified line version in SVG; a proper illustration would need an artist or image tool.
 4. **WalletConnect project ID** (free at cloud.reown.com) for phone wallets. Optional; Binance Wallet and MetaMask work without it.

@@ -1,4 +1,4 @@
-# League of Stocks on BSC: build spec
+# Median Markets on BSC: build spec
 
 **Target:** BNB Hack: Tokenized Stocks Edition. Submissions lock **Sun 11 Oct 2026, 12:00 UTC**.
 **Status (Mon 5 Oct, evening):** engine, escrow, Binance API client, settlement pipeline and keeper are built and tested end to end on a local chain (docs/KEEPER.md). UI kit built (docs/UI.md). Next: API routes, pages, mainnet deploy.

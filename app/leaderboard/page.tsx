@@ -1,7 +1,7 @@
 import { Shell, PageHead, Container } from "@/web/components/Shell";
 import { Leaderboard } from "@/web/components/Leaderboard";
 
-export const metadata = { title: "Leaderboard · League of Stocks" };
+export const metadata = { title: "Leaderboard · Median Markets" };
 
 export default function Page() {
   return (

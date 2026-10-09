@@ -1,7 +1,7 @@
 import { Shell, PageHead, Container } from "@/web/components/Shell";
 import { ContractInfo } from "@/web/components/ContractInfo";
 
-export const metadata = { title: "Rules · League of Stocks" };
+export const metadata = { title: "Rules · Median Markets" };
 
 function H({ id, children }: { id?: string; children: React.ReactNode }) {
   return (

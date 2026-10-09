@@ -2,7 +2,7 @@
   "name": "league-of-stocks",
   "version": "0.1.0",
   "private": true,
-  "description": "League of Stocks: on-chain stock ETFs on BNB Chain compete in weekly leagues. Built for BNB Hack: Tokenized Stocks Edition.",
+  "description": "Median Markets: on-chain stock ETFs on BNB Chain compete in weekly leagues. Built for BNB Hack: Tokenized Stocks Edition.",
   "type": "module",
   "license": "MIT",
   "packageManager": "pnpm@10.28.0",

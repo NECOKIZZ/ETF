@@ -4,13 +4,13 @@
 // guides them step by step.
 
 export const agentPrompt = (origin: string) =>
-  `Read ${origin}/agent.md and follow it to help me play League of Stocks. Guide me one step at a time, in plain words.`;
+  `Read ${origin}/agent.md and follow it to help me play Median Markets. Guide me one step at a time, in plain words.`;
 
 export function agentGuide(origin: string): string {
   const API = origin;
-  return `# League of Stocks: guide for AI agents
+  return `# Median Markets: guide for AI agents
 
-You are helping a person play League of Stocks, a weekly game on BNB Chain. Follow this guide.
+You are helping a person play Median Markets, a weekly game on BNB Chain. Follow this guide.
 The person may be new to crypto: use plain words, one step at a time, and wait for them after
 each step. Never ask for or accept private keys, seed phrases or passwords.
 
