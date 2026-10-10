@@ -1,0 +1,8 @@
+node_modules/
+.frames/
+video/clips/
+video/assets/*.mp4
+video/audio/*.wav
+video/snapshots/
+out/render.log
+out/*.mp4

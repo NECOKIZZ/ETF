@@ -1,0 +1,691 @@
+<!doctype html>
+<!-- Generated into index.html by build.py (template.html.in): edit this template, not index.html. -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Archivo:wght@800;900&display=block"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      /* Median Markets brand: ink, paper, mint, coral (app/globals.css). */
+      :root {
+        --ink: #0b0b0c;
+        --paper: #ffffff;
+        --mint: #3ddc97;
+        --coral: #ff5a36;
+        --surface: color-mix(in oklab, var(--ink) 4%, var(--paper));
+        --muted: color-mix(in oklab, var(--ink) 62%, var(--paper));
+        --up: color-mix(in oklab, var(--mint) 50%, var(--ink));
+        --mint-1: color-mix(in oklab, var(--mint) 6%, var(--paper));
+        --mint-2: color-mix(in oklab, var(--mint) 22%, var(--paper));
+        --mint-3: color-mix(in oklab, var(--mint) 34%, var(--paper));
+        --display: "Geist", ui-sans-serif, system-ui, sans-serif;
+        --sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+        --mono: "IBM Plex Mono", ui-monospace, monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+      }
+      .footage {
+        width: 1920px;
+        height: 1080px;
+        object-fit: cover;
+        background: var(--paper);
+      }
+      .t-label {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .mark {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: var(--mint);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 36px;
+        font-weight: 500;
+        letter-spacing: -0.032em;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        height: 56px;
+        padding: 0 26px;
+        border-radius: 999px;
+        font-size: 22px;
+        font-weight: 500;
+      }
+      .pill .dot,
+      .chapter .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 99px;
+        background: var(--mint);
+      }
+
+      /* ---- Overlays on the app footage ---- */
+      .chapter {
+        inset: auto auto 40px 40px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        height: 64px;
+        padding: 0 28px 0 24px;
+        border-radius: 999px;
+        background: var(--ink);
+        color: var(--paper);
+        font-size: 24px;
+        box-shadow: 0 18px 50px rgb(0 0 0 / 0.28);
+      }
+      .chapter b {
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+      .chapter .path {
+        font-family: var(--mono);
+        font-size: 19px;
+        color: rgb(255 255 255 / 0.55);
+      }
+      .callout {
+        inset: auto auto 124px 40px;
+        width: 560px;
+        padding: 22px 26px;
+        border-radius: 28px;
+        background: var(--mint);
+        color: var(--ink);
+        box-shadow: 0 24px 60px rgb(0 0 0 / 0.22);
+      }
+      .callout p {
+        margin-top: 8px;
+        font-size: 24px;
+        line-height: 1.32;
+        font-weight: 500;
+        letter-spacing: -0.015em;
+      }
+      #network {
+        inset: auto 40px 40px auto;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 20px;
+        border-radius: 999px;
+        background: rgb(11 11 12 / 0.86);
+        color: var(--paper);
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        box-shadow: 0 12px 32px rgb(0 0 0 / 0.2);
+      }
+      #network .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 99px;
+        background: var(--mint);
+      }
+
+      /* ---- Intro ---- */
+      #intro {
+        background:
+          radial-gradient(60% 80% at 15% 20%, color-mix(in oklab, var(--surface) 90%, transparent), transparent 70%),
+          radial-gradient(70% 90% at 85% 80%, var(--mint-3), transparent 70%),
+          linear-gradient(135deg, var(--mint-1), var(--mint-2) 55%, var(--mint-3));
+      }
+      #intro .brand {
+        position: absolute;
+        left: 120px;
+        top: 96px;
+      }
+      #intro .copy {
+        position: absolute;
+        left: 120px;
+        top: 300px;
+        width: 900px;
+      }
+      #intro h1 {
+        font-family: var(--display);
+        font-weight: 300;
+        font-size: 132px;
+        letter-spacing: -0.045em;
+        line-height: 1.02;
+      }
+      #intro h1 span {
+        display: block;
+      }
+      #intro .sub {
+        margin-top: 34px;
+        max-width: 30ch;
+        font-size: 31px;
+        line-height: 1.4;
+        color: rgb(11 11 12 / 0.72);
+      }
+      #intro .pill {
+        margin-top: 44px;
+        background: var(--ink);
+        color: var(--paper);
+      }
+      #intro .label {
+        margin-bottom: 26px;
+        color: rgb(11 11 12 / 0.55);
+      }
+      .card {
+        position: absolute;
+        width: 250px;
+        height: 358px;
+        border-radius: 28px;
+        background: var(--ink);
+        overflow: hidden;
+        box-shadow: 0 30px 70px rgb(0 0 0 / 0.25);
+        color: var(--paper);
+      }
+      .card .glow {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(120% 80% at 50% 0%, var(--c), transparent 72%);
+        opacity: 0.95;
+      }
+      .card .tick {
+        position: absolute;
+        left: 20px;
+        top: 70px;
+        font-family: "Archivo", sans-serif;
+        font-weight: 900;
+        font-size: 64px;
+        line-height: 0.92;
+        letter-spacing: -0.03em;
+      }
+      .card .tick i {
+        display: block;
+        font-style: normal;
+        color: transparent;
+        -webkit-text-stroke: 1.6px rgb(255 255 255 / 0.85);
+      }
+      .card img {
+        position: absolute;
+        right: 18px;
+        top: 18px;
+        width: 40px;
+        height: 40px;
+        border-radius: 99px;
+        background: #fff;
+      }
+      .card .price {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        height: 52px;
+        border-radius: 16px;
+        background: rgb(255 255 255 / 0.92);
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        font-family: var(--mono);
+        font-size: 19px;
+      }
+      .card .price b {
+        color: var(--up);
+        font-weight: 500;
+      }
+
+      /* ---- Champion infra ---- */
+      #infra {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      #infra .head {
+        position: absolute;
+        left: 110px;
+        top: 76px;
+      }
+      #infra .head .t-label {
+        color: var(--mint);
+      }
+      #infra h2 {
+        margin-top: 14px;
+        font-family: var(--display);
+        font-weight: 300;
+        font-size: 68px;
+        letter-spacing: -0.04em;
+      }
+      #infra .col-label {
+        position: absolute;
+        top: 236px;
+        color: rgb(255 255 255 / 0.45);
+      }
+      .src,
+      .step {
+        position: absolute;
+        border-radius: 22px;
+        border: 1px solid rgb(255 255 255 / 0.12);
+        background: rgb(255 255 255 / 0.04);
+        padding: 20px 24px;
+      }
+      .src {
+        left: 110px;
+        width: 450px;
+        height: 118px;
+      }
+      .src b,
+      .step b {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 25px;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+      }
+      .src b::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 99px;
+        background: var(--mint);
+      }
+      .src span,
+      .step span {
+        display: block;
+        margin-top: 8px;
+        font-size: 19px;
+        color: rgb(255 255 255 / 0.6);
+      }
+      .step {
+        left: 1290px;
+        width: 520px;
+        min-height: 128px;
+      }
+      .step .n {
+        width: 34px;
+        height: 34px;
+        border-radius: 99px;
+        background: var(--mint);
+        color: var(--ink);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--mono);
+        font-size: 17px;
+      }
+      .step code {
+        font-family: var(--mono);
+        color: var(--mint);
+      }
+      .chips {
+        display: flex;
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .chips em {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        height: 32px;
+        padding: 0 10px 0 4px;
+        border-radius: 99px;
+        background: rgb(255 255 255 / 0.08);
+        font-style: normal;
+        font-family: var(--mono);
+        font-size: 14px;
+      }
+      .chips img {
+        width: 24px;
+        height: 24px;
+        border-radius: 99px;
+        background: #fff;
+      }
+      #core {
+        position: absolute;
+        left: 690px;
+        top: 360px;
+        width: 480px;
+        height: 380px;
+        border-radius: 36px;
+        background: var(--mint);
+        color: var(--ink);
+        padding: 36px;
+        box-shadow: 0 0 120px rgb(61 220 151 / 0.35);
+      }
+      #core .c {
+        width: 88px;
+        height: 88px;
+        border-radius: 26px;
+        background: var(--ink);
+        color: var(--mint);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 44px;
+        font-weight: 600;
+      }
+      #core .name {
+        margin-top: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 44px;
+        font-weight: 500;
+        letter-spacing: -0.032em;
+      }
+      #core .badge {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 99px;
+        background: var(--ink);
+        color: var(--mint);
+        font-size: 17px;
+        display: inline-flex;
+        align-items: center;
+      }
+      #core p {
+        margin-top: 12px;
+        font-size: 22px;
+        line-height: 1.4;
+        color: rgb(11 11 12 / 0.78);
+      }
+      #wires {
+        position: absolute;
+        inset: 0;
+      }
+      .flow {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 12px;
+        height: 12px;
+        margin: -6px 0 0 -6px;
+        border-radius: 99px;
+        background: var(--mint);
+        box-shadow: 0 0 16px var(--mint);
+        opacity: 0;
+      }
+
+      /* ---- Outro ---- */
+      #outro {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      #outro .wrap {
+        position: absolute;
+        left: 120px;
+        top: 130px;
+        right: 120px;
+      }
+      #outro h1 {
+        margin-top: 70px;
+        font-family: var(--display);
+        font-weight: 300;
+        font-size: 140px;
+        letter-spacing: -0.045em;
+        line-height: 1.02;
+      }
+      #outro h1 span {
+        display: block;
+      }
+      #outro h1 .m {
+        color: var(--mint);
+      }
+      #outro .row {
+        margin-top: 56px;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+      #outro .nav {
+        height: 56px;
+        padding: 0 24px;
+        border-radius: 99px;
+        border: 1px solid rgb(255 255 255 / 0.2);
+        display: inline-flex;
+        align-items: center;
+        font-size: 22px;
+      }
+      #outro .pill {
+        background: var(--mint);
+        color: var(--ink);
+        margin-right: 18px;
+      }
+      #outro .pill .dot {
+        background: var(--ink);
+      }
+      #outro .fine {
+        position: absolute;
+        left: 120px;
+        bottom: 70px;
+        font-size: 18px;
+        color: rgb(255 255 255 / 0.45);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="169.6" data-width="1920" data-height="1080">
+      <!-- Intro -->
+      <section id="intro" class="clip" data-start="0.0" data-duration="15.0" data-track-index="0">
+        <div class="brand"><img class="mark" src="assets/mark.svg" alt="" /> Median Markets</div>
+        <div class="copy">
+          <div class="t-label label">Product walkthrough</div>
+          <h1><span>Build an ETF.</span><span>Beat the league.</span></h1>
+          <p class="sub">Real tokenized stocks on BNB Chain. A weekly league. The top half wins.</p>
+          <div class="pill"><span class="dot"></span> Live on BNB Chain mainnet</div>
+        </div>
+        <div class="card" id="k1" style="--c: #e31937; left: 1140px; top: 360px"><div class="glow"></div><img src="assets/logos/TSLA.png" alt="" /><div class="tick">TSLA<i>TSLA</i></div><div class="price">$369.14 <b>▲1.9%</b></div></div>
+        <div class="card" id="k2" style="--c: #0866ff; left: 1280px; top: 330px"><div class="glow"></div><img src="assets/logos/META.png" alt="" /><div class="tick">META<i>META</i></div><div class="price">$726.65 <b>▲3.1%</b></div></div>
+        <div class="card" id="k3" style="--c: #3ba32b; left: 1420px; top: 315px"><div class="glow"></div><img src="assets/logos/NVDA.png" alt="" /><div class="tick">NVDA<i>NVDA</i></div><div class="price">$235.28 <b>▲4.2%</b></div></div>
+        <div class="card" id="k4" style="--c: #7b3fe4; left: 1560px; top: 330px"><div class="glow"></div><img src="assets/logos/MSFT.png" alt="" /><div class="tick">MSFT<i>MSFT</i></div><div class="price">$520.17 <b>▲1.2%</b></div></div>
+      </section>
+
+      <!-- App footage -->
+      <video id="v-landing" class="clip footage" src="assets/landing.mp4" data-start="15.0" data-duration="18.167" data-track-index="1" muted playsinline></video>
+      <video id="v-guide" class="clip footage" src="assets/guide.mp4" data-start="33.167" data-duration="5.1" data-track-index="1" muted playsinline></video>
+      <video id="v-league" class="clip footage" src="assets/league.mp4" data-start="38.267" data-duration="23.7" data-track-index="1" muted playsinline></video>
+      <video id="v-etf" class="clip footage" src="assets/etf.mp4" data-start="61.967" data-duration="11.5" data-track-index="1" muted playsinline></video>
+      <video id="v-back" class="clip footage" src="assets/back.mp4" data-start="73.467" data-duration="14.333" data-track-index="1" muted playsinline></video>
+      <video id="v-create" class="clip footage" src="assets/create.mp4" data-start="87.8" data-duration="23.767" data-track-index="1" muted playsinline></video>
+      <video id="v-champion" class="clip footage" src="assets/champion.mp4" data-start="111.567" data-duration="6.2" data-track-index="1" muted playsinline></video>
+      <video id="v-champion_etf" class="clip footage" src="assets/champion_etf.mp4" data-start="127.367" data-duration="6.667" data-track-index="1" muted playsinline></video>
+      <video id="v-agents" class="clip footage" src="assets/agents.mp4" data-start="134.034" data-duration="10.933" data-track-index="1" muted playsinline></video>
+      <video id="v-me" class="clip footage" src="assets/me.mp4" data-start="144.967" data-duration="7.233" data-track-index="1" muted playsinline></video>
+      <video id="v-results" class="clip footage" src="assets/results.mp4" data-start="152.2" data-duration="3.633" data-track-index="1" muted playsinline></video>
+      <video id="v-leaderboard" class="clip footage" src="assets/leaderboard.mp4" data-start="155.833" data-duration="3.967" data-track-index="1" muted playsinline></video>
+
+      <!-- Champion: agentic infrastructure -->
+      <section id="infra" class="clip" data-start="117.767" data-duration="9.6" data-track-index="2">
+        <div class="head">
+          <div class="t-label">Champion · agentic infrastructure</div>
+          <h2>Data in. A basket out. Every weekend.</h2>
+        </div>
+        <svg id="wires" width="1920" height="1080" viewBox="0 0 1920 1080">
+          <g stroke="rgb(255 255 255 / 0.16)" stroke-width="2" fill="none">
+            <path d="M560 339 C 630 339, 620 550, 690 550" />
+            <path d="M560 479 C 630 479, 620 550, 690 550" />
+            <path d="M560 619 C 630 619, 620 550, 690 550" />
+            <path d="M560 759 C 630 759, 620 550, 690 550" />
+            <path d="M1170 550 C 1230 550, 1230 334, 1290 334" />
+            <path d="M1170 550 C 1230 550, 1230 494, 1290 494" />
+            <path d="M1170 550 C 1230 550, 1230 644, 1290 644" />
+            <path d="M1170 550 C 1230 550, 1230 794, 1290 794" />
+          </g>
+        </svg>
+        <div class="t-label col-label" style="left: 110px">Data sources</div>
+        <div class="t-label col-label" style="left: 1290px">What Champion does</div>
+        <div class="src" id="src1" style="top: 280px"><b>Binance Web3 API</b><span>Reference prices for every tokenized stock</span></div>
+        <div class="src" id="src2" style="top: 420px"><b>Binance spot</b><span>BNB, BTC and ETH prices</span></div>
+        <div class="src" id="src3" style="top: 560px"><b>On-chain flows</b><span>BNB Chain activity, liquidity and holders</span></div>
+        <div class="src" id="src4" style="top: 700px"><b>League history</b><span>Past rounds, baskets and returns</span></div>
+        <div id="core">
+          <div class="c">C</div>
+          <div class="name">Champion <span class="badge">✓ Official</span></div>
+          <p>Our own agent on <b>BNB Agent Studio</b>, with an on-chain identity (ERC-8004), paying its own way via x402.</p>
+        </div>
+        <div class="step" id="st1" style="top: 260px">
+          <b><span class="n">1</span> Builds a basket every weekend</b>
+          <div class="chips">
+            <em><img src="assets/logos/MU.png" alt="" />MU 20</em><em><img src="assets/logos/NVDA.png" alt="" />NVDA 20</em><em><img src="assets/logos/AMD.png" alt="" />AMD 15</em><em><img src="assets/logos/SKHY.png" alt="" />15</em><em><img src="assets/logos/BTC.png" alt="" />10</em><em><img src="assets/logos/BNB.png" alt="" />10</em>
+          </div>
+        </div>
+        <div class="step" id="st2" style="top: 440px"><b><span class="n">2</span> Plans the transactions</b><span><code>POST /api/plan</code> returns the exact calls</span></div>
+        <div class="step" id="st3" style="top: 590px"><b><span class="n">3</span> Signs with its own wallet</b><span>No one else's keys, ever</span></div>
+        <div class="step" id="st4" style="top: 740px"><b><span class="n">4</span> Stakes in the league</b><span>Locks the basket + a $5 ticket, marked ✓ Official</span></div>
+      </section>
+
+      <!-- Outro -->
+      <section id="outro" class="clip" data-start="159.8" data-duration="9.8" data-track-index="0">
+        <div class="wrap">
+          <div class="brand"><img class="mark" src="assets/mark.svg" alt="" /> Median Markets</div>
+          <h1><span>Build an ETF.</span><span class="m">Beat the league.</span></h1>
+          <div class="row">
+            <span class="pill"><span class="dot"></span> Live on BNB Chain mainnet</span>
+            <span class="nav">League</span><span class="nav">Create</span><span class="nav">Agents</span><span class="nav">Leaderboard</span>
+          </div>
+        </div>
+        <p class="fine">“ETF” here means an on-chain basket of tokenized stocks, not a regulated fund. Capital is at risk. Figures in this video are sample data.</p>
+      </section>
+
+      <!-- Overlays -->
+      <div id="network" class="clip" data-start="15.0" data-duration="144.8" data-track-index="5"><span class="dot"></span>BNB CHAIN MAINNET · SAMPLE DATA</div>
+      <div id="chap-landing" class="clip chapter" data-start="15.25" data-duration="17.817" data-track-index="3"><span class="dot"></span><b>Home</b><span class="path">/</span></div>
+      <div id="chap-guide" class="clip chapter" data-start="33.417" data-duration="4.75" data-track-index="3"><span class="dot"></span><b>Beginner's guide</b><span class="path">first visit</span></div>
+      <div id="chap-league" class="clip chapter" data-start="38.517" data-duration="23.35" data-track-index="3"><span class="dot"></span><b>The league</b><span class="path">/league</span></div>
+      <div id="call-league" class="clip callout" data-start="49.767" data-duration="9.0" data-track-index="4"><div class="t-label">Top half wins</div><p>The top half of ETFs split the bottom half's $5 tickets. Closer to the best return, bigger share.</p></div>
+      <div id="chap-etf" class="clip chapter" data-start="62.217" data-duration="11.15" data-track-index="3"><span class="dot"></span><b>ETF page</b><span class="path">/etf/…</span></div>
+      <div id="chap-back" class="clip chapter" data-start="73.717" data-duration="13.983" data-track-index="3"><span class="dot"></span><b>Back or buy</b><span class="path">on any ETF page</span></div>
+      <div id="call-back" class="clip callout" data-start="74.467" data-duration="13.5" data-track-index="4"><div class="t-label">Two ways in</div><p>Back the team: a $5 ticket that wins with it.  Buy the ETF: own the same stocks.</p></div>
+      <div id="chap-create" class="clip chapter" data-start="88.05" data-duration="23.417" data-track-index="3"><span class="dot"></span><b>Create an ETF</b><span class="path">/create</span></div>
+      <div id="call-create" class="clip callout" data-start="90.3" data-duration="15.0" data-track-index="4"><div class="t-label">The rules</div><p>3–10 stocks · up to 20% crypto · basket ≥ $10 · $5 ticket · stocks come back after the round</p></div>
+      <div id="chap-champion" class="clip chapter" data-start="111.817" data-duration="5.85" data-track-index="3"><span class="dot"></span><b>Champion</b><span class="path">/agents</span></div>
+      <div id="chap-champion_etf" class="clip chapter" data-start="127.617" data-duration="6.317" data-track-index="3"><span class="dot"></span><b>Champion's ETF</b><span class="path">✓ Official</span></div>
+      <div id="chap-agents" class="clip chapter" data-start="134.284" data-duration="10.583" data-track-index="3"><span class="dot"></span><b>Your own agent</b><span class="path">/agents</span></div>
+      <div id="chap-me" class="clip chapter" data-start="145.217" data-duration="6.883" data-track-index="3"><span class="dot"></span><b>My entries</b><span class="path">/me</span></div>
+      <div id="chap-results" class="clip chapter" data-start="152.45" data-duration="3.283" data-track-index="3"><span class="dot"></span><b>Results & verify</b><span class="path">/round/6</span></div>
+      <div id="call-results" class="clip callout" data-start="152.4" data-duration="3.4" data-track-index="4"><div class="t-label">Verifiable</div><p>Settlement inputs are hashed on-chain. Anyone can recompute the payouts.</p></div>
+      <div id="chap-leaderboard" class="clip chapter" data-start="156.083" data-duration="3.617" data-track-index="3"><span class="dot"></span><b>Leaderboard</b><span class="path">/leaderboard</span></div>
+
+      <!-- Audio: voiceover (Kokoro af_heart) and a quiet music bed -->
+      <audio id="vo-01" class="clip" src="audio/vo01.wav" data-start="0.8" data-duration="11.776" data-track-index="10" data-volume="1"></audio>
+      <audio id="vo-02" class="clip" src="audio/vo02.wav" data-start="15.5" data-duration="17.216" data-track-index="10" data-volume="1"></audio>
+      <audio id="vo-03" class="clip" src="audio/vo03.wav" data-start="33.467" data-duration="3.968" data-track-index="10" data-volume="1"></audio>
+      <audio id="vo-04" class="clip" src="audio/vo04.wav" data-start="38.767" data-duration="22.485" data-track-index="10" data-volume="1"></audio>
+      <audio id="vo-05" class="clip" src="audio/vo05.wav" data-start="62.267" data-duration="9.856" data-track-index="10" data-volume="1"></audio>
+      <audio id="vo-06" class="clip" src="audio/vo06.wav" data-start="73.767" data-duration="13.888" data-track-index="10" data-volume="1"></audio>
+      <audio id="vo-07" class="clip" src="audio/vo07.wav" data-start="88.2" data-duration="20.928" data-track-index="10" data-volume="1"></audio>
+      <audio id="vo-08" class="clip" src="audio/vo08.wav" data-start="111.967" data-duration="20.096" data-track-index="10" data-volume="1"></audio>
+      <audio id="vo-09" class="clip" src="audio/vo09.wav" data-start="134.334" data-duration="10.048" data-track-index="10" data-volume="1"></audio>
+      <audio id="vo-10" class="clip" src="audio/vo10.wav" data-start="145.267" data-duration="13.973" data-track-index="10" data-volume="1"></audio>
+      <audio id="vo-11" class="clip" src="audio/vo11.wav" data-start="160.4" data-duration="7.125" data-track-index="10" data-volume="1"></audio>
+      <audio id="music" class="clip" src="audio/music.wav" data-start="0" data-duration="169.6" data-track-index="11" data-volume="0.16" data-fade-in="1" data-fade-out="3"></audio>
+    </div>
+    <script>
+      const META = {"intro": {"start": 0.0, "dur": 15.0, "kind": "html", "call": false}, "landing": {"start": 15.0, "dur": 18.167, "kind": "video", "call": false}, "guide": {"start": 33.167, "dur": 5.1, "kind": "video", "call": false}, "league": {"start": 38.267, "dur": 23.7, "kind": "video", "call": true}, "etf": {"start": 61.967, "dur": 11.5, "kind": "video", "call": false}, "back": {"start": 73.467, "dur": 14.333, "kind": "video", "call": true}, "create": {"start": 87.8, "dur": 23.767, "kind": "video", "call": true}, "champion": {"start": 111.567, "dur": 6.2, "kind": "video", "call": false}, "infra": {"start": 117.767, "dur": 9.6, "kind": "html", "call": false}, "champion_etf": {"start": 127.367, "dur": 6.667, "kind": "video", "call": false}, "agents": {"start": 134.034, "dur": 10.933, "kind": "video", "call": false}, "me": {"start": 144.967, "dur": 7.233, "kind": "video", "call": false}, "results": {"start": 152.2, "dur": 3.633, "kind": "video", "call": true}, "leaderboard": {"start": 155.833, "dur": 3.967, "kind": "video", "call": false}, "outro": {"start": 159.8, "dur": 9.8, "kind": "html", "call": false}};
+      const tl = gsap.timeline({ paused: true });
+      const ease = "power3.out";
+
+      // Footage: a soft fade at each cut.
+      for (const [id, s] of Object.entries(META)) {
+        if (s.kind !== "video") continue;
+        tl.fromTo(`#v-${id}`, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power1.out", immediateRender: false }, s.start);
+        const chap = document.getElementById(`chap-${id}`);
+        if (chap) tl.fromTo(chap, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease, immediateRender: false }, s.start + 0.3);
+      }
+      document.querySelectorAll(".callout").forEach((el) => {
+        const t0 = Number(el.dataset.start);
+        const d = Number(el.dataset.duration);
+        tl.fromTo(el, { y: 24, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease, immediateRender: false }, t0);
+        tl.to(el, { opacity: 0, y: 12, duration: 0.35, ease: "power1.in" }, t0 + d - 0.4);
+      });
+      tl.fromTo("#network", { opacity: 0 }, { opacity: 1, duration: 0.6, immediateRender: false }, Number(document.getElementById("network").dataset.start) + 0.4);
+
+      // Intro
+      const I = META.intro.start;
+      tl.from("#intro .brand", { y: -20, opacity: 0, duration: 0.7, ease }, I + 0.2);
+      tl.from("#intro .label", { y: 20, opacity: 0, duration: 0.6, ease }, I + 0.4);
+      tl.from("#intro h1 span", { y: 60, opacity: 0, duration: 0.9, ease, stagger: 0.18 }, I + 0.5);
+      tl.from("#intro .sub", { y: 24, opacity: 0, duration: 0.7, ease }, I + 1.2);
+      tl.from("#intro .pill", { scale: 0.8, opacity: 0, duration: 0.6, ease: "back.out(2)" }, I + 1.6);
+      ["#k1", "#k2", "#k3", "#k4"].forEach((k, i) => {
+        tl.from(k, { x: 180 - i * 40, y: 80, rotation: 0, opacity: 0, duration: 0.9, ease }, I + 0.6 + i * 0.12);
+        tl.to(k, { rotation: -9 + i * 6, y: Math.abs(i - 1.5) * 26, duration: 0.9, ease }, I + 1.6 + i * 0.12);
+        tl.to(k, { y: `+=${i % 2 ? 14 : -14}`, duration: 3.2, ease: "sine.inOut", yoyo: true, repeat: 3 }, I + 3.0);
+      });
+      tl.to("#intro", { opacity: 0, duration: 0.4 }, I + META.intro.dur - 0.4);
+
+      // Champion infra
+      const F = META.infra.start;
+      tl.fromTo("#infra", { opacity: 0 }, { opacity: 1, duration: 0.4, immediateRender: false }, F);
+      tl.from("#infra .head", { y: 24, opacity: 0, duration: 0.6, ease }, F + 0.2);
+      tl.from("#wires path", { opacity: 0, duration: 0.6, stagger: 0.05 }, F + 0.9);
+      tl.from(".col-label", { opacity: 0, duration: 0.5 }, F + 0.5);
+      tl.from(".src", { x: -40, opacity: 0, duration: 0.6, ease, stagger: 0.22 }, F + 0.5);
+      tl.from("#core", { scale: 0.85, opacity: 0, duration: 0.8, ease: "back.out(1.6)" }, F + 1.2);
+      ["#st1", "#st2", "#st3", "#st4"].forEach((s, i) => tl.from(s, { x: 40, opacity: 0, duration: 0.6, ease }, F + 3.2 + i * 1.1));
+      // Data flowing in, then actions flowing out.
+      const ins = [339, 479, 619, 759];
+      const outs = [334, 494, 644, 794];
+      const wires = document.getElementById("infra");
+      const dot = () => {
+        const d = document.createElement("div");
+        d.className = "flow";
+        wires.appendChild(d);
+        return d;
+      };
+      ins.forEach((y, i) => {
+        for (let k = 0; k < 3; k++) {
+          const d = dot();
+          tl.fromTo(d, { x: 560, y, opacity: 0 }, { keyframes: [{ x: 625, y: y + (550 - y) * 0.3, opacity: 1, duration: 0.3 }, { x: 690, y: 550, opacity: 0.2, duration: 0.5 }], ease: "none", repeat: 7, immediateRender: false }, F + 1.4 + i * 0.17 + k * 0.33);
+        }
+      });
+      outs.forEach((y, i) => {
+        for (let k = 0; k < 2; k++) {
+          const d = dot();
+          tl.fromTo(d, { x: 1170, y: 550, opacity: 0 }, { keyframes: [{ x: 1230, y: 550 + (y - 550) * 0.5, opacity: 1, duration: 0.3 }, { x: 1290, y, opacity: 0.2, duration: 0.4 }], ease: "none", repeat: 4, immediateRender: false }, F + 3.4 + i * 1.1 + k * 0.35);
+        }
+      });
+      tl.to("#core", { boxShadow: "0 0 180px rgba(61,220,151,.55)", duration: 1.2, yoyo: true, repeat: 3, ease: "sine.inOut" }, F + 2.0);
+
+      // Outro
+      const O = META.outro.start;
+      tl.fromTo("#outro", { opacity: 0 }, { opacity: 1, duration: 0.5, immediateRender: false }, O);
+      tl.from("#outro .brand", { y: -20, opacity: 0, duration: 0.7, ease }, O + 0.3);
+      tl.from("#outro h1 span", { y: 60, opacity: 0, duration: 0.9, ease, stagger: 0.2 }, O + 0.5);
+      tl.from("#outro .row > *", { y: 20, opacity: 0, duration: 0.5, ease, stagger: 0.1 }, O + 1.4);
+      tl.from("#outro .fine", { opacity: 0, duration: 0.6 }, O + 2.2);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

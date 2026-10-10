@@ -1,6 +1,6 @@
-// Median Markets mark. The image lives at public/brand/mark.svg (placeholder
-// for now): replace that one file and the header, footer and browser tab all
-// pick up the new logo.
+// Median Markets mark: "Md" in Fraunces (M SemiBold, d Light Italic), white on
+// mint. The image lives at public/brand/mark.svg, with the letters as outlines;
+// the header, footer and browser tab all use that one file.
 export const BRAND = "Median Markets";
 export const MARK_SRC = "/brand/mark.svg";
 
