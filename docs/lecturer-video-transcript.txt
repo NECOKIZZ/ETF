@@ -1,0 +1,49 @@
+[00:00.0] filter also but this is a spectral graph um this one you're supposed to copy out what is this
+[00:08.2] pdb okay this is for the flight controller this is the actual part number scm tattoo f405 this
+[00:14.0] is the gyroscope the actual number the gyroscope because you could have used any other gyroscope
+[00:17.8] icm gyroscope this is the barometer part number this is the osd chip so you need to copy out
+[00:24.2] these ones don't bother about this it's not important anyone that has numbers
+[00:28.1] at this input voltage that's why you need to copy us don't bother about it you can write this if you
+[00:32.2] want nobody's reaching it um what else you had support i squared c isn't everything you copy out
+[00:39.4] the whole decision you don't need to copy them this is good sports you don't need you don't need to
+[00:42.9] post it's just those numbers so i i put it there so that you can you can add it to the work um you
+[00:49.8] can add these dimensions if you want but remove this size thing that i say you don't need everything
+[00:56.1] you can just use only one or crop it out if you want um this one is for that motor is one first
+[01:04.7] um the motor raising is is even here
+[01:11.1] and there is 10 to 50 voltene is not one of these ones is velops i'm looking for
+[01:19.3] so this doesn't confuse the other one okay no they are showing propellers um which propeller
+[01:34.9] we use this is the propeller we use 5143 this is the one we use so it is this section that you'll copy
+[01:42.9] see this graph this diagram is large go include everything this is the section you need
+[01:50.5] the section with 5143 because that's the one we used
+[01:55.0] first you said it's
+[02:04.1] the one here is 53rd just copy this one is the closest to what we used
+[02:11.0] so if i use the 53rd let me see let me see let me see use this one use the use the at least the
+[02:17.7] numbers from this so this one shows you the way you get there you now go to this 2050 section
+[02:24.0] because that's the moto kv it's 2050 section here and this is what you can judge to is to crop out
+[02:33.9] but it has headings that's the problem so you have to create your own your own diagram for
+[02:38.1] your own table for this it has headings so just create these headings and then go to this
+[02:44.0] particular section and copy it at at 20 percent or two it is this amount of trust is that's in
+[02:49.5] trust let me see okay it's voltage and then current and then rpm and then trust and then
+[02:55.0] power and efficiency this power isn't what they usually ask it because efficiency is also given
+[03:00.6] efficiency is is actually trust power to something so see this efficiency you're seeing g over w
+[03:08.6] trust is given in grams so it's trust power what's trust over power that's efficiency
+[03:13.2] that's how you know the motor efficiency this power isn't what the guy coming is from ee
+[03:17.7] is not mechanical guy at this time so he's going to ask a lot of voltage current power something
+[03:22.6] so you need to know the power motor he may ask you the power instead of just voltage
+[03:26.7] so you need to know so this that side is power and then efficiency of the motor
+[03:36.2] so it's just this section you need for this one that's why i included this you don't need to
+[03:40.9] include the whole thing you need this section from 20 percent to down
+[03:48.9] under 51 43 this 2050 everything on that is 2050 that's all you need because this is the
+[03:56.1] motor we used we didn't use the motor our motor is 2050 um what other diagram here you just see
+[04:02.9] this diagram so there is that 2050 there's a i haven't copied the wrong there but it doesn't
+[04:07.4] matter they will not they will not know it's an image this 2050 is actually a 4s model and you need
+[04:14.2] this one okay this one it would make your life easier but i like having more options so you can
+[04:19.5] include this whole crop it off don't join this to crop off this as a different table
+[04:24.7] but this way we need 2050 uh see the weights here because we're going to between that
+[04:30.0] weights calculation actually weight of the propellers this is the weight of the motor
+[04:35.7] 6.8 grams times four obviously um that is the weight of something else i gave you
+[04:41.8] it's the weight of the frame the weight of the esc is also there we just do approximations and
+[04:48.2] come up to and all up with um this idle current this is maximum power just include this but this
+[04:55.0] would be different put this in your chapter three obviously corporators separately um there's
+[05:03.9] another diagram here okay this is the other is it is it the same thing probably the same
+[05:16.3] that should be the that's the end uh so he's smiling he's like
