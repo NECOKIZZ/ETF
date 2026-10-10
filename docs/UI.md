@@ -172,7 +172,7 @@ Short, exact, calm, like Gloam and Sleeve. Real numbers and times, no hype words
 
 ## 9. Decisions needed from you
 1. ✅ **Name:** Median Markets.
-2. **Logo:** a simple mark, e.g. three stacked rounded cards. I can draw a first version.
+2. ✅ **Logo:** "Md" in Fraunces (M SemiBold, d Light Italic), white on a mint rounded square: `public/brand/mark.svg`.
 3. **Footer illustration:** etching-style bull (Gloam-like). I'd draw a simplified line version in SVG; a proper illustration would need an artist or image tool.
 4. **WalletConnect project ID** (free at cloud.reown.com) for phone wallets. Optional; Binance Wallet and MetaMask work without it.
 5. **Hosting:** Vercel (set region to Singapore) or similar. Needed by Thursday.

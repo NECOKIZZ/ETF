@@ -1,0 +1,16 @@
+{
+  "name": "median-markets-walkthrough",
+  "private": true,
+  "type": "module",
+  "description": "Product walkthrough video: captures the real app with mock data, composes with HyperFrames.",
+  "scripts": {
+    "capture": "tsx capture/capture.mts",
+    "render": "hyperframes render video -o out/walkthrough.mp4 -f 30 -q high"
+  },
+  "devDependencies": {
+    "hyperframes": "0.8.143",
+    "playwright": "1.56.1",
+    "tsx": "^4.23.1",
+    "viem": "^2.55.8"
+  }
+}
